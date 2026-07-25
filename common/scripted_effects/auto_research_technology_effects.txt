@@ -486,12 +486,6 @@ auto_research = {
 		add_daily_mastery = { amount = 1 days = 3650 }
 		auto_mio_complete_trait = yes
 		auto_design = yes
-		add_unit_bonus = {
-			category_army = {
-				fuel_consumption = -1
-				fuel_consumption_factor = -1
-			}
-		}
 	}
 	if = {
 		limit = {
