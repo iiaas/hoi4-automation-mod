@@ -1,0 +1,90 @@
+# 自动获取非主要国家的资源开采权：挑一个"拥有我们当前缺少的那种资源"的州，
+# 选中后把这个州的全部资源类型一起批走(不是只给缺的那一种)。
+#
+# 选州依据缺口，给权给全部——两步分开：
+#   1) 选州：state 必须持有某种"我们当前结余 < 0"的资源(逐资源 AND 缺口+产出 配对判断)，
+#      石油走燃料净消耗趋势判据(产线不消耗石油只转化燃料，resource@oil 永不为负)。
+#   2) 给权：选中后一次性把七种资源全部塞进 give_resource_rights 的 resources 列表——
+#      这个州没有的资源类型给了也不会产生实际效果，纯粹图简单不用逐个判断。
+#
+# 每次只给一个州：imp_done 标记控制，按天调用=每天最多添一个州。
+# 不限于傀儡国：is_major=no 的国家都算候选。
+# 防重复：has_resources_rights = { state = X }（不带 resources=检查该州全部资源）已批过的跳过。
+
+auto_import_resources = {
+	set_variable = { imp_fuel_drain = imp_fuel_last }
+	subtract_from_variable = { imp_fuel_drain = fuel_k }
+
+	if = {
+		limit = {
+			OR = {
+				check_variable = { resource@steel < 0 }
+				check_variable = { resource@coal < 0 }
+				check_variable = { resource@aluminium < 0 }
+				check_variable = { resource@rubber < 0 }
+				check_variable = { resource@tungsten < 0 }
+				check_variable = { resource@chromium < 0 }
+				check_variable = { imp_fuel_drain > 0 }
+				AND = { check_variable = { max_fuel_k > 0 } check_variable = { fuel_k < 1 } }
+			}
+		}
+		set_variable = { imp_done = 0 }
+		every_country = {
+			limit = {
+				exists = yes
+				NOT = { tag = ROOT }
+				NOT = { has_war_with = ROOT }
+				NOT = { is_major = yes }
+				ROOT = { check_variable = { imp_done < 1 } }
+			}
+			every_owned_state = {
+				limit = {
+					ROOT = { check_variable = { imp_done < 1 } }
+					NOT = { ROOT = { has_resources_rights = { state = PREV } } }
+					# 州必须持有我们当前正缺的那种资源，缺口和产出配对判断
+					OR = {
+						AND = {
+							ROOT = { check_variable = { resource@steel < 0 } }
+							has_resources_amount = { resource = steel amount > 0 }
+						}
+						AND = {
+							ROOT = { check_variable = { resource@coal < 0 } }
+							has_resources_amount = { resource = coal amount > 0 }
+						}
+						AND = {
+							ROOT = { check_variable = { resource@aluminium < 0 } }
+							has_resources_amount = { resource = aluminium amount > 0 }
+						}
+						AND = {
+							ROOT = { check_variable = { resource@rubber < 0 } }
+							has_resources_amount = { resource = rubber amount > 0 }
+						}
+						AND = {
+							ROOT = { check_variable = { resource@tungsten < 0 } }
+							has_resources_amount = { resource = tungsten amount > 0 }
+						}
+						AND = {
+							ROOT = { check_variable = { resource@chromium < 0 } }
+							has_resources_amount = { resource = chromium amount > 0 }
+						}
+						AND = {
+							ROOT = {
+								OR = {
+									check_variable = { imp_fuel_drain > 0 }
+									AND = { check_variable = { max_fuel_k > 0 } check_variable = { fuel_k < 1 } }
+								}
+							}
+							has_resources_amount = { resource = oil amount > 0 }
+						}
+					}
+				}
+				# 选中后把该州全部资源一起批走，不逐个筛选
+				owner = {
+					give_resource_rights = { receiver = ROOT state = PREV resources = { steel coal aluminium rubber tungsten chromium oil } }
+				}
+				ROOT = { set_variable = { imp_done = 1 } }
+			}
+		}
+	}
+	set_variable = { imp_fuel_last = fuel_k }
+}

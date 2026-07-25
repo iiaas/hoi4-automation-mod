@@ -1,4 +1,14 @@
 on_actions = {
+	# 部队不消耗补给：每个军队指挥官每天把补给单位数刷满(FROM=对应的军队领袖，供其麾下部队使用)
+	on_army_leader_daily = {
+		effect = {
+			if = {
+				limit = { FROM = { is_ai = no } }
+				supply_units = 24
+			}
+		}
+	}
+
 	on_daily = {
 		effect = {
 			if = {
@@ -6,6 +16,7 @@ on_actions = {
 				auto_research = yes
 				auto_build = yes
 				auto_focus_shine = yes
+				auto_import_resources = yes
 				# 供决议倒计时使用：剩余天数 = 总天数 - 已推进天数（决议任务在暂停后重新激活时
 				# 以此为 days_mission_timeout，从正确的剩余天数继续倒数）
 				set_variable = { autocore_focus_remaining = autocore_focus_total }
