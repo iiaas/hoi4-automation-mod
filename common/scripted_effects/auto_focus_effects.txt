@@ -77050,4 +77050,8 @@ auto_focus_shine = {
 		limit = { has_focus_tree = china_communist_focus_sea }
 		auto_focus_complete_prc_sea_shine = yes
 	}
+	# 供决议倒计时使用：剩余天数 = 总天数 - 已推进天数（决议任务在暂停后重新激活时
+	# 以此为 days_mission_timeout，从正确的剩余天数继续倒数）
+	set_variable = { autocore_focus_remaining = autocore_focus_total }
+	subtract_from_variable = { autocore_focus_remaining = autocore_focus_days }
 }

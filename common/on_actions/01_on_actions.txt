@@ -1,5 +1,4 @@
 on_actions = {
-	# 部队不消耗补给：每个军队指挥官每天把补给单位数刷满(FROM=对应的军队领袖，供其麾下部队使用)
 	on_army_leader_daily = {
 		effect = {
 			if = {
@@ -17,19 +16,7 @@ on_actions = {
 				auto_build = yes
 				auto_focus_shine = yes
 				auto_import_resources = yes
-				# 供决议倒计时使用：剩余天数 = 总天数 - 已推进天数（决议任务在暂停后重新激活时
-				# 以此为 days_mission_timeout，从正确的剩余天数继续倒数）
-				set_variable = { autocore_focus_remaining = autocore_focus_total }
-				subtract_from_variable = { autocore_focus_remaining = autocore_focus_days }
 				auto_production_naval = yes
-				auto_mio_complete_trait = yes
-				# 设计/MIO 只执行一次（永久 flag 复刻原 autocore_army_no_fuel idea 的
-				# "加上就永不过期"节奏）：auto_design 重复执行会不断重复创建变体/师模板
-				if = {
-					limit = { NOT = { has_country_flag = auto_design_done } }
-					auto_design = yes
-					set_country_flag = auto_design_done
-				}
 			}
 		}
 	}
