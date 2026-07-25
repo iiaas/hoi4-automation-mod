@@ -475,58 +475,110 @@ complete_special_project_1945 = {
 	complete_special_project = { project = sp:sp_rockets_long_range_ballistic_missile }
 }
 
+# 每个年份段各自一个永久 flag：set_technology 对已解锁的科技重复调用会重新触发该科技的
+# on_research_complete 效果(蓝图/经验等一次性奖励)，按天调用 auto_research 若不加锁会导致
+# 这些一次性奖励每天重复发放。flag 保证每个年份段的科技只真正下发一次。
 auto_research = {
-	set_technology_before_1936 = yes
 	if = {
-		limit = { date > 1936.1.1 }
-		set_technology_1936 = yes
+		limit = { NOT = { has_country_flag = auto_research_pre1936_done } }
+		set_technology_before_1936 = yes
+		set_country_flag = auto_research_pre1936_done
+		add_daily_mastery = { amount = 1 days = 3650 }
 	}
 	if = {
-		limit = { date > 1937.1.1 }
+		limit = {
+			date > 1936.1.1
+			NOT = { has_country_flag = auto_research_1936_done }
+		}
+		set_technology_1936 = yes
+		set_country_flag = auto_research_1936_done
+	}
+	if = {
+		limit = {
+			date > 1937.1.1
+			NOT = { has_country_flag = auto_research_1937_done }
+		}
 		set_technology_1937 = yes
 		complete_special_project_1937 = yes
+		set_country_flag = auto_research_1937_done
 	}
 	if = {
-		limit = { date > 1938.1.1 }
+		limit = {
+			date > 1938.1.1
+			NOT = { has_country_flag = auto_research_1938_done }
+		}
 		set_technology_1938 = yes
 		complete_special_project_1938 = yes
+		set_country_flag = auto_research_1938_done
 	}
 	if = {
-		limit = { date > 1939.1.1 }
+		limit = {
+			date > 1939.1.1
+			NOT = { has_country_flag = auto_research_1939_done }
+		}
 		set_technology_1939 = yes
+		set_country_flag = auto_research_1939_done
 	}
 	if = {
-		limit = { date > 1940.1.1 }
+		limit = {
+			date > 1940.1.1
+			NOT = { has_country_flag = auto_research_1940_done }
+		}
 		set_technology_1940 = yes
 		complete_special_project_1940 = yes
+		set_country_flag = auto_research_1940_done
 	}
 	if = {
-		limit = { date > 1941.1.1 }
+		limit = {
+			date > 1941.1.1
+			NOT = { has_country_flag = auto_research_1941_done }
+		}
 		set_technology_1941 = yes
 		complete_special_project_1941 = yes
+		set_country_flag = auto_research_1941_done
 	}
 	if = {
-		limit = { date > 1942.1.1 }
+		limit = {
+			date > 1942.1.1
+			NOT = { has_country_flag = auto_research_1942_done }
+		}
 		set_technology_1942 = yes
 		complete_special_project_1942 = yes
+		set_country_flag = auto_research_1942_done
 	}
 	if = {
-		limit = { date > 1943.1.1 }
+		limit = {
+			date > 1943.1.1
+			NOT = { has_country_flag = auto_research_1943_done }
+		}
 		set_technology_1943 = yes
 		complete_special_project_1943 = yes
+		set_country_flag = auto_research_1943_done
 	}
 	if = {
-		limit = { date > 1944.1.1 }
+		limit = {
+			date > 1944.1.1
+			NOT = { has_country_flag = auto_research_1944_done }
+		}
 		set_technology_1944 = yes
 		complete_special_project_1944 = yes
+		set_country_flag = auto_research_1944_done
 	}
 	if = {
-		limit = { date > 1945.1.1 }
+		limit = {
+			date > 1945.1.1
+			NOT = { has_country_flag = auto_research_1945_done }
+		}
 		set_technology_1945 = yes
 		complete_special_project_1945 = yes
+		set_country_flag = auto_research_1945_done
 	}
 	if = {
-		limit = { date > 1946.1.1 }
+		limit = {
+			date > 1946.1.1
+			NOT = { has_country_flag = auto_research_1946_done }
+		}
 		set_technology_1946 = yes
+		set_country_flag = auto_research_1946_done
 	}
 }
