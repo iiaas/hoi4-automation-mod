@@ -1730,7 +1730,7 @@ auto_design = {
 	if = {
 		limit = { check_variable = { design_mio_carrier > 0 } }
 		create_equipment_variant = {
-			name = "现代航空母舰"
+			name = "现代航母"
 			type = ship_hull_carrier_modern
 			design_team = design_mio_carrier
 			modules = {
@@ -1755,7 +1755,7 @@ auto_design = {
 	}
 	else = {
 		create_equipment_variant = {
-			name = "现代航空母舰"
+			name = "现代航母"
 			type = ship_hull_carrier_modern
 			modules = {
 				fixed_ship_anti_air_slot = ship_anti_air_3
@@ -2360,7 +2360,7 @@ auto_design = {
 	if = {
 		limit = { check_variable = { design_mio_capital > 0 } }
 		create_equipment_variant = {
-			name = "现代战列舰"
+			name = "现代战列"
 			type = ship_hull_heavy_modern
 			design_team = design_mio_capital
 			modules = {
@@ -2387,7 +2387,7 @@ auto_design = {
 	}
 	else = {
 		create_equipment_variant = {
-			name = "现代战列舰"
+			name = "现代战列"
 			type = ship_hull_heavy_modern
 			modules = {
 				fixed_ship_anti_air_slot = ship_anti_air_3
