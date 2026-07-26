@@ -77052,6 +77052,23 @@ auto_focus_shine = {
 	}
 	# 供决议倒计时使用：剩余天数 = 总天数 - 已推进天数（决议任务在暂停后重新激活时
 	# 以此为 days_mission_timeout，从正确的剩余天数继续倒数）
-	set_variable = { autocore_focus_remaining = autocore_focus_total }
-	subtract_from_variable = { autocore_focus_remaining = autocore_focus_days }
+	#
+	# 注意：任务【运行期间】不能每天重算这个变量，否则决议上没有条状进度条。
+	# 进度条的填充比例 = 已过天数 ÷ 总天数，而 days_mission_timeout 取的就是本变量。
+	# 若它随倒计时同步递减，引擎眼里的"总天数"也跟着缩水，比例恒定接近 0，条永远是空的
+	# （倒计时文字只显示剩余天数，所以那部分看着正常，很容易误判成"没问题"）。
+	# 因此只在这两种时刻重算，其余时间保持不变，让引擎有一个固定的总长度可用：
+	#   - autocore_focus_days < 1：刚选中新国策那天，remaining = total
+	#   - autocore_focus_paused > 0：暂停期间（days 本就冻结，重算结果也是恒定的），
+	#     供恢复时决议重新激活读取正确的剩余天数
+	if = {
+		limit = {
+			OR = {
+				check_variable = { autocore_focus_days < 1 }
+				check_variable = { autocore_focus_paused > 0 }
+			}
+		}
+		set_variable = { autocore_focus_remaining = autocore_focus_total }
+		subtract_from_variable = { autocore_focus_remaining = autocore_focus_days }
+	}
 }
