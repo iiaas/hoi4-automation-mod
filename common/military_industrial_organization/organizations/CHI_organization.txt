@@ -1,13 +1,28 @@
+# autoCore：以下 @ 脚本常量随特性一并搬运。特性的 position 用 @常量 表示，
+# 而 @常量定义在文件顶层——只搬 MIO 块不搬常量，位置解析不出来，特性在界面上不显示。
+@aircraft_hamburger_X = 9 # 来自 GER_organization.txt
+@aircraft_hamburger_Y = 0 # 来自 GER_organization.txt
+@tank_1_X = 9 # 来自 SOV_organization.txt
+@tank_1_Y = 2 # 来自 SOV_organization.txt
+@tank_2_X = 9 # 来自 SOV_organization.txt
+@tank_2_Y = 3 # 来自 SOV_organization.txt
+@tank_3_X = 9 # 来自 SOV_organization.txt
+@tank_3_Y = 4 # 来自 SOV_organization.txt
+@tank_hoesch_X = 9 # 来自 GER_organization.txt
+@tank_hoesch_Y = 0 # 来自 GER_organization.txt
+@tank_max_speed = 0.05 # 来自 SOV_organization.txt
+@tank_production_capacity_factor = 0.05 # 来自 SOV_organization.txt
+@tank_soft_attack = 0.05 # 来自 SOV_organization.txt
+
 #####################
 
-###  ##  #  # # #  ## 
- #  #  # ## # # # #   
- #  #### # ## ##   #  
- #  #  # #  # # #   # 
- #  #  # #  # # # ## 
+###  ##  #  # # #  ##
+#  #  # ## # # # #
+#  #### # ## ##   #
+#  #  # #  # # #   #
+#  #  # #  # # # ##
 
- #################### 
-
+####################
 
 CHI_sino_german_technical_mission_organization = {
 	# autoCore：中德技术特派团 -> 奔驰
@@ -20,18 +35,15 @@ CHI_sino_german_technical_mission_organization = {
 		x = 2
 	}
 
-
 	tree_header_text = {
 		text = mio_header_equipment_and_specialization
 		x = 6
 	}
 
-
 	tree_header_text = {
 		text = mio_header_armor
 		x = 8
 	}
-
 
 	initial_trait = {
 		organization_modifier = {
@@ -39,28 +51,25 @@ CHI_sino_german_technical_mission_organization = {
 		}
 	}
 
-
 	override_trait = {
 		token = generic_mio_trait_simplified_suspension
 
 		position = { x=0 y=0 }
 	}
 
-
 	override_trait = {
-    	token = generic_mio_trait_improved_tooling
+		token = generic_mio_trait_improved_tooling
 
-    	relative_position_id = GER_mio_trait_versatile_chassis
+		relative_position_id = GER_mio_trait_versatile_chassis
 
 		all_parents = { generic_mio_trait_improved_tracks generic_mio_trait_command_upgrades GER_mio_trait_versatile_chassis }
 
-    	position = { x=0 y=1 }
-  	}
-    #override_trait = {
-    #    token = generic_mio_trait_crew_ergonomics
-    #    position = { x=3 y=0 }
-    #}
-
+		position = { x=0 y=1 }
+	}
+	#override_trait = {
+	#    token = generic_mio_trait_crew_ergonomics
+	#    position = { x=3 y=0 }
+	#}
 
 	add_trait = {
 		token = GER_mio_trait_hotrolled_armor
@@ -84,7 +93,6 @@ CHI_sino_german_technical_mission_organization = {
 			}
 		}
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_multilayer_armour
@@ -111,7 +119,6 @@ CHI_sino_german_technical_mission_organization = {
 			}
 		}
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_hoesch_facilities
@@ -147,7 +154,6 @@ CHI_sino_german_technical_mission_organization = {
 		}
 	}
 
-
 	add_trait = {
 		token = GER_mio_trait_versatile_chassis
 		name = GER_mio_trait_versatile_chassis
@@ -173,7 +179,6 @@ CHI_sino_german_technical_mission_organization = {
 		}
 	}
 
-
 	add_trait = {
 		token = GER_mio_trait_tungsten_tipped_rounds
 		name = GER_mio_trait_tungsten_tipped_rounds
@@ -187,10 +192,10 @@ CHI_sino_german_technical_mission_organization = {
 		position = { x=0 y=1 }
 
 		available = {
-            FROM = {
-                has_tech = antitank2
-            }
-        }
+			FROM = {
+				has_tech = antitank2
+			}
+		}
 
 		equipment_bonus = {
 			ap_attack = 0.05
@@ -231,26 +236,26 @@ CHI_sino_german_technical_mission_organization = {
 		IF = {
 			limit = { FROM = { NOT = { original_tag = CHI } } }
 			owner = {
-					OR = {
-						hidden_trigger = {
+				OR = {
+					hidden_trigger = {
+						has_completed_focus = CHI_chinese_panzers
+						has_completed_focus = CHI_sea_chinese_panzers
+					}
+					custom_trigger_tooltip = {
+						tooltip = CHI_chinese_panzers_TT
+						OR = {
 							has_completed_focus = CHI_chinese_panzers
 							has_completed_focus = CHI_sea_chinese_panzers
 						}
-						custom_trigger_tooltip = {
-							tooltip = CHI_chinese_panzers_TT
-							OR = {
-								has_completed_focus = CHI_chinese_panzers
-								has_completed_focus = CHI_sea_chinese_panzers
-							}
-						}
-		
-						has_idea = german_advisors
 					}
-					NOT = {
-						has_war_with = GER
-					}
+
+					has_idea = german_advisors
 				}
-		
+				NOT = {
+					has_war_with = GER
+				}
+			}
+
 		}
 	}
 }
@@ -269,7 +274,6 @@ CHI_shanghai_arsenal = {
 		any_parent = { GER_mio_trait_technical_superiority }
 	}
 
-
 	override_trait = {
 		token = generic_mio_trait_medium_tank_specialization
 
@@ -278,7 +282,6 @@ CHI_shanghai_arsenal = {
 		any_parent = { GER_mio_trait_technical_superiority }
 	}
 
-
 	override_trait = {
 		token = generic_mio_trait_heavy_tank_specialization
 
@@ -286,7 +289,6 @@ CHI_shanghai_arsenal = {
 		relative_position_id = GER_mio_trait_technical_superiority
 		any_parent = { GER_mio_trait_technical_superiority }
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_hoesch_facilities
@@ -321,7 +323,6 @@ CHI_shanghai_arsenal = {
 			base = 2
 		}
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_involve_henschel_in_special_projects
@@ -355,7 +356,6 @@ CHI_shanghai_arsenal = {
 		}
 	}
 
-
 	add_trait = {
 		token = GER_mio_trait_steel_wheel_design
 		name = GER_mio_trait_steel_wheel_design
@@ -369,7 +369,6 @@ CHI_shanghai_arsenal = {
 
 		any_parent = { generic_mio_trait_interleaved_track_wheels generic_mio_trait_overlapped_track_wheels }
 
-
 		equipment_bonus = {
 			reliability = 0.03
 			breakthrough = 0.05
@@ -380,7 +379,6 @@ CHI_shanghai_arsenal = {
 			production_cost_factor = 0.03
 		}
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_telescopic_sight
@@ -410,7 +408,6 @@ CHI_shanghai_arsenal = {
 		}
 	}
 
-
 	add_trait = {
 		token = GER_mio_trait_technical_superiority
 		name = GER_mio_trait_technical_superiority
@@ -421,7 +418,6 @@ CHI_shanghai_arsenal = {
 		relative_position_id = generic_mio_trait_adaptable_chassis
 
 		any_parent = { generic_mio_trait_adaptable_chassis }
-
 
 		equipment_bonus = {
 			defense = 0.05
@@ -449,12 +445,12 @@ CHI_shanghai_arsenal = {
 		IF = {
 			limit = { FROM = { NOT = { original_tag = CHI } } }
 			IF = {
-					limit = {
-						FROM = { NOT = { original_tag = CHI } }
-					}
-					owner = { controls_state = CHI.mio_locations^7 } # #613 Shanghai
+				limit = {
+					FROM = { NOT = { original_tag = CHI } }
 				}
-		
+				owner = { controls_state = CHI.mio_locations^7 } # #613 Shanghai
+			}
+
 		}
 	}
 }
@@ -470,18 +466,15 @@ CHI_ncns_sino_german_technical_mission_organization = {
 		x = 2
 	}
 
-
 	tree_header_text = {
 		text = mio_header_equipment_and_specialization
 		x = 6
 	}
 
-
 	tree_header_text = {
 		text = mio_header_armor
 		x = 8
 	}
-
 
 	initial_trait = {
 		organization_modifier = {
@@ -489,28 +482,25 @@ CHI_ncns_sino_german_technical_mission_organization = {
 		}
 	}
 
-
 	override_trait = {
 		token = generic_mio_trait_simplified_suspension
 
 		position = { x=0 y=0 }
 	}
 
-
 	override_trait = {
-    	token = generic_mio_trait_improved_tooling
+		token = generic_mio_trait_improved_tooling
 
-    	relative_position_id = GER_mio_trait_versatile_chassis
+		relative_position_id = GER_mio_trait_versatile_chassis
 
 		all_parents = { generic_mio_trait_improved_tracks generic_mio_trait_command_upgrades GER_mio_trait_versatile_chassis }
 
-    	position = { x=0 y=1 }
-  	}
-    #override_trait = {
-    #    token = generic_mio_trait_crew_ergonomics
-    #    position = { x=3 y=0 }
-    #}
-
+		position = { x=0 y=1 }
+	}
+	#override_trait = {
+	#    token = generic_mio_trait_crew_ergonomics
+	#    position = { x=3 y=0 }
+	#}
 
 	add_trait = {
 		token = GER_mio_trait_hotrolled_armor
@@ -534,7 +524,6 @@ CHI_ncns_sino_german_technical_mission_organization = {
 			}
 		}
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_multilayer_armour
@@ -561,7 +550,6 @@ CHI_ncns_sino_german_technical_mission_organization = {
 			}
 		}
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_hoesch_facilities
@@ -597,7 +585,6 @@ CHI_ncns_sino_german_technical_mission_organization = {
 		}
 	}
 
-
 	add_trait = {
 		token = GER_mio_trait_versatile_chassis
 		name = GER_mio_trait_versatile_chassis
@@ -623,7 +610,6 @@ CHI_ncns_sino_german_technical_mission_organization = {
 		}
 	}
 
-
 	add_trait = {
 		token = GER_mio_trait_tungsten_tipped_rounds
 		name = GER_mio_trait_tungsten_tipped_rounds
@@ -637,10 +623,10 @@ CHI_ncns_sino_german_technical_mission_organization = {
 		position = { x=0 y=1 }
 
 		available = {
-            FROM = {
-                has_tech = antitank2
-            }
-        }
+			FROM = {
+				has_tech = antitank2
+			}
+		}
 
 		equipment_bonus = {
 			ap_attack = 0.05
@@ -662,29 +648,35 @@ CHI_ncns_sino_german_technical_mission_organization = {
 		original_tag = CHI
 	}
 
+	visible = {
+		owner = {
+			has_completed_focus = CHI_strengthening_our_resolve
+		}
+	}
+
 	available = {
 		# autoCore：中国无条件可用（这里什么都不写）；其它国家保持原版判定，通常是控制对应省份。
 		IF = {
 			limit = { FROM = { NOT = { original_tag = CHI } } }
 			owner = {
-					has_completed_focus = CHI_seek_out_western_fascist_cooperation
-					NOT = {
-						has_war_with = GER
-					}
+				has_completed_focus = CHI_seek_out_western_fascist_cooperation
+				NOT = {
+					has_war_with = GER
 				}
-		
+			}
+
 		}
 	}
 }
 
 #####################
 
- ## #  # ### ###   ## 
-#   #  #  #  #  # #   
- #  ####  #  ###   #  
-  # #  #  #  #      # 
-##  #  # ### #    ##  
- 
+## #  # ### ###   ##
+#   #  #  #  #  # #
+#  ####  #  ###   #
+# #  #  #  #      #
+##  #  # ### #    ##
+
 #####################
 
 CHI_jiangnan_shipyard_group_organization = {
@@ -707,11 +699,10 @@ CHI_jiangnan_shipyard_group_organization = {
 		IF = {
 			limit = { FROM = { NOT = { original_tag = CHI } } }
 			owner = { controls_state = CHI.mio_locations^0 } # #613 Shanghai
-		
+
 		}
 	}
 }
-
 
 CHI_dagu_shipyard_organization = {
 	# autoCore：船厂属性不改，仅放开 available 的地区限制。
@@ -733,7 +724,7 @@ CHI_dagu_shipyard_organization = {
 		IF = {
 			limit = { FROM = { NOT = { original_tag = CHI } } }
 			owner = { controls_state = CHI.mio_locations^1 } #608 Beijing
-		
+
 		}
 	}
 }
@@ -810,12 +801,12 @@ CHI_kiangnan_shipyard_group_organization_sea = {
 		IF = {
 			limit = { FROM = { NOT = { original_tag = CHI } } }
 			IF = {
-					limit = {
-						FROM = { NOT = { original_tag = CHI } }
-					}
-					owner = { controls_state = CHI.mio_locations^7 } # #613 Shanghai
+				limit = {
+					FROM = { NOT = { original_tag = CHI } }
 				}
-		
+				owner = { controls_state = CHI.mio_locations^7 } # #613 Shanghai
+			}
+
 		}
 	}
 }
@@ -869,23 +860,23 @@ CHI_dagu_shipyard_organization_sea = {
 		IF = {
 			limit = { FROM = { NOT = { original_tag = CHI } } }
 			IF = {
-					limit = {
-						FROM = { NOT = { original_tag = CHI } }
-					}
-					owner = { controls_state = CHI.mio_locations^1 } #608 Beijing
+				limit = {
+					FROM = { NOT = { original_tag = CHI } }
 				}
-		
+				owner = { controls_state = CHI.mio_locations^1 } #608 Beijing
+			}
+
 		}
 	}
 }
 
 ###########################
 
-###  #    ##  #  # ###  ## 
-#  # #   #  # ## # #   #   
-###  #   #### # ## ##   #  
-#    #   #  # #  # #     # 
-#    ### #  # #  # ### ##  
+###  #    ##  #  # ###  ##
+#  # #   #  # ## # #   #
+###  #   #### # ## ##   #
+#    #   #  # #  # #     #
+#    ### #  # #  # ### ##
 
 ###########################
 
@@ -916,7 +907,6 @@ CHI_camco_organization = {
 		}
 	}
 
-
 	add_trait = {
 		token = GER_mio_trait_fuselage_based_weapons
 		name = GER_mio_trait_fuselage_based_weapons
@@ -935,7 +925,6 @@ CHI_camco_organization = {
 		}
 	}
 
-
 	add_trait = {
 		token = GER_mio_trait_hamburger_flugzeugbau
 		name = GER_mio_trait_hamburger_flugzeugbau
@@ -953,12 +942,12 @@ CHI_camco_organization = {
 			IF = {
 				limit = { FROM = { NOT = { original_tag = CHI } } }
 
-			FROM = {
-				mio:GER_blohm_und_voss_organization = {
-					has_mio_size > 4
+				FROM = {
+					mio:GER_blohm_und_voss_organization = {
+						has_mio_size > 4
+					}
+					NOT = { has_country_flag = GER_hamburger_flugzeugbau_trait_taken_flag }
 				}
-				NOT = { has_country_flag = GER_hamburger_flugzeugbau_trait_taken_flag }
-			}
 			}
 		}
 
@@ -977,7 +966,6 @@ CHI_camco_organization = {
 			base = 2
 		}
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_aerodynamic_research_insitute
@@ -998,10 +986,10 @@ CHI_camco_organization = {
 			IF = {
 				limit = { FROM = { NOT = { original_tag = CHI } } }
 
-			FROM = {
-				has_completed_focus = GER_aerodynamic_research_institute
-				NOT = { has_country_flag = GER_mio_trait_aerodynamic_research_insitute_taken_flag }
-			}
+				FROM = {
+					has_completed_focus = GER_aerodynamic_research_institute
+					NOT = { has_country_flag = GER_mio_trait_aerodynamic_research_insitute_taken_flag }
+				}
 			}
 		}
 
@@ -1013,14 +1001,13 @@ CHI_camco_organization = {
 		}
 
 		organization_modifier = {
-		    military_industrial_organization_research_bonus = 0.1
+			military_industrial_organization_research_bonus = 0.1
 		}
 
 		ai_will_do = {
 			base = 2
 		}
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_amerikabomber_learnings
@@ -1033,8 +1020,8 @@ CHI_camco_organization = {
 		relative_position_id = GER_mio_trait_aerodynamic_research_insitute
 
 		visible = {
-				has_dlc = "Gotterdammerung"
-				FROM = { OR = { original_tag = GER original_tag = CHI } }
+			has_dlc = "Gotterdammerung"
+			FROM = { OR = { original_tag = GER original_tag = CHI } }
 		}
 
 		available = {
@@ -1042,10 +1029,10 @@ CHI_camco_organization = {
 			IF = {
 				limit = { FROM = { NOT = { original_tag = CHI } } }
 
-			owner = {
-				has_completed_focus = GER_amerikabomber
-				has_country_flag = GER_amerikabomber_messerschmitt_flag
-			}
+				owner = {
+					has_completed_focus = GER_amerikabomber
+					has_country_flag = GER_amerikabomber_messerschmitt_flag
+				}
 			}
 		}
 
@@ -1086,7 +1073,6 @@ CHI_camco_medium_organization = {
 		}
 	}
 
-
 	add_trait = {
 		token = GER_mio_trait_schnellbomber_doctrine
 		name = GER_mio_trait_schnellbomber_doctrine
@@ -1103,7 +1089,6 @@ CHI_camco_medium_organization = {
 			maximum_speed = 0.1
 		}
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_hamburger_flugzeugbau
@@ -1122,12 +1107,12 @@ CHI_camco_medium_organization = {
 			IF = {
 				limit = { FROM = { NOT = { original_tag = CHI } } }
 
-			FROM = {
-				mio:GER_blohm_und_voss_organization = {
-					has_mio_size > 4
+				FROM = {
+					mio:GER_blohm_und_voss_organization = {
+						has_mio_size > 4
+					}
+					NOT = { has_country_flag = GER_hamburger_flugzeugbau_trait_taken_flag }
 				}
-				NOT = { has_country_flag = GER_hamburger_flugzeugbau_trait_taken_flag }
-			}
 			}
 		}
 
@@ -1146,7 +1131,6 @@ CHI_camco_medium_organization = {
 			base = 2
 		}
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_aerodynamic_research_insitute
@@ -1167,10 +1151,10 @@ CHI_camco_medium_organization = {
 			IF = {
 				limit = { FROM = { NOT = { original_tag = CHI } } }
 
-			FROM = {
-				has_completed_focus = GER_aerodynamic_research_institute
-				NOT = { has_country_flag = GER_mio_trait_aerodynamic_research_insitute_taken_flag }
-			}
+				FROM = {
+					has_completed_focus = GER_aerodynamic_research_institute
+					NOT = { has_country_flag = GER_mio_trait_aerodynamic_research_insitute_taken_flag }
+				}
 			}
 		}
 
@@ -1182,7 +1166,7 @@ CHI_camco_medium_organization = {
 		}
 
 		organization_modifier = {
-		    military_industrial_organization_research_bonus = 0.1
+			military_industrial_organization_research_bonus = 0.1
 		}
 
 		ai_will_do = {
@@ -1215,23 +1199,22 @@ CHI_camco_medium_organization = {
 		IF = {
 			limit = { FROM = { NOT = { original_tag = CHI } } }
 			owner = {
-					hidden_trigger = {
-						OR = {
-							has_completed_focus = CHI_camco
-							has_completed_focus = CHI_sea_camco
-						}
+				hidden_trigger = {
+					OR = {
+						has_completed_focus = CHI_camco
+						has_completed_focus = CHI_sea_camco
 					}
-					custom_trigger_tooltip = {
-						tooltip = CHI_camco_tt
-						OR = {
-							has_completed_focus = CHI_camco
-							has_completed_focus = CHI_sea_camco
-						}
-					}
-		
 				}
-		
-		
+				custom_trigger_tooltip = {
+					tooltip = CHI_camco_tt
+					OR = {
+						has_completed_focus = CHI_camco
+						has_completed_focus = CHI_sea_camco
+					}
+				}
+
+			}
+
 		}
 	}
 }
@@ -1262,7 +1245,6 @@ CHI_camco_fighter_organization = {
 		}
 	}
 
-
 	add_trait = {
 		token = GER_mio_trait_fuselage_based_weapons
 		name = GER_mio_trait_fuselage_based_weapons
@@ -1281,7 +1263,6 @@ CHI_camco_fighter_organization = {
 		}
 	}
 
-
 	add_trait = {
 		token = GER_mio_trait_hamburger_flugzeugbau
 		name = GER_mio_trait_hamburger_flugzeugbau
@@ -1299,12 +1280,12 @@ CHI_camco_fighter_organization = {
 			IF = {
 				limit = { FROM = { NOT = { original_tag = CHI } } }
 
-			FROM = {
-				mio:GER_blohm_und_voss_organization = {
-					has_mio_size > 4
+				FROM = {
+					mio:GER_blohm_und_voss_organization = {
+						has_mio_size > 4
+					}
+					NOT = { has_country_flag = GER_hamburger_flugzeugbau_trait_taken_flag }
 				}
-				NOT = { has_country_flag = GER_hamburger_flugzeugbau_trait_taken_flag }
-			}
 			}
 		}
 
@@ -1323,7 +1304,6 @@ CHI_camco_fighter_organization = {
 			base = 2
 		}
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_aerodynamic_research_insitute
@@ -1344,10 +1324,10 @@ CHI_camco_fighter_organization = {
 			IF = {
 				limit = { FROM = { NOT = { original_tag = CHI } } }
 
-			FROM = {
-				has_completed_focus = GER_aerodynamic_research_institute
-				NOT = { has_country_flag = GER_mio_trait_aerodynamic_research_insitute_taken_flag }
-			}
+				FROM = {
+					has_completed_focus = GER_aerodynamic_research_institute
+					NOT = { has_country_flag = GER_mio_trait_aerodynamic_research_insitute_taken_flag }
+				}
 			}
 		}
 
@@ -1359,14 +1339,13 @@ CHI_camco_fighter_organization = {
 		}
 
 		organization_modifier = {
-		    military_industrial_organization_research_bonus = 0.1
+			military_industrial_organization_research_bonus = 0.1
 		}
 
 		ai_will_do = {
 			base = 2
 		}
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_amerikabomber_learnings
@@ -1379,8 +1358,8 @@ CHI_camco_fighter_organization = {
 		relative_position_id = GER_mio_trait_aerodynamic_research_insitute
 
 		visible = {
-				has_dlc = "Gotterdammerung"
-				FROM = { OR = { original_tag = GER original_tag = CHI } }
+			has_dlc = "Gotterdammerung"
+			FROM = { OR = { original_tag = GER original_tag = CHI } }
 		}
 
 		available = {
@@ -1388,10 +1367,10 @@ CHI_camco_fighter_organization = {
 			IF = {
 				limit = { FROM = { NOT = { original_tag = CHI } } }
 
-			owner = {
-				has_completed_focus = GER_amerikabomber
-				has_country_flag = GER_amerikabomber_messerschmitt_flag
-			}
+				owner = {
+					has_completed_focus = GER_amerikabomber
+					has_country_flag = GER_amerikabomber_messerschmitt_flag
+				}
 			}
 		}
 
@@ -1427,21 +1406,21 @@ CHI_camco_fighter_organization = {
 		IF = {
 			limit = { FROM = { NOT = { original_tag = CHI } } }
 			owner = {
-					hidden_trigger = {
-						OR = {
-							has_completed_focus = CHI_local_fighter_production
-							has_completed_focus = CHI_sea_local_fighter_production
-						}
-					}
-					custom_trigger_tooltip = {
-						tooltip = CHI_local_fighter_production_tt
-						OR = {
-							has_completed_focus = CHI_local_fighter_production
-							has_completed_focus = CHI_sea_local_fighter_production
-						}
+				hidden_trigger = {
+					OR = {
+						has_completed_focus = CHI_local_fighter_production
+						has_completed_focus = CHI_sea_local_fighter_production
 					}
 				}
-		
+				custom_trigger_tooltip = {
+					tooltip = CHI_local_fighter_production_tt
+					OR = {
+						has_completed_focus = CHI_local_fighter_production
+						has_completed_focus = CHI_sea_local_fighter_production
+					}
+				}
+			}
+
 		}
 	}
 }
@@ -1466,7 +1445,6 @@ CHI_camco_bomber_organization = {
 		}
 	}
 
-
 	add_trait = {
 		token = GER_mio_trait_90_degree_dives
 		name = GER_mio_trait_90_degree_dives
@@ -1482,7 +1460,6 @@ CHI_camco_bomber_organization = {
 			air_ground_attack = 0.05
 		}
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_hamburger_flugzeugbau
@@ -1501,12 +1478,12 @@ CHI_camco_bomber_organization = {
 			IF = {
 				limit = { FROM = { NOT = { original_tag = CHI } } }
 
-			FROM = {
-				mio:GER_blohm_und_voss_organization = {
-					has_mio_size > 4
+				FROM = {
+					mio:GER_blohm_und_voss_organization = {
+						has_mio_size > 4
+					}
+					NOT = { has_country_flag = GER_hamburger_flugzeugbau_trait_taken_flag }
 				}
-				NOT = { has_country_flag = GER_hamburger_flugzeugbau_trait_taken_flag }
-			}
 			}
 		}
 
@@ -1525,7 +1502,6 @@ CHI_camco_bomber_organization = {
 			base = 2
 		}
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_aerodynamic_research_insitute
@@ -1546,10 +1522,10 @@ CHI_camco_bomber_organization = {
 			IF = {
 				limit = { FROM = { NOT = { original_tag = CHI } } }
 
-			FROM = {
-				has_completed_focus = GER_aerodynamic_research_institute
-				NOT = { has_country_flag = GER_mio_trait_aerodynamic_research_insitute_taken_flag }
-			}
+				FROM = {
+					has_completed_focus = GER_aerodynamic_research_institute
+					NOT = { has_country_flag = GER_mio_trait_aerodynamic_research_insitute_taken_flag }
+				}
 			}
 		}
 
@@ -1561,14 +1537,13 @@ CHI_camco_bomber_organization = {
 		}
 
 		organization_modifier = {
-		    military_industrial_organization_research_bonus = 0.1
+			military_industrial_organization_research_bonus = 0.1
 		}
 
 		ai_will_do = {
 			base = 2
 		}
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_amerikabomber_learnings
@@ -1581,8 +1556,8 @@ CHI_camco_bomber_organization = {
 		relative_position_id = GER_mio_trait_aerodynamic_research_insitute
 
 		visible = {
-				has_dlc = "Gotterdammerung"
-				FROM = { OR = { original_tag = GER original_tag = CHI } }
+			has_dlc = "Gotterdammerung"
+			FROM = { OR = { original_tag = GER original_tag = CHI } }
 		}
 
 		available = {
@@ -1590,10 +1565,10 @@ CHI_camco_bomber_organization = {
 			IF = {
 				limit = { FROM = { NOT = { original_tag = CHI } } }
 
-			owner = {
-				has_completed_focus = GER_amerikabomber
-				has_country_flag = GER_amerikabomber_junkers_flag
-			}
+				owner = {
+					has_completed_focus = GER_amerikabomber
+					has_country_flag = GER_amerikabomber_junkers_flag
+				}
 			}
 		}
 
@@ -1630,21 +1605,21 @@ CHI_camco_bomber_organization = {
 		IF = {
 			limit = { FROM = { NOT = { original_tag = CHI } } }
 			owner = {
-					hidden_trigger = {
-						OR = {
-							has_completed_focus = CHI_local_bomber_production
-							has_completed_focus = CHI_sea_local_bomber_production
-						}
-					}
-					custom_trigger_tooltip = {
-						tooltip = CHI_local_bomber_production_tt
-						OR = {
-							has_completed_focus = CHI_local_bomber_production
-							has_completed_focus = CHI_sea_local_bomber_production
-						}
+				hidden_trigger = {
+					OR = {
+						has_completed_focus = CHI_local_bomber_production
+						has_completed_focus = CHI_sea_local_bomber_production
 					}
 				}
-		
+				custom_trigger_tooltip = {
+					tooltip = CHI_local_bomber_production_tt
+					OR = {
+						has_completed_focus = CHI_local_bomber_production
+						has_completed_focus = CHI_sea_local_bomber_production
+					}
+				}
+			}
+
 		}
 	}
 }
@@ -1676,7 +1651,6 @@ CHI_camco_organization_sea = {
 		}
 	}
 
-
 	add_trait = {
 		token = GER_mio_trait_fuselage_based_weapons
 		name = GER_mio_trait_fuselage_based_weapons
@@ -1695,7 +1669,6 @@ CHI_camco_organization_sea = {
 		}
 	}
 
-
 	add_trait = {
 		token = GER_mio_trait_hamburger_flugzeugbau
 		name = GER_mio_trait_hamburger_flugzeugbau
@@ -1713,12 +1686,12 @@ CHI_camco_organization_sea = {
 			IF = {
 				limit = { FROM = { NOT = { original_tag = CHI } } }
 
-			FROM = {
-				mio:GER_blohm_und_voss_organization = {
-					has_mio_size > 4
+				FROM = {
+					mio:GER_blohm_und_voss_organization = {
+						has_mio_size > 4
+					}
+					NOT = { has_country_flag = GER_hamburger_flugzeugbau_trait_taken_flag }
 				}
-				NOT = { has_country_flag = GER_hamburger_flugzeugbau_trait_taken_flag }
-			}
 			}
 		}
 
@@ -1737,7 +1710,6 @@ CHI_camco_organization_sea = {
 			base = 2
 		}
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_aerodynamic_research_insitute
@@ -1758,10 +1730,10 @@ CHI_camco_organization_sea = {
 			IF = {
 				limit = { FROM = { NOT = { original_tag = CHI } } }
 
-			FROM = {
-				has_completed_focus = GER_aerodynamic_research_institute
-				NOT = { has_country_flag = GER_mio_trait_aerodynamic_research_insitute_taken_flag }
-			}
+				FROM = {
+					has_completed_focus = GER_aerodynamic_research_institute
+					NOT = { has_country_flag = GER_mio_trait_aerodynamic_research_insitute_taken_flag }
+				}
 			}
 		}
 
@@ -1773,14 +1745,13 @@ CHI_camco_organization_sea = {
 		}
 
 		organization_modifier = {
-		    military_industrial_organization_research_bonus = 0.1
+			military_industrial_organization_research_bonus = 0.1
 		}
 
 		ai_will_do = {
 			base = 2
 		}
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_amerikabomber_learnings
@@ -1793,8 +1764,8 @@ CHI_camco_organization_sea = {
 		relative_position_id = GER_mio_trait_aerodynamic_research_insitute
 
 		visible = {
-				has_dlc = "Gotterdammerung"
-				FROM = { OR = { original_tag = GER original_tag = CHI } }
+			has_dlc = "Gotterdammerung"
+			FROM = { OR = { original_tag = GER original_tag = CHI } }
 		}
 
 		available = {
@@ -1802,10 +1773,10 @@ CHI_camco_organization_sea = {
 			IF = {
 				limit = { FROM = { NOT = { original_tag = CHI } } }
 
-			owner = {
-				has_completed_focus = GER_amerikabomber
-				has_country_flag = GER_amerikabomber_messerschmitt_flag
-			}
+				owner = {
+					has_completed_focus = GER_amerikabomber
+					has_country_flag = GER_amerikabomber_messerschmitt_flag
+				}
 			}
 		}
 
@@ -1827,105 +1798,143 @@ CHI_camco_organization_sea = {
 		IF = {
 			limit = { FROM = { NOT = { original_tag = CHI } } }
 			IF = {
-					limit = {
-						FROM = { NOT = { original_tag = CHI } }
-					}
-					owner = { controls_state = CHI.mio_locations^8 } # #596 Zhejiang
+				limit = {
+					FROM = { NOT = { original_tag = CHI } }
 				}
-		
+				owner = { controls_state = CHI.mio_locations^8 } # #596 Zhejiang
+			}
+
 		}
 	}
 }
 
 CHI_sinaw_organization_sea = {
-	# autoCore：中意飞机制造厂 -> 勒纳尔飞机制造厂(比利时)
-	# 属性整套取自 BEL_renard_organization；name/icon/allowed/visible/available 保留中国自己的。
+	# autoCore：中意飞机制造厂 -> 横须贺海军航空技术厂
+	# 属性整套取自 JAP_yokosuka_organization；name/icon/allowed/visible/available 保留中国自己的。
 	# 摊平搬运而非嵌套 include（原版无两级 include 先例，且跨文件受加载顺序影响）。
-	include = generic_high_agility_fighter_aircraft_organization
+	include = generic_naval_aircraft_organization
 
 	add_trait = {
-		token = BEL_mio_trait_all_metal_expertise
-		name = BEL_mio_trait_all_metal_expertise
-		icon = GFX_generic_mio_trait_icon_armor_value
+		token = JAP_mio_trait_type_91_aerial_torpedo_integration
+		name = JAP_mio_trait_type_91_aerial_torpedo_integration
+		icon = GFX_generic_mio_trait_icon_air_ground_attack
 		special_trait_background = yes
 
-		position = { x=2 y=1 }
+		relative_position_id = generic_mio_trait_navigation_equipment
 
-		any_parent = { generic_mio_trait_metal_skin }
+		all_parents = { generic_mio_trait_navigation_equipment }
 
-		equipment_bonus = {
-			air_defence = 0.10
+		position = { x = 2 y = 1 }
+
+		visible = {
+			FROM = { OR = { original_tag = JAP original_tag = CHI } }
 		}
 
+		available = {
+			# autoCore：含中国无法满足的条件，对中国整体绕过
+			IF = {
+				limit = { FROM = { NOT = { original_tag = CHI } } }
+
+				FROM = {
+					has_completed_focus = JAP_improve_the_type_91_aerial_torpedo
+				}
+			}
+		}
+
+		on_complete = {
+		}
+
+		equipment_bonus = {
+			naval_strike_attack = 0.1
+			naval_strike_targetting = 0.05
+		}
+
+		ai_will_do = {
+			base = 5
+		}
 	}
 
-
 	add_trait = {
-		token = BEL_mio_trait_browning_collaboration
-		name = BEL_mio_trait_browning_collaboration
-		icon = GFX_generic_mio_trait_icon_anti_air_attack
+		token = JAP_mio_trait_naval_arsenal_trait
+		name = JAP_mio_trait_naval_arsenal_trait
+		icon = GFX_generic_mio_trait_icon_production_capacity
 		special_trait_background = yes
 
-        available = {
-            owner = {
-            	OR = {
-            		has_completed_focus = COG_standardize_military_production
-            		has_completed_focus = BEL_fn_herstal
-            	}
-            }
-        }
+		relative_position_id = generic_mio_trait_navigation_equipment
 
-		position = { x=7 y=1 }
+		position = { x = 4 y = 0 }
 
-		any_parent = { generic_mio_trait_minimum_weapon_requirements }
-
-		equipment_bonus = {
-			air_attack = 0.05
+		visible = {
+			FROM = { OR = { original_tag = JAP original_tag = CHI } }
 		}
 
+		available = {
+			FROM = {
+				JAP_naval_faction_is_not_subdued = yes
+			}
+		}
+
+		on_complete = {
+
+		}
+
+		organization_modifier = {
+
+		}
+
+		production_bonus = {
+			production_capacity_factor = 0.05
+		}
+
+		ai_will_do = {
+			base = 2
+		}
 	}
 
-
 	add_trait = {
-		token = BEL_mio_trait_stampe_et_vertrongen
-		name = BEL_mio_trait_stampe_et_vertrongen
-		icon = GFX_generic_mio_trait_icon_naval_range
+		token = JAP_mio_trait_unified_research_and_development
+		name = JAP_mio_trait_unified_research_and_development
+		icon = GFX_generic_mio_department_icon_facilities
 		special_trait_background = yes
 
-        available = {
-            owner = {
-            	OR = {
-            		has_completed_focus = COG_expand_production_facilities
-            		has_completed_focus = BEL_stampe_et_vertrongen
-            	}
-            }
-        }
+		relative_position_id = generic_mio_trait_navigation_equipment
 
-		position = { x=9 y=0 }
+		position = { x = 5 y = 0 }
 
-		equipment_bonus = {
-			air_agility = 0.05
-			air_range = 0.05
+		visible = {
+			FROM = { OR = { original_tag = JAP original_tag = CHI } }
 		}
 
-	}
+		available = {
+			# autoCore：含中国无法满足的条件，对中国整体绕过
+			IF = {
+				limit = { FROM = { NOT = { original_tag = CHI } } }
 
-
-	add_trait = {
-		token = BEL_mio_trait_stampe_et_renard
-		name = BEL_mio_trait_stampe_et_renard
-		icon = GFX_generic_mio_department_icon_plane_fighter_combat
-		special_trait_background = yes
-
-		position = { x=9 y=1 }
-
-		any_parent = { BEL_mio_trait_stampe_et_vertrongen }
-
-		equipment_bonus = {
-			air_attack = 0.05
-			reliability = 0.05
+				FROM = {
+					has_completed_focus = JAP_sea_unify_the_air_forces
+					NOT = { has_country_flag = JAP_mio_trait_unified_research_and_development_taken_flag }
+				}
+			}
 		}
 
+		on_complete = {
+			custom_effect_tooltip = generic_trait_will_not_be_available_in_other_organizations
+			FROM = {
+				set_country_flag = JAP_mio_trait_unified_research_and_development_taken_flag
+			}
+		}
+
+		organization_modifier = {
+			military_industrial_organization_research_bonus = 0.15
+		}
+
+		production_bonus = {
+			production_capacity_factor = 0.1
+		}
+
+		ai_will_do = {
+			base = 2
+		}
 	}
 	icon = GFX_idea_CHI_SINAW
 
@@ -1939,24 +1948,23 @@ CHI_sinaw_organization_sea = {
 		IF = {
 			limit = { FROM = { NOT = { original_tag = CHI } } }
 			IF = {
-					limit = {
-						FROM = { NOT = { original_tag = CHI } }
-					}
-					owner = { controls_state = CHI.mio_locations^9 } # #600 Jiangxi
+				limit = {
+					FROM = { NOT = { original_tag = CHI } }
 				}
-		
+				owner = { controls_state = CHI.mio_locations^9 } # #600 Jiangxi
+			}
+
 		}
 	}
 }
 
-################################### 
+###################################
 
-#   #  ##  ### ### ###  ### ### #   
-## ## #  #  #  #   #  #  #  #   #   
-# # # ####  #  ##  ###   #  ##  #   
-#   # #  #  #  #   #  #  #  #   #   
-#   # #  #  #  ### #  # ### ### ### 
-
+#   #  ##  ### ### ###  ### ### #
+## ## #  #  #  #   #  #  #  #   #
+# # # ####  #  ##  ###   #  ##  #
+#   # #  #  #  #   #  #  #  #   #
+#   # #  #  #  ### #  # ### ### ###
 
 ###################################
 
@@ -1988,7 +1996,6 @@ CHI_taiyuan_arsenal_organization = {
 		}
 	}
 
-
 	add_trait = {
 		token = GER_mio_trait_7_5_cm_pak
 		name = GER_mio_trait_7_5_cm_pak
@@ -2009,7 +2016,6 @@ CHI_taiyuan_arsenal_organization = {
 			hard_attack = 0.1
 		}
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_versatile_carriage
@@ -2036,7 +2042,6 @@ CHI_taiyuan_arsenal_organization = {
 			air_attack = 0.05
 		}
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_dual_recoil_mechanism
@@ -2083,7 +2088,7 @@ CHI_taiyuan_arsenal_organization = {
 		IF = {
 			limit = { FROM = { NOT = { original_tag = CHI } } }
 			owner = { controls_state = CHI.mio_locations^2 } # #615 Shanxi
-		
+
 		}
 	}
 }
@@ -2114,14 +2119,14 @@ CHI_liaoning_arsenal_organization = {
 			IF = {
 				limit = { FROM = { NOT = { original_tag = CHI } } }
 
-			FROM = {
-				OR = {
-					controls_state = 4
-					any_subject_country = {
+				FROM = {
+					OR = {
 						controls_state = 4
+						any_subject_country = {
+							controls_state = 4
+						}
 					}
 				}
-			}
 			}
 		}
 
@@ -2149,7 +2154,7 @@ CHI_liaoning_arsenal_organization = {
 		IF = {
 			limit = { FROM = { NOT = { original_tag = CHI } } }
 			owner = { controls_state = CHI.mio_locations^3 } # #715 Liaobei
-		
+
 		}
 	}
 }
@@ -2165,13 +2170,11 @@ CHI_hanyan_arsenal_organization = {
 		position = { x=0 y=2 }
 	}
 
-
 	override_trait = {
 		token = generic_mio_trait_advanced_barrel_forging
 
 		position = { x=1 y=2 }
 	}
-
 
 	override_trait = {
 		token = generic_mio_trait_reinforced_stocks
@@ -2179,13 +2182,11 @@ CHI_hanyan_arsenal_organization = {
 		position = { x=3 y=0 }
 	}
 
-
 	override_trait = {
 		token = generic_mio_trait_medium_machineguns
 
 		position = { x=0 y=2 }
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_experienced_manufacturer
@@ -2209,7 +2210,6 @@ CHI_hanyan_arsenal_organization = {
 		}
 	}
 
-
 	add_trait = {
 		token = GER_mio_trait_export_models
 		name = GER_mio_trait_export_models
@@ -2232,7 +2232,6 @@ CHI_hanyan_arsenal_organization = {
 			base = 2
 		}
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_karabiner
@@ -2261,7 +2260,6 @@ CHI_hanyan_arsenal_organization = {
 			base = 2
 		}
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_sturmgewehr
@@ -2313,63 +2311,140 @@ CHI_hanyan_arsenal_organization = {
 		IF = {
 			limit = { FROM = { NOT = { original_tag = CHI } } }
 			owner = { controls_state = CHI.mio_locations^4 } ##1036 Wuhan
-		
+
 		}
 	}
 }
 
 CHI_mukden_arsenal_organization = {
-	# autoCore：奉天兵工厂 -> 卡尔·瓦尔特
-	# 属性整套取自 GER_carl_walther_organization；name/icon/allowed/visible/available 保留中国自己的。
+	# autoCore：奉天兵工厂 -> 梅季希机器制造厂
+	# 属性整套取自 SOV_mytishchy_machine_building_plant_organization；name/icon/allowed/visible/available 保留中国自己的。
 	# 摊平搬运而非嵌套 include（原版无两级 include 先例，且跨文件受加载顺序影响）。
-	include = generic_support_equipment_organization
+	include = generic_tank_refurbishment_plant_organization
 
 	add_trait = {
-		token = GER_mio_trait_innovative_safety_features
-		name = GER_mio_trait_innovative_safety_features
-		icon = GFX_generic_mio_department_icon_facilities
+		token = SOV_mio_trait_merge_plant_no_174
+		name = SOV_merge_tank_plant
+		#icon = GFX_generic_mio_department_icon_facilities
+		icon = GFX_generic_mio_trait_icon_maximum_speed
 		special_trait_background = yes
 
-		position = { x=1 y=1 }
-		relative_position_id = generic_mio_trait_private_scientists_program
+		position = { x=@tank_1_X y=@tank_1_Y }
 
-		all_parents = { generic_mio_trait_private_scientists_program }
-
-		ai_will_do = {
-			base = 2
+		visible = {
+			FROM = { OR = { original_tag = SOV original_tag = CHI } }
 		}
 
-		organization_modifier = {
-			military_industrial_organization_research_bonus = 0.05
-			military_industrial_organization_design_team_assign_cost = -0.05
-			military_industrial_organization_industrial_manufacturer_assign_cost = -0.05
-		}
-	}
-
-
-	add_trait = {
-		token = GER_mio_trait_policiary_equipment
-		name = GER_mio_trait_policiary_equipment
-		icon = GFX_generic_mio_department_icon_support_equipment
-		special_trait_background = yes
-
-		position = { x=0 y=1 }
-		relative_position_id = generic_mio_trait_private_tenders
-
-		all_parents = { generic_mio_trait_private_tenders }
-
-		ai_will_do = {
-			base = 2
+		available = {
+			# autoCore：含中国无法满足的条件，对中国整体绕过
+			IF = {
+				limit = { FROM = { NOT = { original_tag = CHI } } }
+				#Two FROM blocs to provide two different check marks in the UI
+				FROM = {
+					has_full_control_of_state = 195 #LENINGRAD
+				}
+				FROM = {
+					has_completed_focus = SOV_merge_tank_and_materiel_plants
+				}
+				FROM = {
+					NOT = { has_country_flag = SOV_merge_plant_no_174_flag }
+				}
+			}
 		}
 
-		limit_to_equipment_type = { support_equipment }
-
-		organization_modifier = {
-			military_industrial_organization_funds_gain = 0.05
+		on_complete = {
+			custom_effect_tooltip = generic_trait_will_not_be_available_in_other_organizations
+			FROM = {
+				set_country_flag = SOV_merge_plant_no_174_flag
+			}
 		}
 
 		equipment_bonus = {
-			build_cost_ic = -0.05
+			maximum_speed = @tank_max_speed
+		}
+	}
+
+	add_trait = {
+		token = SOV_mio_trait_merge_plant_no_112
+		name = SOV_merge_tank_plant_2
+		#icon = GFX_generic_mio_department_icon_facilities
+		icon = GFX_generic_mio_trait_icon_production_capacity
+		special_trait_background = yes
+
+		position = { x=@tank_2_X y=@tank_2_Y }
+
+		visible = {
+			FROM = { OR = { original_tag = SOV original_tag = CHI } }
+		}
+
+		available = {
+			# autoCore：含中国无法满足的条件，对中国整体绕过
+			IF = {
+				limit = { FROM = { NOT = { original_tag = CHI } } }
+
+				FROM = {
+					has_full_control_of_state = 252 #GORKY
+				}
+				FROM = {
+					has_completed_focus = SOV_merge_tank_and_materiel_plants
+				}
+				FROM = {
+					NOT = { has_country_flag = SOV_merge_plant_no_112_flag }
+				}
+			}
+		}
+
+		on_complete = {
+			custom_effect_tooltip = generic_trait_will_not_be_available_in_other_organizations
+			FROM = {
+				set_country_flag = SOV_merge_plant_no_112_flag
+			}
+		}
+
+		production_bonus = {
+			production_capacity_factor = @tank_production_capacity_factor
+		}
+	}
+
+	add_trait = {
+		token = SOV_mio_trait_merge_ural_heavy_machine_building_plant
+		name = SOV_merge_tank_plant_3
+		#icon = GFX_generic_mio_department_icon_facilities
+		icon = GFX_generic_mio_trait_icon_soft_attack
+		special_trait_background = yes
+
+		position = { x=@tank_3_X y=@tank_3_Y }
+
+		visible = {
+			FROM = { OR = { original_tag = SOV original_tag = CHI } }
+		}
+
+		available = {
+			# autoCore：含中国无法满足的条件，对中国整体绕过
+			IF = {
+				limit = { FROM = { NOT = { original_tag = CHI } } }
+
+				FROM = {
+					has_full_control_of_state = 653 #SVERDLOVSK
+				}
+				FROM = {
+					has_completed_focus = SOV_merge_tank_and_materiel_plants
+				}
+				FROM = {
+					NOT = { has_country_flag = SOV_merge_ural_heavy_machine_building_plant_flag }
+				}
+			}
+		}
+
+		on_complete = {
+			custom_effect_tooltip = generic_trait_will_not_be_available_in_other_organizations
+			FROM = {
+				set_country_flag = SOV_merge_ural_heavy_machine_building_plant_flag
+			}
+		}
+
+		equipment_bonus = {
+			soft_attack = @tank_soft_attack
 		}
 	}
 	icon = GFX_idea_CHI_mukden
@@ -2387,20 +2462,20 @@ CHI_mukden_arsenal_organization = {
 		IF = {
 			limit = { FROM = { NOT = { original_tag = CHI } } }
 			IF = {
-					limit = {
-						FROM = {
-							OR = {
-								NOT = { original_tag = CHI }
-								AND = {
-									original_tag = CHI
-									NOT = { has_dlc = "No Compromise, No Surrender" }
-								}
+				limit = {
+					FROM = {
+						OR = {
+							NOT = { original_tag = CHI }
+							AND = {
+								original_tag = CHI
+								NOT = { has_dlc = "No Compromise, No Surrender" }
 							}
 						}
 					}
-					owner = { controls_state = CHI.mio_locations^5 } # #716 Liaoning
 				}
-		
+				owner = { controls_state = CHI.mio_locations^5 } # #716 Liaoning
+			}
+
 		}
 	}
 }
@@ -2433,7 +2508,6 @@ CHI_taiyuan_arsenal_organization_sea = {
 		}
 	}
 
-
 	add_trait = {
 		token = GER_mio_trait_7_5_cm_pak
 		name = GER_mio_trait_7_5_cm_pak
@@ -2454,7 +2528,6 @@ CHI_taiyuan_arsenal_organization_sea = {
 			hard_attack = 0.1
 		}
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_versatile_carriage
@@ -2481,7 +2554,6 @@ CHI_taiyuan_arsenal_organization_sea = {
 			air_attack = 0.05
 		}
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_dual_recoil_mechanism
@@ -2528,12 +2600,12 @@ CHI_taiyuan_arsenal_organization_sea = {
 		IF = {
 			limit = { FROM = { NOT = { original_tag = CHI } } }
 			IF = {
-					limit = {
-						FROM = { NOT = { original_tag = CHI } }
-					}
-					owner = { controls_state = CHI.mio_locations^2 } # #615 Shanxi
+				limit = {
+					FROM = { NOT = { original_tag = CHI } }
 				}
-		
+				owner = { controls_state = CHI.mio_locations^2 } # #615 Shanxi
+			}
+
 		}
 	}
 }
@@ -2564,14 +2636,14 @@ CHI_liaoning_arsenal_organization_sea = {
 			IF = {
 				limit = { FROM = { NOT = { original_tag = CHI } } }
 
-			FROM = {
-				OR = {
-					controls_state = 4
-					any_subject_country = {
+				FROM = {
+					OR = {
 						controls_state = 4
+						any_subject_country = {
+							controls_state = 4
+						}
 					}
 				}
-			}
 			}
 		}
 
@@ -2599,12 +2671,12 @@ CHI_liaoning_arsenal_organization_sea = {
 		IF = {
 			limit = { FROM = { NOT = { original_tag = CHI } } }
 			IF = {
-					limit = {
-						FROM = { NOT = { original_tag = CHI } }
-					}
-					owner = { controls_state = CHI.mio_locations^3 } # #715 Liaobei
+				limit = {
+					FROM = { NOT = { original_tag = CHI } }
 				}
-		
+				owner = { controls_state = CHI.mio_locations^3 } # #715 Liaobei
+			}
+
 		}
 	}
 }
@@ -2620,13 +2692,11 @@ CHI_hanyan_arsenal_organization_sea = {
 		position = { x=0 y=2 }
 	}
 
-
 	override_trait = {
 		token = generic_mio_trait_advanced_barrel_forging
 
 		position = { x=1 y=2 }
 	}
-
 
 	override_trait = {
 		token = generic_mio_trait_reinforced_stocks
@@ -2634,13 +2704,11 @@ CHI_hanyan_arsenal_organization_sea = {
 		position = { x=3 y=0 }
 	}
 
-
 	override_trait = {
 		token = generic_mio_trait_medium_machineguns
 
 		position = { x=0 y=2 }
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_experienced_manufacturer
@@ -2664,7 +2732,6 @@ CHI_hanyan_arsenal_organization_sea = {
 		}
 	}
 
-
 	add_trait = {
 		token = GER_mio_trait_export_models
 		name = GER_mio_trait_export_models
@@ -2687,7 +2754,6 @@ CHI_hanyan_arsenal_organization_sea = {
 			base = 2
 		}
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_karabiner
@@ -2716,7 +2782,6 @@ CHI_hanyan_arsenal_organization_sea = {
 			base = 2
 		}
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_sturmgewehr
@@ -2768,12 +2833,12 @@ CHI_hanyan_arsenal_organization_sea = {
 		IF = {
 			limit = { FROM = { NOT = { original_tag = CHI } } }
 			IF = {
-					limit = {
-						FROM = { NOT = { original_tag = CHI } }
-					}
-					owner = { controls_state = CHI.mio_locations^4 } ##1036 Wuhan
+				limit = {
+					FROM = { NOT = { original_tag = CHI } }
 				}
-		
+				owner = { controls_state = CHI.mio_locations^4 } ##1036 Wuhan
+			}
+
 		}
 	}
 }
@@ -2801,9 +2866,9 @@ CHI_china_automobile_corporation_organization = {
 			IF = {
 				limit = { FROM = { NOT = { original_tag = CHI } } }
 
-			FROM = {
-				has_completed_focus = GER_nationalize_ford_factories
-			}
+				FROM = {
+					has_completed_focus = GER_nationalize_ford_factories
+				}
 			}
 		}
 
@@ -2816,7 +2881,6 @@ CHI_china_automobile_corporation_organization = {
 			base = 2
 		}
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_ford_facilities
@@ -2835,9 +2899,9 @@ CHI_china_automobile_corporation_organization = {
 			IF = {
 				limit = { FROM = { NOT = { original_tag = CHI } } }
 
-			FROM = {
-				has_completed_focus = GER_nationalize_ford_factories
-			}
+				FROM = {
+					has_completed_focus = GER_nationalize_ford_factories
+				}
 			}
 		}
 
@@ -2849,7 +2913,6 @@ CHI_china_automobile_corporation_organization = {
 			base = 2
 		}
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_efficiency_in_mass_production
@@ -2874,7 +2937,6 @@ CHI_china_automobile_corporation_organization = {
 			base = 2
 		}
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_improved_engines
@@ -2917,12 +2979,12 @@ CHI_china_automobile_corporation_organization = {
 		IF = {
 			limit = { FROM = { NOT = { original_tag = CHI } } }
 			IF = {
-					limit = {
-						FROM = { NOT = { original_tag = CHI } }
-					}
-					owner = { controls_state = CHI.mio_locations^6 } # 613 Shanghai
+				limit = {
+					FROM = { NOT = { original_tag = CHI } }
 				}
-		
+				owner = { controls_state = CHI.mio_locations^6 } # 613 Shanghai
+			}
+
 		}
 	}
 }
@@ -2954,7 +3016,6 @@ CHI_jinling_arsenal_organization = {
 			military_industrial_organization_industrial_manufacturer_assign_cost = -0.05
 		}
 	}
-
 
 	add_trait = {
 		token = GER_mio_trait_policiary_equipment
@@ -2997,12 +3058,12 @@ CHI_jinling_arsenal_organization = {
 		IF = {
 			limit = { FROM = { NOT = { original_tag = CHI } } }
 			IF = {
-					limit = {
-						FROM = { NOT = { original_tag = CHI } }
-					}
-					owner = { controls_state = CHI.mio_locations^6 } # 1035 Nanjing
+				limit = {
+					FROM = { NOT = { original_tag = CHI } }
 				}
-		
+				owner = { controls_state = CHI.mio_locations^6 } # 1035 Nanjing
+			}
+
 		}
 	}
 }
