@@ -3272,7 +3272,4 @@ auto_mio_complete_trait = {
 			complete_mio_trait = { trait = set_capacity_to_1 show_modifiers = no }
 		}
 	}
-	clr_country_flag = SOV_accepted_Morozov
-	clr_country_flag = SOV_accepted_Astrov
-	set_country_flag = SOV_accepted_OKMO
 }
