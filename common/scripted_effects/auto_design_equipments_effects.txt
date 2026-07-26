@@ -30,6 +30,24 @@ auto_design = {
 			ROOT = { set_variable = { design_mio_tank = PREV } }
 		}
 	}
+	# 兜底：补齐 重型坦克/突击炮/坦克翻修厂 原型。只在前面几遍全落空时才跑，
+	# 本来就能选到设计局的国家行为不变。
+	if = {
+		limit = { check_variable = { design_mio_tank < 1 } }
+		every_military_industrial_organization = {
+			limit = {
+				is_mio_available = yes
+				OR = {
+					has_mio_trait = generic_mio_trait_apcr_hvap_shells # 重型坦克
+					has_mio_trait = generic_mio_armor_hardening_process_assault_guns # 突击炮
+					has_mio_trait = generic_mio_trait_24h_rotation_shifts # 坦克翻修厂
+					has_mio_trait = generic_mio_initial_trait_light_armored_manufacturer # 轻型装甲制造商
+					has_mio_trait = generic_mio_trait_heavy_anti_tank_gun # 装甲车原型
+				}
+			}
+			ROOT = { set_variable = { design_mio_tank = PREV } }
+		}
+	}
 	# 驱逐舰 → 护航舰艇设计师，退而特混舰队/袭击舰队
 	set_variable = { design_mio_dd = 0 }
 	every_military_industrial_organization = {
@@ -44,6 +62,22 @@ auto_design = {
 				OR = {
 					has_mio_trait = generic_mio_trait_transom_stern
 					has_mio_trait = generic_mio_trait_high_speed_raiding
+				}
+			}
+			ROOT = { set_variable = { design_mio_dd = PREV } }
+		}
+	}
+	# 兜底：补齐 战列线/黑海舰队/翻修维修 原型。只在前面几遍全落空时才跑，
+	# 本来就能选到设计局的国家行为不变。
+	if = {
+		limit = { check_variable = { design_mio_dd < 1 } }
+		every_military_industrial_organization = {
+			limit = {
+				is_mio_available = yes
+				OR = {
+					has_mio_trait = generic_mio_trait_advanced_armor_design # 战列线
+					has_mio_trait = generic_mio_advanced_periscope # 黑海舰队
+					has_mio_trait = generic_mio_trait_advanced_scanners # 翻修维修
 				}
 			}
 			ROOT = { set_variable = { design_mio_dd = PREV } }
@@ -68,6 +102,22 @@ auto_design = {
 			ROOT = { set_variable = { design_mio_cruiser = PREV } }
 		}
 	}
+	# 兜底：补齐 黑海舰队/护航舰艇/翻修维修 原型。只在前面几遍全落空时才跑，
+	# 本来就能选到设计局的国家行为不变。
+	if = {
+		limit = { check_variable = { design_mio_cruiser < 1 } }
+		every_military_industrial_organization = {
+			limit = {
+				is_mio_available = yes
+				OR = {
+					has_mio_trait = generic_mio_advanced_periscope # 黑海舰队
+					has_mio_trait = generic_mio_trait_anti_air_ships # 护航舰艇
+					has_mio_trait = generic_mio_trait_advanced_scanners # 翻修维修
+				}
+			}
+			ROOT = { set_variable = { design_mio_cruiser = PREV } }
+		}
+	}
 	# 主力舰 → 战列线设计师，退而袭击舰队/翻新维修
 	set_variable = { design_mio_capital = 0 }
 	every_military_industrial_organization = {
@@ -87,11 +137,41 @@ auto_design = {
 			ROOT = { set_variable = { design_mio_capital = PREV } }
 		}
 	}
+	# 兜底：补齐 黑海舰队/特混舰队 原型。只在前面几遍全落空时才跑，
+	# 本来就能选到设计局的国家行为不变。
+	if = {
+		limit = { check_variable = { design_mio_capital < 1 } }
+		every_military_industrial_organization = {
+			limit = {
+				is_mio_available = yes
+				OR = {
+					has_mio_trait = generic_mio_advanced_periscope # 黑海舰队
+					has_mio_trait = generic_mio_trait_advanced_fitting_works # 特混舰队
+				}
+			}
+			ROOT = { set_variable = { design_mio_capital = PREV } }
+		}
+	}
 	# 航母 → 特混舰队设计师（唯一覆盖航母的通用原型，无备选）
 	set_variable = { design_mio_carrier = 0 }
 	every_military_industrial_organization = {
 		limit = { is_mio_available = yes has_mio_trait = generic_mio_trait_carrier_flight_operations_center }
 		ROOT = { set_variable = { design_mio_carrier = PREV } }
+	}
+	# 兜底：补齐 战列线/黑海舰队 原型。只在前面几遍全落空时才跑，
+	# 本来就能选到设计局的国家行为不变。
+	if = {
+		limit = { check_variable = { design_mio_carrier < 1 } }
+		every_military_industrial_organization = {
+			limit = {
+				is_mio_available = yes
+				OR = {
+					has_mio_trait = generic_mio_trait_advanced_armor_design # 战列线
+					has_mio_trait = generic_mio_advanced_periscope # 黑海舰队
+				}
+			}
+			ROOT = { set_variable = { design_mio_carrier = PREV } }
+		}
 	}
 	# 潜艇 → 潜艇设计师，退而袭击舰队/黑海舰队
 	set_variable = { design_mio_sub = 0 }
@@ -138,6 +218,18 @@ auto_design = {
 			ROOT = { set_variable = { design_mio_fighter = PREV } }
 		}
 	}
+	# 兜底：补齐 远程飞机 原型。只在前面几遍全落空时才跑，
+	# 本来就能选到设计局的国家行为不变。
+	if = {
+		limit = { check_variable = { design_mio_fighter < 1 } }
+		every_military_industrial_organization = {
+			limit = {
+				is_mio_available = yes
+				has_mio_trait = generic_mio_trait_advanced_production_techniques # 远程飞机
+			}
+			ROOT = { set_variable = { design_mio_fighter = PREV } }
+		}
+	}
 	# 对地攻击机/多功能 → CAS 设计师，退而轻型飞机/通用飞机
 	set_variable = { design_mio_cas = 0 }
 	every_military_industrial_organization = {
@@ -176,6 +268,23 @@ auto_design = {
 			ROOT = { set_variable = { design_mio_cvplane = PREV } }
 		}
 	}
+	# 兜底：补齐 对地攻击机/高敏战机/多用途/远程飞机 原型。只在前面几遍全落空时才跑，
+	# 本来就能选到设计局的国家行为不变。
+	if = {
+		limit = { check_variable = { design_mio_cvplane < 1 } }
+		every_military_industrial_organization = {
+			limit = {
+				is_mio_available = yes
+				OR = {
+					has_mio_trait = generic_mio_cluster_bombs # 对地攻击机
+					has_mio_trait = generic_mio_trait_bigger_engines # 高敏战机
+					has_mio_trait = generic_mio_trait_armored_cockpit # 多用途
+					has_mio_trait = generic_mio_trait_advanced_production_techniques # 远程飞机
+				}
+			}
+			ROOT = { set_variable = { design_mio_cvplane = PREV } }
+		}
+	}
 	# 侦察机 → 中型飞机设计师，退而通用飞机/多用途/远程
 	set_variable = { design_mio_scout = 0 }
 	every_military_industrial_organization = {
@@ -192,6 +301,18 @@ auto_design = {
 					has_mio_trait = generic_mio_trait_medium_airframe
 					has_mio_trait = generic_mio_trait_long_range_modifications
 				}
+			}
+			ROOT = { set_variable = { design_mio_scout = PREV } }
+		}
+	}
+	# 兜底：补齐 轻型飞机 原型。只在前面几遍全落空时才跑，
+	# 本来就能选到设计局的国家行为不变。
+	if = {
+		limit = { check_variable = { design_mio_scout < 1 } }
+		every_military_industrial_organization = {
+			limit = {
+				is_mio_available = yes
+				has_mio_trait = generic_mio_trait_advanced_aerodynamics # 轻型飞机
 			}
 			ROOT = { set_variable = { design_mio_scout = PREV } }
 		}
@@ -2979,6 +3100,42 @@ auto_design = {
 				special_type_slot_2 = extra_ammo_storage
 				special_type_slot_3 = extra_ammo_storage
 				special_type_slot_4 = extra_ammo_storage
+			}
+		}
+	}
+	if = {
+		limit = { check_variable = { design_mio_tank > 0 } }
+		create_equipment_variant = {
+			name = "36轻型坦克"
+			type = light_tank_chassis_2
+			design_team = design_mio_tank
+			modules = {
+				armor_type_slot = tank_riveted_armor
+				engine_type_slot = tank_diesel_engine
+				main_armament_slot = tank_auto_cannon
+				special_type_slot_1 = easy_maintenance
+				special_type_slot_2 = extra_ammo_storage
+				special_type_slot_3 = extra_ammo_storage
+				special_type_slot_4 = extra_ammo_storage
+				suspension_type_slot = tank_wheeled_suspension
+				turret_type_slot = tank_light_three_man_tank_turret
+			}
+		}
+	}
+	else = {
+		create_equipment_variant = {
+			name = "36轻型坦克"
+			type = light_tank_chassis_2
+			modules = {
+				armor_type_slot = tank_riveted_armor
+				engine_type_slot = tank_diesel_engine
+				main_armament_slot = tank_auto_cannon
+				special_type_slot_1 = easy_maintenance
+				special_type_slot_2 = extra_ammo_storage
+				special_type_slot_3 = extra_ammo_storage
+				special_type_slot_4 = extra_ammo_storage
+				suspension_type_slot = tank_wheeled_suspension
+				turret_type_slot = tank_light_three_man_tank_turret
 			}
 		}
 	}

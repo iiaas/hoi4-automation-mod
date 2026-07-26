@@ -1,98 +1,23 @@
-# 中国德械师兵模：不替换默认兵模，覆盖 CHI_infantry_alt_0_entity / CHI_infantry_2_alt_0_entity
-# 这两个原版已有的实体（同名覆盖），并新增 CHI_infantry_3_alt_0_entity（原版没有，仿照
-# CHI_infantry_3_entity 的写法，克隆_2_alt_0补上突击档位）。
-# 相对原版多的改动：
-#   - move / march_move 的 animation_blend_time 由 1.0 改成 0.0（跟德国基础模板 infantry_2_entity 一致，
-#     避免换装后武器道具在待机->移动过渡混合期间穿模）
-#   - 三档(3_alt_0)手部/背部挂点换成德国 StG44(MP43) 道具实体（GER_infantry_weapon_mg_2_*_entity）
-entity = {
-	name = "CHI_infantry_alt_0_entity"
-	pdxmesh = "CHI_infantry_rifle_mesh"
-
-	default_state = "idle"
-	state = { name = "attack"			animation = "charge_rifle" 					animation_blend_time = 0.0  animation_speed = 1.0 looping = no next_state = "attack" chance = 2 propagate_state = { rifle2 = "idle" } }
-	state = { name = "attack"			animation = "charge_rifle_shoot" 			animation_blend_time = 0.0  animation_speed = 1.0 looping = no next_state = "attack" chance = 1 }
-	state = { name = "defend"			animation = "attack" 			animation_blend_time = 0.3  animation_speed = 1.0 }
-	state = { name = "support_attack"	animation = "support_attack" 	animation_blend_time = 0.3 animation_speed = 1.0 }
-	state = { name = "move"				animation = "move" 		 		animation_blend_time = 0.0 animation_speed = 1.0 chance = 1
-		event = { sound = { soundeffect = "infantry_move_animation" } }
-	}
-	state = { name = "move"				animation = "march_move" 		 		animation_blend_time = 0.0 animation_speed = 1.0 chance = 1
-		event = { sound = { soundeffect = "infantry_move_animation" } }
-	}
-	state = { name = "retreat"			animation = "retreat"		 	animation_blend_time = 0.3 animation_speed = 1.0 }
-	state = { name = "death"			animation = "death"				animation_blend_time = 0.3 animation_speed = 1.0 }
-	state = { name = "idle"				animation = "idle"				animation_blend_time = 0.3 animation_speed = 1.0 chance = 15 looping = no }
-	state = { name = "idle"				animation = "long_idle02" 		animation_blend_time = 0.3 animation_speed = 1.0 chance = 1 looping = no }
-	state = { name = "idle"				animation = "long_idle03" 		animation_blend_time = 0.3 animation_speed = 1.0 chance = 1 looping = no propagate_state = { lighter = "smoke" }
-		event = { time = 0 node="head" particle = "cigarette_smoke_particle"  keep_particle = yes }
-	}
-	state = { name = "idle"				animation = "long_idle04" 		animation_blend_time = 0.3 animation_speed = 1.0 chance = 1 looping = no }
-	state = { name = "idle"				animation = "long_idle05" 		animation_blend_time = 0.3 animation_speed = 1.0 chance = 1 looping = no }
-	state = { name = "training"				animation = "training" 			animation_blend_time = 0.3 animation_speed = 1.0 chance = 2 looping = no }
-	state = { name = "training"				animation = "jumping_jacks" 	animation_blend_time = 0.3 animation_speed = 1.0 chance = 1 looping = no }
-	state = { name = "training"				animation = "pushup" 			animation_blend_time = 0.3 animation_speed = 1.0 chance = 1 looping = no }
-	state = { name = "training"				animation = "guard_rifle" 		animation_blend_time = 0.3 animation_speed = 1.0 chance = 1 looping = no }
-	state = { name = "training"				animation = "aim_exercise" 		animation_blend_time = 0.3 animation_speed = 1.0 chance = 1 looping = no }
-
-	attach = { 	name = "rifle1"	Right_Hand_node = "CHI_infantry_weapon_rifle_right_entity" }
-	attach = { 	name = "rifle4"	Root_node_2 = "CHI_infantry_weapon_rifle_right_entity" }
-	attach = { 	name = "rifle2"	Left_Hand_node = "CHI_infantry_weapon_rifle_left_entity" }
-	attach = { 	name = "rifle3"	mid_back_node = "CHI_infantry_weapon_rifle_long_idle_entity" }
-
-	attach = { 	name = "lighter"			Right_Hand_node_4 = "lighter_entity" }
-	attach = { 	name = "cigarette1"			Right_Hand_node_2 = "cigarette_entity" }
-	attach = { 	name = "cigarette_package1"	Right_Hand_node_3 = "cigarette_package_entity" }
-	attach = { 	name = "cigarette_package2"	Left_Hand_node_2 = "cigarette_package_entity" }
-	attach = { 	name = "cigarette2"			Root_node_1 = "cigarette_entity" }
-
-	scale = 0.8
-}
-
-entity = {
-	name = "CHI_infantry_2_alt_0_entity"
-	pdxmesh = "CHI_infantry_mg_mesh"
-
-	default_state = "idle"
-	state = { name = "attack"			animation = "charge_mg" 					animation_blend_time = 0.0  animation_speed = 1.0 looping = no next_state = "attack" chance = 2 propagate_state = { rifle1 = "idle" } }
-	state = { name = "attack"			animation = "charge_mg_shoot" 			animation_blend_time = 0.0  animation_speed = 1.0 looping = no next_state = "attack" chance = 1 }
-	state = { name = "defend"			animation = "attack" 			animation_blend_time = 0.3  animation_speed = 1.0 }
-	state = { name = "support_attack"	animation = "support_attack" animation_blend_time = 0.3 animation_speed = 1.0 }
-	state = { name = "move"				animation = "move" 		 		animation_blend_time = 0.0 animation_speed = 1.0 chance = 1
-		event = { sound = { soundeffect = "infantry_move_animation" } }
-	}
-	state = { name = "move"				animation = "march_move" 		 		animation_blend_time = 0.0 animation_speed = 1.0 chance = 1
-		event = { sound = { soundeffect = "infantry_move_animation" } }
-	}
-	state = { name = "retreat"			animation = "retreat" animation_blend_time = 0.3 animation_speed = 1.0 }
-	state = { name = "death"			animation = "death" animation_blend_time = 0.3 animation_speed = 1.0 }
-	state = { name = "idle"				animation = "idle"        animation_blend_time = 0.3 animation_speed = 1.0 chance = 15 looping = no }
-	state = { name = "idle"				animation = "long_idle02" animation_blend_time = 0.3 animation_speed = 1.0 chance = 1 looping = no }
-	state = { name = "idle"				animation = "long_idle03" animation_blend_time = 0.3 animation_speed = 1.0 chance = 1 looping = no propagate_state = { lighter = "smoke"}
-		event = { time = 0 node="head" particle = "cigarette_smoke_particle"  keep_particle = yes }
-	}
-	state = { name = "idle"				animation = "long_idle04" animation_blend_time = 0.3 animation_speed = 1.0 chance = 1 looping = no }
-	state = { name = "idle"				animation = "long_idle05" animation_blend_time = 0.3 animation_speed = 1.0 chance = 1 looping = no }
-	state = { name = "training"				animation = "training" 			animation_blend_time = 0.3 animation_speed = 1.0 chance = 2 looping = no }
-	state = { name = "training"				animation = "jumping_jacks" 	animation_blend_time = 0.3 animation_speed = 1.0 chance = 1 looping = no }
-	state = { name = "training"				animation = "pushup" 			animation_blend_time = 0.3 animation_speed = 1.0 chance = 1 looping = no }
-	state = { name = "training"				animation = "guard_rifle" 		animation_blend_time = 0.3 animation_speed = 1.0 chance = 1 looping = no }
-	state = { name = "training"				animation = "aim_exercise" 		animation_blend_time = 0.3 animation_speed = 1.0 chance = 1 looping = no }
-
-	attach = { 	name = "rifle1"	Right_Hand_node = "CHI_infantry_weapon_mg_right_entity" }
-	attach = { 	name = "rifle4"	Root_node_2 = "CHI_infantry_weapon_rifle_right_entity" }
-	attach = { 	name = "rifle2"	Left_Hand_node = "CHI_infantry_weapon_mg_left_entity" }
-	attach = { 	name = "rifle3"	mid_back_node = "CHI_infantry_weapon_mg_long_idle_entity" }
-
-	attach = { 	name = "lighter"			Right_Hand_node_4 = "lighter_entity" }
-	attach = { 	name = "cigarette1"			Right_Hand_node_2 = "cigarette_entity" }
-	attach = { 	name = "cigarette_package1"	Right_Hand_node_3 = "cigarette_package_entity" }
-	attach = { 	name = "cigarette_package2"	Left_Hand_node_2 = "cigarette_package_entity" }
-	attach = { 	name = "cigarette2"			Root_node_1 = "cigarette_entity" }
-
-	scale = 0.8
-}
-
+# 中国德械师兵模：只保留 CHI_infantry_3_alt_0_entity（原版没有这个实体，仿照 CHI_infantry_2_alt_0
+# 的写法补上突击档位，手部/背部挂点用德国 StG44(MP43) 道具）。
+#
+# 原先这里还覆盖了 CHI_infantry_alt_0_entity / CHI_infantry_2_alt_0_entity 两个【原版已存在】的实体
+# （定义在 integrated_dlc/dlc022_waking_the_tiger/gfx/entities/wtt_units_infantry.asset），
+# 已删除，原因有二：
+#   1) 引擎不接受 gfx/entities/*.asset 的跨文件同名覆盖，error.log 会报
+#      "Duplicate of CHI_infantry_alt_0_entity added to entity system"，覆盖静默失效，改了也没用。
+#      要真正覆盖只能整份复制原版文件到同一相对路径（1593 行）。
+#   2) 它跟原版的唯一差异是把 move / march_move 的 animation_blend_time 由 1.0 改成 0.0，而原版
+#      CHI_infantry_alt_0_entity 的动画本就与 GER_infantry_entity 完全一致（GER 是
+#      clone = "infantry_rifle_entity"，该模板每条 state 与原版 CHI alt_0 逐字相同：
+#      move/march_move 混合 1.0，其余 0.3，animation_speed 全为 1.0）。
+#      删掉这两块 = 回落原版 = 与德国一致，正是所需效果。
+#
+# 钢盔外观不受影响：它来自 z_chi_ger_helmet.gfx 里的 pdxmesh 同名覆盖（.gfx 允许小文件覆盖），
+# 与实体定义无关。
+#
+# 3_alt_0 的 move / march_move 混合时长同样取 1.0，与 GER_infantry_entity（clone 自
+# infantry_rifle_entity）保持一致——德国用 1.0 也没有枪背穿模，所以不需要压到 0.0。
 entity = {
 	name = "CHI_infantry_3_alt_0_entity"
 	pdxmesh = "CHI_infantry_mg_mesh"
