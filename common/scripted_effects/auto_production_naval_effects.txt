@@ -24,7 +24,7 @@ auto_production_naval = {
 			if = {
 				limit = { check_variable = { line_mio > 0 } }
 				add_equipment_production = {
-					equipment = { type = ship_hull_carrier_modern version_name = "现代航母" }
+					equipment = { type = ship_hull_carrier_modern }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -33,7 +33,7 @@ auto_production_naval = {
 			}
 			else = {
 				add_equipment_production = {
-					equipment = { type = ship_hull_carrier_modern version_name = "现代航母" }
+					equipment = { type = ship_hull_carrier_modern }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -45,7 +45,7 @@ auto_production_naval = {
 			if = {
 				limit = { check_variable = { line_mio > 0 } }
 				add_equipment_production = {
-					equipment = { type = ship_hull_carrier_3 version_name = "1944航空母舰" }
+					equipment = { type = ship_hull_carrier_3 }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -54,7 +54,7 @@ auto_production_naval = {
 			}
 			else = {
 				add_equipment_production = {
-					equipment = { type = ship_hull_carrier_3 version_name = "1944航空母舰" }
+					equipment = { type = ship_hull_carrier_3 }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -66,7 +66,7 @@ auto_production_naval = {
 			if = {
 				limit = { check_variable = { line_mio > 0 } }
 				add_equipment_production = {
-					equipment = { type = ship_hull_carrier_2 version_name = "1940航空母舰船体" }
+					equipment = { type = ship_hull_carrier_2 }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -75,7 +75,7 @@ auto_production_naval = {
 			}
 			else = {
 				add_equipment_production = {
-					equipment = { type = ship_hull_carrier_2 version_name = "1940航空母舰船体" }
+					equipment = { type = ship_hull_carrier_2 }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -87,7 +87,7 @@ auto_production_naval = {
 			if = {
 				limit = { check_variable = { line_mio > 0 } }
 				add_equipment_production = {
-					equipment = { type = ship_hull_carrier_1 version_name = "1936航空母舰船体" }
+					equipment = { type = ship_hull_carrier_1 }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -96,7 +96,7 @@ auto_production_naval = {
 			}
 			else = {
 				add_equipment_production = {
-					equipment = { type = ship_hull_carrier_1 version_name = "1936航空母舰船体" }
+					equipment = { type = ship_hull_carrier_1 }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -114,7 +114,7 @@ auto_production_naval = {
 			if = {
 				limit = { check_variable = { line_mio > 0 } }
 				add_equipment_production = {
-					equipment = { type = ship_hull_carrier_modern version_name = "现代航母" }
+					equipment = { type = ship_hull_carrier_modern }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -123,7 +123,7 @@ auto_production_naval = {
 			}
 			else = {
 				add_equipment_production = {
-					equipment = { type = ship_hull_carrier_modern version_name = "现代航母" }
+					equipment = { type = ship_hull_carrier_modern }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -135,7 +135,7 @@ auto_production_naval = {
 			if = {
 				limit = { check_variable = { line_mio > 0 } }
 				add_equipment_production = {
-					equipment = { type = ship_hull_carrier_3 version_name = "1944航空母舰" }
+					equipment = { type = ship_hull_carrier_3 }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -144,7 +144,7 @@ auto_production_naval = {
 			}
 			else = {
 				add_equipment_production = {
-					equipment = { type = ship_hull_carrier_3 version_name = "1944航空母舰" }
+					equipment = { type = ship_hull_carrier_3 }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -156,7 +156,7 @@ auto_production_naval = {
 			if = {
 				limit = { check_variable = { line_mio > 0 } }
 				add_equipment_production = {
-					equipment = { type = ship_hull_carrier_2 version_name = "1940航空母舰船体" }
+					equipment = { type = ship_hull_carrier_2 }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -165,7 +165,7 @@ auto_production_naval = {
 			}
 			else = {
 				add_equipment_production = {
-					equipment = { type = ship_hull_carrier_2 version_name = "1940航空母舰船体" }
+					equipment = { type = ship_hull_carrier_2 }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -177,7 +177,7 @@ auto_production_naval = {
 			if = {
 				limit = { check_variable = { line_mio > 0 } }
 				add_equipment_production = {
-					equipment = { type = ship_hull_carrier_1 version_name = "1936航空母舰船体" }
+					equipment = { type = ship_hull_carrier_1 }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -186,7 +186,7 @@ auto_production_naval = {
 			}
 			else = {
 				add_equipment_production = {
-					equipment = { type = ship_hull_carrier_1 version_name = "1936航空母舰船体" }
+					equipment = { type = ship_hull_carrier_1 }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -217,7 +217,7 @@ auto_production_naval = {
 			if = {
 				limit = { check_variable = { line_mio > 0 } }
 				add_equipment_production = {
-					equipment = { type = ship_hull_heavy_modern version_name = "现代战列" }
+					equipment = { type = ship_hull_heavy_modern }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -226,7 +226,7 @@ auto_production_naval = {
 			}
 			else = {
 				add_equipment_production = {
-					equipment = { type = ship_hull_heavy_modern version_name = "现代战列" }
+					equipment = { type = ship_hull_heavy_modern }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -238,7 +238,7 @@ auto_production_naval = {
 			if = {
 				limit = { check_variable = { line_mio > 0 } }
 				add_equipment_production = {
-					equipment = { type = ship_hull_heavy_4 version_name = "1944重型战舰" }
+					equipment = { type = ship_hull_heavy_4 }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -247,7 +247,7 @@ auto_production_naval = {
 			}
 			else = {
 				add_equipment_production = {
-					equipment = { type = ship_hull_heavy_4 version_name = "1944重型战舰" }
+					equipment = { type = ship_hull_heavy_4 }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -259,7 +259,7 @@ auto_production_naval = {
 			if = {
 				limit = { check_variable = { line_mio > 0 } }
 				add_equipment_production = {
-					equipment = { type = ship_hull_heavy_3 version_name = "1940重型战舰船体" }
+					equipment = { type = ship_hull_heavy_3 }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -268,7 +268,7 @@ auto_production_naval = {
 			}
 			else = {
 				add_equipment_production = {
-					equipment = { type = ship_hull_heavy_3 version_name = "1940重型战舰船体" }
+					equipment = { type = ship_hull_heavy_3 }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -280,7 +280,7 @@ auto_production_naval = {
 			if = {
 				limit = { check_variable = { line_mio > 0 } }
 				add_equipment_production = {
-					equipment = { type = ship_hull_heavy_2 version_name = "1936重型战舰" }
+					equipment = { type = ship_hull_heavy_2 }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -289,7 +289,7 @@ auto_production_naval = {
 			}
 			else = {
 				add_equipment_production = {
-					equipment = { type = ship_hull_heavy_2 version_name = "1936重型战舰" }
+					equipment = { type = ship_hull_heavy_2 }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -320,7 +320,7 @@ auto_production_naval = {
 			if = {
 				limit = { check_variable = { line_mio > 0 } }
 				add_equipment_production = {
-					equipment = { type = ship_hull_heavy_modern version_name = "现代战列" }
+					equipment = { type = ship_hull_heavy_modern }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -329,7 +329,7 @@ auto_production_naval = {
 			}
 			else = {
 				add_equipment_production = {
-					equipment = { type = ship_hull_heavy_modern version_name = "现代战列" }
+					equipment = { type = ship_hull_heavy_modern }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -341,7 +341,7 @@ auto_production_naval = {
 			if = {
 				limit = { check_variable = { line_mio > 0 } }
 				add_equipment_production = {
-					equipment = { type = ship_hull_heavy_4 version_name = "1944重型战舰" }
+					equipment = { type = ship_hull_heavy_4 }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -350,7 +350,7 @@ auto_production_naval = {
 			}
 			else = {
 				add_equipment_production = {
-					equipment = { type = ship_hull_heavy_4 version_name = "1944重型战舰" }
+					equipment = { type = ship_hull_heavy_4 }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -362,7 +362,7 @@ auto_production_naval = {
 			if = {
 				limit = { check_variable = { line_mio > 0 } }
 				add_equipment_production = {
-					equipment = { type = ship_hull_heavy_3 version_name = "1940重型战舰船体" }
+					equipment = { type = ship_hull_heavy_3 }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -371,7 +371,7 @@ auto_production_naval = {
 			}
 			else = {
 				add_equipment_production = {
-					equipment = { type = ship_hull_heavy_3 version_name = "1940重型战舰船体" }
+					equipment = { type = ship_hull_heavy_3 }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -383,7 +383,7 @@ auto_production_naval = {
 			if = {
 				limit = { check_variable = { line_mio > 0 } }
 				add_equipment_production = {
-					equipment = { type = ship_hull_heavy_2 version_name = "1936重型战舰" }
+					equipment = { type = ship_hull_heavy_2 }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -392,7 +392,7 @@ auto_production_naval = {
 			}
 			else = {
 				add_equipment_production = {
-					equipment = { type = ship_hull_heavy_2 version_name = "1936重型战舰" }
+					equipment = { type = ship_hull_heavy_2 }
 					requested_factories = 5
 					amount = 1
 					progress = 0
@@ -423,7 +423,7 @@ auto_production_naval = {
 			if = {
 				limit = { check_variable = { line_mio > 0 } }
 				add_equipment_production = {
-					equipment = { type = ship_hull_cruiser_3 version_name = "1940轻炮巡洋舰" }
+					equipment = { type = ship_hull_cruiser_3 }
 					requested_factories = 10
 					amount = 4
 					progress = 0
@@ -432,7 +432,7 @@ auto_production_naval = {
 			}
 			else = {
 				add_equipment_production = {
-					equipment = { type = ship_hull_cruiser_3 version_name = "1940轻炮巡洋舰" }
+					equipment = { type = ship_hull_cruiser_3 }
 					requested_factories = 10
 					amount = 4
 					progress = 0
@@ -444,7 +444,7 @@ auto_production_naval = {
 			if = {
 				limit = { check_variable = { line_mio > 0 } }
 				add_equipment_production = {
-					equipment = { type = ship_hull_cruiser_2 version_name = "1936轻炮巡洋" }
+					equipment = { type = ship_hull_cruiser_2 }
 					requested_factories = 10
 					amount = 4
 					progress = 0
@@ -453,7 +453,7 @@ auto_production_naval = {
 			}
 			else = {
 				add_equipment_production = {
-					equipment = { type = ship_hull_cruiser_2 version_name = "1936轻炮巡洋" }
+					equipment = { type = ship_hull_cruiser_2 }
 					requested_factories = 10
 					amount = 4
 					progress = 0
@@ -484,7 +484,7 @@ auto_production_naval = {
 			if = {
 				limit = { check_variable = { line_mio > 0 } }
 				add_equipment_production = {
-					equipment = { type = ship_hull_light_4 version_name = "44肉驱逐" }
+					equipment = { type = ship_hull_light_4 }
 					requested_factories = 10
 					amount = 8
 					progress = 0
@@ -493,7 +493,7 @@ auto_production_naval = {
 			}
 			else = {
 				add_equipment_production = {
-					equipment = { type = ship_hull_light_4 version_name = "44肉驱逐" }
+					equipment = { type = ship_hull_light_4 }
 					requested_factories = 10
 					amount = 8
 					progress = 0
@@ -505,7 +505,7 @@ auto_production_naval = {
 			if = {
 				limit = { check_variable = { line_mio > 0 } }
 				add_equipment_production = {
-					equipment = { type = ship_hull_light_3 version_name = "40肉驱逐" }
+					equipment = { type = ship_hull_light_3 }
 					requested_factories = 10
 					amount = 8
 					progress = 0
@@ -514,7 +514,7 @@ auto_production_naval = {
 			}
 			else = {
 				add_equipment_production = {
-					equipment = { type = ship_hull_light_3 version_name = "40肉驱逐" }
+					equipment = { type = ship_hull_light_3 }
 					requested_factories = 10
 					amount = 8
 					progress = 0
@@ -526,7 +526,7 @@ auto_production_naval = {
 			if = {
 				limit = { check_variable = { line_mio > 0 } }
 				add_equipment_production = {
-					equipment = { type = ship_hull_light_2 version_name = "肉驱逐" }
+					equipment = { type = ship_hull_light_2 }
 					requested_factories = 10
 					amount = 8
 					progress = 0
@@ -535,7 +535,7 @@ auto_production_naval = {
 			}
 			else = {
 				add_equipment_production = {
-					equipment = { type = ship_hull_light_2 version_name = "肉驱逐" }
+					equipment = { type = ship_hull_light_2 }
 					requested_factories = 10
 					amount = 8
 					progress = 0

@@ -1310,7 +1310,7 @@ auto_design = {
 	if = {
 		limit = { check_variable = { design_mio_carrier > 0 } }
 		create_equipment_variant = {
-			name = "1940航空母舰船体"
+			name = "1940航空母舰"
 			type = ship_hull_carrier_2
 			design_team = design_mio_carrier
 			modules = {
@@ -1333,7 +1333,7 @@ auto_design = {
 	}
 	else = {
 		create_equipment_variant = {
-			name = "1940航空母舰船体"
+			name = "1940航空母舰"
 			type = ship_hull_carrier_2
 			modules = {
 				fixed_ship_anti_air_slot = ship_anti_air_2
@@ -2316,7 +2316,7 @@ auto_design = {
 	if = {
 		limit = { check_variable = { design_mio_carrier > 0 } }
 		create_equipment_variant = {
-			name = "1936航空母舰船体"
+			name = "1936航空母舰"
 			type = ship_hull_carrier_1
 			design_team = design_mio_carrier
 			modules = {
@@ -2338,7 +2338,7 @@ auto_design = {
 	}
 	else = {
 		create_equipment_variant = {
-			name = "1936航空母舰船体"
+			name = "1936航空母舰"
 			type = ship_hull_carrier_1
 			modules = {
 				fixed_ship_anti_air_slot = ship_anti_air_2
