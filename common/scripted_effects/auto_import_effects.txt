@@ -1,8 +1,13 @@
-# 自动获取非主要国家的资源开采权：挑一个"拥有我们当前缺少的那种资源"的州，
+# 自动获取【傀儡国】的资源开采权：在自己的傀儡里挑一个"拥有我们当前缺少的那种资源"的州，
 # 选中后把这个州的全部资源类型一起批走(不是只给缺的那一种)。
 #
-# 每次只给一个州(imp_done 标记)，按天调用=每天最多添一个州；不限于傀儡国，
-# is_major=no 的国家都算候选；has_resources_rights 天然防止重复批同一个州。
+# 只对傀儡生效：用 every_subject_country 遍历，天然限定为自己的附庸。附庸不会与宗主交战、
+# 也不会是"自己"，所以不再需要 exists / NOT tag=ROOT / NOT has_war_with / NOT is_major 这些筛选。
+# 语义上也更站得住：give_resource_rights 只能由州的所有者授出，原版唯一的用例
+# (CHI_decisions.txt 的 CHI_concessions_give_resource_rights)也是所有者主动让权。
+#
+# 每次只给一个州(imp_done 标记)，按天调用=每天最多添一个州；
+# has_resources_rights 天然防止重复批同一个州。
 #
 # 两处防"批到一半就不动了"的处理：
 #   1) 只挑【宗主自己完全控制】的州(is_fully_controlled_by = PREV)。被占领/易手的州
@@ -32,12 +37,8 @@ auto_import_resources = {
 			}
 		}
 		set_variable = { imp_done = 0 }
-		every_country = {
+		every_subject_country = {
 			limit = {
-				exists = yes
-				NOT = { tag = ROOT }
-				NOT = { has_war_with = ROOT }
-				NOT = { is_major = yes }
 				ROOT = { check_variable = { imp_done < 1 } }
 			}
 			every_owned_state = {
