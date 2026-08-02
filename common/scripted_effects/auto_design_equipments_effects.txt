@@ -1064,36 +1064,6 @@ auto_design = {
 		}
 	}
 	if = {
-		limit = { check_variable = { design_mio_cruiser > 0 } }
-		create_equipment_variant = {
-			name = "1940副炮重巡洋舰"
-			type = ship_hull_cruiser_3
-			design_team = design_mio_cruiser
-			modules = {
-				fixed_ship_battery_slot = ship_medium_battery_3
-				fixed_ship_engine_slot = cruiser_ship_engine_3
-				fixed_ship_fire_control_system_slot = ship_fire_control_system_2
-				fixed_ship_secondaries_slot = ship_secondaries_2
-				mid_1_custom_slot = ship_secondaries_2
-				mid_2_custom_slot = ship_secondaries_2
-			}
-		}
-	}
-	else = {
-		create_equipment_variant = {
-			name = "1940副炮重巡洋舰"
-			type = ship_hull_cruiser_3
-			modules = {
-				fixed_ship_battery_slot = ship_medium_battery_3
-				fixed_ship_engine_slot = cruiser_ship_engine_3
-				fixed_ship_fire_control_system_slot = ship_fire_control_system_2
-				fixed_ship_secondaries_slot = ship_secondaries_2
-				mid_1_custom_slot = ship_secondaries_2
-				mid_2_custom_slot = ship_secondaries_2
-			}
-		}
-	}
-	if = {
 		limit = { check_variable = { design_mio_capital > 0 } }
 		create_equipment_variant = {
 			name = "1936重型战舰"
@@ -1188,122 +1158,6 @@ auto_design = {
 				ship_engine_upgrade = 0
 				ship_gun_upgrade = 0
 				ship_reliability_upgrade = 0
-			}
-		}
-	}
-	if = {
-		limit = { check_variable = { design_mio_carrier > 0 } }
-		create_equipment_variant = {
-			name = "改装巡洋舰"
-			type = ship_hull_carrier_conversion_ca
-			design_team = design_mio_carrier
-			modules = {
-				fixed_ship_anti_air_slot = ship_anti_air_2
-				fixed_ship_deck_slot_1 = ship_deck_space
-				fixed_ship_deck_slot_2 = ship_deck_space
-				fixed_ship_engine_slot = carrier_ship_engine_2
-				fixed_ship_secondaries_slot = ship_secondaries_2
-			}
-			upgrades = {
-				carrier_armor_upgrade = 0
-				ship_deckspace_upgrade = 0
-				ship_engine_upgrade = 0
-				ship_reliability_upgrade = 0
-			}
-		}
-	}
-	else = {
-		create_equipment_variant = {
-			name = "改装巡洋舰"
-			type = ship_hull_carrier_conversion_ca
-			modules = {
-				fixed_ship_anti_air_slot = ship_anti_air_2
-				fixed_ship_deck_slot_1 = ship_deck_space
-				fixed_ship_deck_slot_2 = ship_deck_space
-				fixed_ship_engine_slot = carrier_ship_engine_2
-				fixed_ship_secondaries_slot = ship_secondaries_2
-			}
-			upgrades = {
-				carrier_armor_upgrade = 0
-				ship_deckspace_upgrade = 0
-				ship_engine_upgrade = 0
-				ship_reliability_upgrade = 0
-			}
-		}
-	}
-	if = {
-		limit = { check_variable = { design_mio_cruiser > 0 } }
-		create_equipment_variant = {
-			name = "1936重巡洋舰"
-			type = ship_hull_cruiser_2
-			design_team = design_mio_cruiser
-			modules = {
-				fixed_ship_anti_air_slot = ship_anti_air_2
-				fixed_ship_battery_slot = ship_medium_battery_2
-				fixed_ship_engine_slot = cruiser_ship_engine_2
-				fixed_ship_fire_control_system_slot = ship_fire_control_system_0
-				fixed_ship_radar_slot = ship_radar_1
-				fixed_ship_secondaries_slot = ship_secondaries_2
-				front_1_custom_slot = ship_medium_battery_2
-				mid_1_custom_slot = ship_secondaries_2
-				mid_2_custom_slot = ship_secondaries_2
-				rear_1_custom_slot = ship_medium_battery_2
-			}
-		}
-	}
-	else = {
-		create_equipment_variant = {
-			name = "1936重巡洋舰"
-			type = ship_hull_cruiser_2
-			modules = {
-				fixed_ship_anti_air_slot = ship_anti_air_2
-				fixed_ship_battery_slot = ship_medium_battery_2
-				fixed_ship_engine_slot = cruiser_ship_engine_2
-				fixed_ship_fire_control_system_slot = ship_fire_control_system_0
-				fixed_ship_radar_slot = ship_radar_1
-				fixed_ship_secondaries_slot = ship_secondaries_2
-				front_1_custom_slot = ship_medium_battery_2
-				mid_1_custom_slot = ship_secondaries_2
-				mid_2_custom_slot = ship_secondaries_2
-				rear_1_custom_slot = ship_medium_battery_2
-			}
-		}
-	}
-	if = {
-		limit = { check_variable = { design_mio_cruiser > 0 } }
-		create_equipment_variant = {
-			name = "1940重巡洋舰船体"
-			type = ship_hull_cruiser_3
-			design_team = design_mio_cruiser
-			modules = {
-				fixed_ship_anti_air_slot = ship_anti_air_2
-				fixed_ship_battery_slot = ship_medium_battery_3
-				fixed_ship_engine_slot = cruiser_ship_engine_3
-				fixed_ship_fire_control_system_slot = ship_fire_control_system_2
-				fixed_ship_secondaries_slot = ship_secondaries_2
-				front_1_custom_slot = ship_medium_battery_3
-				mid_1_custom_slot = ship_secondaries_2
-				mid_2_custom_slot = ship_secondaries_2
-				rear_1_custom_slot = ship_medium_battery_3
-				rear_2_custom_slot = ship_medium_battery_3
-			}
-		}
-	}
-	else = {
-		create_equipment_variant = {
-			name = "1940重巡洋舰船体"
-			type = ship_hull_cruiser_3
-			modules = {
-				fixed_ship_anti_air_slot = ship_anti_air_2
-				fixed_ship_battery_slot = ship_medium_battery_3
-				fixed_ship_engine_slot = cruiser_ship_engine_3
-				fixed_ship_fire_control_system_slot = ship_fire_control_system_2
-				fixed_ship_secondaries_slot = ship_secondaries_2
-				front_1_custom_slot = ship_medium_battery_3
-				mid_1_custom_slot = ship_secondaries_2
-				mid_2_custom_slot = ship_secondaries_2
-				rear_1_custom_slot = ship_medium_battery_3
-				rear_2_custom_slot = ship_medium_battery_3
 			}
 		}
 	}
@@ -1594,36 +1448,6 @@ auto_design = {
 		}
 	}
 	if = {
-		limit = { check_variable = { design_mio_cruiser > 0 } }
-		create_equipment_variant = {
-			name = "侦查CL"
-			type = ship_hull_cruiser_2
-			design_team = design_mio_cruiser
-			modules = {
-				fixed_ship_battery_slot = ship_light_medium_battery_2
-				fixed_ship_engine_slot = cruiser_ship_engine_2
-				fixed_ship_fire_control_system_slot = ship_fire_control_system_0
-				mid_1_custom_slot = ship_airplane_launcher_2
-				mid_2_custom_slot = ship_airplane_launcher_2
-				rear_1_custom_slot = ship_airplane_launcher_2
-			}
-		}
-	}
-	else = {
-		create_equipment_variant = {
-			name = "侦查CL"
-			type = ship_hull_cruiser_2
-			modules = {
-				fixed_ship_battery_slot = ship_light_medium_battery_2
-				fixed_ship_engine_slot = cruiser_ship_engine_2
-				fixed_ship_fire_control_system_slot = ship_fire_control_system_0
-				mid_1_custom_slot = ship_airplane_launcher_2
-				mid_2_custom_slot = ship_airplane_launcher_2
-				rear_1_custom_slot = ship_airplane_launcher_2
-			}
-		}
-	}
-	if = {
 		limit = { check_variable = { design_mio_capital > 0 } }
 		create_equipment_variant = {
 			name = "1944重型战舰"
@@ -1778,42 +1602,6 @@ auto_design = {
 		}
 	}
 	if = {
-		limit = { check_variable = { design_mio_dd > 0 } }
-		create_equipment_variant = {
-			name = "侦查驱逐舰"
-			type = ship_hull_light_4
-			design_team = design_mio_dd
-			modules = {
-				fixed_ship_battery_slot = ship_light_battery_4
-				fixed_ship_engine_slot = light_ship_engine_4
-				mid_1_custom_slot = ship_seaplane_tender_2
-			}
-			upgrades = {
-				destroyer_engine_upgrade = 0
-				ship_ASW_upgrade = 0
-				ship_anti_air_upgrade = 0
-				ship_torpedo_upgrade = 0
-			}
-		}
-	}
-	else = {
-		create_equipment_variant = {
-			name = "侦查驱逐舰"
-			type = ship_hull_light_4
-			modules = {
-				fixed_ship_battery_slot = ship_light_battery_4
-				fixed_ship_engine_slot = light_ship_engine_4
-				mid_1_custom_slot = ship_seaplane_tender_2
-			}
-			upgrades = {
-				destroyer_engine_upgrade = 0
-				ship_ASW_upgrade = 0
-				ship_anti_air_upgrade = 0
-				ship_torpedo_upgrade = 0
-			}
-		}
-	}
-	if = {
 		limit = { check_variable = { design_mio_sub > 0 } }
 		create_equipment_variant = {
 			name = "巡洋潜艇"
@@ -1948,44 +1736,6 @@ auto_design = {
 				sub_engine_upgrade = 0
 				sub_stealth_upgrade = 0
 				sub_torpedo_upgrade = 0
-			}
-		}
-	}
-	if = {
-		limit = { check_variable = { design_mio_dd > 0 } }
-		create_equipment_variant = {
-			name = "侦查驱逐舰"
-			type = ship_hull_light_2
-			design_team = design_mio_dd
-			modules = {
-				fixed_ship_battery_slot = ship_light_battery_2
-				fixed_ship_engine_slot = light_ship_engine_2
-				mid_1_custom_slot = ship_seaplane_tender_2
-				rear_1_custom_slot = ship_seaplane_tender_2
-			}
-			upgrades = {
-				destroyer_engine_upgrade = 0
-				ship_ASW_upgrade = 0
-				ship_anti_air_upgrade = 0
-				ship_torpedo_upgrade = 0
-			}
-		}
-	}
-	else = {
-		create_equipment_variant = {
-			name = "侦查驱逐舰"
-			type = ship_hull_light_2
-			modules = {
-				fixed_ship_battery_slot = ship_light_battery_2
-				fixed_ship_engine_slot = light_ship_engine_2
-				mid_1_custom_slot = ship_seaplane_tender_2
-				rear_1_custom_slot = ship_seaplane_tender_2
-			}
-			upgrades = {
-				destroyer_engine_upgrade = 0
-				ship_ASW_upgrade = 0
-				ship_anti_air_upgrade = 0
-				ship_torpedo_upgrade = 0
 			}
 		}
 	}
@@ -2152,126 +1902,6 @@ auto_design = {
 				ship_ASW_upgrade = 0
 				ship_anti_air_upgrade = 0
 				ship_torpedo_upgrade = 0
-			}
-		}
-	}
-	if = {
-		limit = { check_variable = { design_mio_cruiser > 0 } }
-		create_equipment_variant = {
-			name = "44重炮巡洋舰"
-			type = ship_hull_cruiser_4
-			design_team = design_mio_cruiser
-			modules = {
-				fixed_ship_anti_air_slot = ship_anti_air_2
-				fixed_ship_armor_slot = ship_armor_cruiser_4
-				fixed_ship_battery_slot = ship_medium_battery_4
-				fixed_ship_engine_slot = cruiser_ship_engine_4
-				fixed_ship_fire_control_system_slot = ship_fire_control_system_3
-				fixed_ship_radar_slot = ship_radar_4
-				fixed_ship_secondaries_slot = dp_ship_secondaries_4
-				front_1_custom_slot = ship_medium_battery_4
-				mid_1_custom_slot = dp_ship_secondaries_4
-				mid_2_custom_slot = dp_ship_secondaries_4
-				rear_1_custom_slot = ship_medium_battery_4
-				rear_2_custom_slot = ship_medium_battery_4
-			}
-		}
-	}
-	else = {
-		create_equipment_variant = {
-			name = "44重炮巡洋舰"
-			type = ship_hull_cruiser_4
-			modules = {
-				fixed_ship_anti_air_slot = ship_anti_air_2
-				fixed_ship_armor_slot = ship_armor_cruiser_4
-				fixed_ship_battery_slot = ship_medium_battery_4
-				fixed_ship_engine_slot = cruiser_ship_engine_4
-				fixed_ship_fire_control_system_slot = ship_fire_control_system_3
-				fixed_ship_radar_slot = ship_radar_4
-				fixed_ship_secondaries_slot = dp_ship_secondaries_4
-				front_1_custom_slot = ship_medium_battery_4
-				mid_1_custom_slot = dp_ship_secondaries_4
-				mid_2_custom_slot = dp_ship_secondaries_4
-				rear_1_custom_slot = ship_medium_battery_4
-				rear_2_custom_slot = ship_medium_battery_4
-			}
-		}
-	}
-	if = {
-		limit = { check_variable = { design_mio_dd > 0 } }
-		create_equipment_variant = {
-			name = "侦查驱逐舰"
-			type = ship_hull_light_3
-			design_team = design_mio_dd
-			modules = {
-				fixed_ship_battery_slot = ship_light_battery_3
-				fixed_ship_engine_slot = light_ship_engine_3
-				mid_1_custom_slot = ship_seaplane_tender_2
-			}
-			upgrades = {
-				destroyer_engine_upgrade = 0
-				ship_ASW_upgrade = 0
-				ship_anti_air_upgrade = 0
-				ship_torpedo_upgrade = 0
-			}
-		}
-	}
-	else = {
-		create_equipment_variant = {
-			name = "侦查驱逐舰"
-			type = ship_hull_light_3
-			modules = {
-				fixed_ship_battery_slot = ship_light_battery_3
-				fixed_ship_engine_slot = light_ship_engine_3
-				mid_1_custom_slot = ship_seaplane_tender_2
-			}
-			upgrades = {
-				destroyer_engine_upgrade = 0
-				ship_ASW_upgrade = 0
-				ship_anti_air_upgrade = 0
-				ship_torpedo_upgrade = 0
-			}
-		}
-	}
-	if = {
-		limit = { check_variable = { design_mio_cruiser > 0 } }
-		create_equipment_variant = {
-			name = "重雷装巡洋舰"
-			type = ship_hull_torpedo_cruiser
-			design_team = design_mio_cruiser
-			modules = {
-				fixed_ship_anti_air_slot = ship_anti_air_4
-				fixed_ship_armor_slot = ship_armor_cruiser_4
-				fixed_ship_battery_slot = ship_light_medium_battery_3
-				fixed_ship_engine_slot = cruiser_ship_engine_4
-				fixed_ship_fire_control_system_slot = ship_fire_control_system_3
-				fixed_ship_radar_slot = ship_radar_4
-				fixed_ship_secondaries_slot = dp_ship_secondaries_4
-				front_1_custom_slot = ship_torpedo_4
-				mid_1_custom_slot = ship_torpedo_4
-				mid_2_custom_slot = ship_torpedo_4
-				rear_1_custom_slot = ship_torpedo_4
-				rear_2_custom_slot = ship_anti_air_4
-			}
-		}
-	}
-	else = {
-		create_equipment_variant = {
-			name = "重雷装巡洋舰"
-			type = ship_hull_torpedo_cruiser
-			modules = {
-				fixed_ship_anti_air_slot = ship_anti_air_4
-				fixed_ship_armor_slot = ship_armor_cruiser_4
-				fixed_ship_battery_slot = ship_light_medium_battery_3
-				fixed_ship_engine_slot = cruiser_ship_engine_4
-				fixed_ship_fire_control_system_slot = ship_fire_control_system_3
-				fixed_ship_radar_slot = ship_radar_4
-				fixed_ship_secondaries_slot = dp_ship_secondaries_4
-				front_1_custom_slot = ship_torpedo_4
-				mid_1_custom_slot = ship_torpedo_4
-				mid_2_custom_slot = ship_torpedo_4
-				rear_1_custom_slot = ship_torpedo_4
-				rear_2_custom_slot = ship_anti_air_4
 			}
 		}
 	}

@@ -14,7 +14,7 @@ on_actions = {
 				limit = { is_ai = no }
 				FROM.FROM = {
 					set_resistance = 0
-					set_compliance = 100
+					set_compliance = 70
 				}
 			}
 		}
