@@ -15,7 +15,7 @@
 # 挂在原版"政治行动"(political_actions)分类，priority=999 排在最前。
 #
 # activation 里的 has_focus_tree 只有【根国策】才带：有前置的国策，其 has_completed_focus
-# = <前置> 一旦成立就已经蕴含了拥有本树（前置必然同树，四棵树的国策 id 两两无交集）。
+# = <前置> 一旦成立就已经蕴含了拥有本树（前置必然同树，五棵树的国策 id 两两无交集）。
 #
 # timeout_effect 里包了一层 NOT = { has_completed_focus }：玩家手点/事件/bypass 都可能在
 # 任务跑完前把这条国策做掉，而 complete_national_focus 对已完成的国策会再跑一遍
@@ -23255,6 +23255,3142 @@ political_actions = {
 			if = {
 				limit = { NOT = { has_completed_focus = JAP_end_the_interservice_rivalry } }
 				complete_national_focus = { focus = JAP_end_the_interservice_rivalry use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_put_an_end_to_the_sufan = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			has_focus_tree = china_communist_focus_sea
+			NOT = { has_completed_focus = PRC_put_an_end_to_the_sufan }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_put_an_end_to_the_sufan } }
+				complete_national_focus = { focus = PRC_put_an_end_to_the_sufan use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_know_the_enemy = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_know_the_enemy }
+			has_completed_focus = PRC_put_an_end_to_the_sufan
+			OR = { 615 = { is_fully_controlled_by = SHX } 1045 = { is_controlled_by = NXM } }
+			NOT = { 1045 = { OR = { state_is_fully_controlled_by_ROOT_subject_or_faction_member = yes NOT = { is_controlled_by = NXM } } } 615 = { OR = { state_is_fully_controlled_by_ROOT_subject_or_faction_member = yes NOT = { is_controlled_by = SHX } } } }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_know_the_enemy } }
+				complete_national_focus = { focus = PRC_know_the_enemy use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_the_westward_expedition = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_the_westward_expedition }
+			has_completed_focus = PRC_know_the_enemy
+			1045 = { is_controlled_by = NXM }
+			NOT = { NOT = { 1045 = { is_controlled_by = NXM } } }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_the_westward_expedition } }
+				complete_national_focus = { focus = PRC_the_westward_expedition use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_the_eastward_expedition = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_the_eastward_expedition }
+			has_completed_focus = PRC_know_the_enemy
+			615 = { is_controlled_by = SHX }
+			NOT = { NOT = { 615 = { is_controlled_by = SHX } } }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_the_eastward_expedition } }
+				complete_national_focus = { focus = PRC_the_eastward_expedition use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_develop_yanan_soviet = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_develop_yanan_soviet }
+			OR = { has_completed_focus = PRC_the_westward_expedition has_completed_focus = PRC_the_eastward_expedition }
+			622 = { is_fully_controlled_by = ROOT } 1032 = { is_fully_controlled_by = ROOT } has_border_war = no
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_develop_yanan_soviet } }
+				complete_national_focus = { focus = PRC_develop_yanan_soviet use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_the_internal_enemy = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_the_internal_enemy }
+			OR = { has_completed_focus = PRC_the_westward_expedition has_completed_focus = PRC_the_eastward_expedition }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_the_internal_enemy } }
+				complete_national_focus = { focus = PRC_the_internal_enemy use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_rally_the_peasants = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_rally_the_peasants }
+			has_completed_focus = PRC_burn_the_paper_tigers
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_rally_the_peasants } }
+				complete_national_focus = { focus = PRC_rally_the_peasants use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_rally_the_28_bolsheviks = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_rally_the_28_bolsheviks }
+			has_completed_focus = PRC_burn_the_paper_tigers
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_rally_the_28_bolsheviks } }
+				complete_national_focus = { focus = PRC_rally_the_28_bolsheviks use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_guide_central_committee = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_guide_central_committee }
+			OR = { has_completed_focus = PRC_rally_the_peasants has_completed_focus = PRC_rally_the_28_bolsheviks }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_guide_central_committee } }
+				complete_national_focus = { focus = PRC_guide_central_committee use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_on_guerilla_warfare = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_on_guerilla_warfare }
+			has_completed_focus = PRC_leadership_of_mao
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_on_guerilla_warfare } }
+				complete_national_focus = { focus = PRC_on_guerilla_warfare use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_secure_the_peoples_support = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_secure_the_peoples_support }
+			has_completed_focus = PRC_leadership_of_mao
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_secure_the_peoples_support } }
+				complete_national_focus = { focus = PRC_secure_the_peoples_support use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_propaganda_efforts = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_propaganda_efforts }
+			OR = { has_completed_focus = PRC_on_guerilla_warfare has_completed_focus = PRC_secure_the_peoples_support }
+			is_in_faction = yes
+			NOT = { is_in_faction = no }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_propaganda_efforts } }
+				complete_national_focus = { focus = PRC_propaganda_efforts use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_dissent_in_the_united_front = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_dissent_in_the_united_front }
+			has_completed_focus = PRC_secure_the_peoples_support
+			is_in_faction = yes
+			NOT = { is_in_faction = no }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_dissent_in_the_united_front } }
+				complete_national_focus = { focus = PRC_dissent_in_the_united_front use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_question_the_faction_leadership = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_question_the_faction_leadership }
+			has_completed_focus = PRC_dissent_in_the_united_front
+			faction_influence_ratio > 0.25 num_faction_members > 2 is_faction_leader = no
+			NOT = { is_faction_leader = yes }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_question_the_faction_leadership } }
+				complete_national_focus = { focus = PRC_question_the_faction_leadership use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_to_unify_a_country = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_to_unify_a_country }
+			has_completed_focus = PRC_question_the_faction_leadership
+			is_faction_leader = yes any_allied_country = { is_chinese_warlord_tooltip = yes any_controlled_state = { PRC_state_is_fully_infiltrated = yes } }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_to_unify_a_country } }
+				complete_national_focus = { focus = PRC_to_unify_a_country use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_establish_friendly_bases = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_establish_friendly_bases }
+			has_completed_focus = PRC_on_guerilla_warfare
+			has_war_with_major = yes
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_establish_friendly_bases } }
+				complete_national_focus = { focus = PRC_establish_friendly_bases use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_empower_the_guerillas = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_empower_the_guerillas }
+			has_completed_focus = PRC_establish_friendly_bases
+			power_balance_value = { id = PRC_communist_power_struggle value < -0.5 }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_empower_the_guerillas } }
+				complete_national_focus = { focus = PRC_empower_the_guerillas use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_holding_half_the_sky = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_holding_half_the_sky }
+			has_completed_focus = PRC_empower_the_guerillas
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_holding_half_the_sky } }
+				complete_national_focus = { focus = PRC_holding_half_the_sky use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_raid_weapon_depots = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_raid_weapon_depots }
+			has_completed_focus = PRC_propaganda_efforts
+			has_completed_focus = PRC_establish_friendly_bases
+			has_war = yes
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_raid_weapon_depots } }
+				complete_national_focus = { focus = PRC_raid_weapon_depots use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_rural_recruitment = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_rural_recruitment }
+			has_completed_focus = PRC_propaganda_efforts
+			has_completed_focus = PRC_dissent_in_the_united_front
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_rural_recruitment } }
+				complete_national_focus = { focus = PRC_rural_recruitment use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_strengthen_the_central_party_school = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_strengthen_the_central_party_school }
+			OR = { has_completed_focus = PRC_raid_weapon_depots has_completed_focus = PRC_rural_recruitment }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_strengthen_the_central_party_school } }
+				complete_national_focus = { focus = PRC_strengthen_the_central_party_school use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_yanan_rectification_movement = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_yanan_rectification_movement }
+			OR = { has_completed_focus = PRC_holding_half_the_sky has_completed_focus = PRC_to_unify_a_country has_completed_focus = PRC_strengthen_the_central_party_school }
+			power_balance_value = { id = PRC_communist_power_struggle value < 0 }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_yanan_rectification_movement } }
+				complete_national_focus = { focus = PRC_yanan_rectification_movement use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_form_central_social_affairs_department = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_form_central_social_affairs_department }
+			has_completed_focus = PRC_yanan_rectification_movement
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_form_central_social_affairs_department } }
+				complete_national_focus = { focus = PRC_form_central_social_affairs_department use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_enforce_maoism = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_enforce_maoism }
+			has_completed_focus = PRC_form_central_social_affairs_department
+			has_completed_focus = PRC_establish_yanan_university
+			has_country_leader = { ruling_only = yes character = PRC_mao_zedong }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_enforce_maoism } }
+				complete_national_focus = { focus = PRC_enforce_maoism use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_invite_the_dixie_mission = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_invite_the_dixie_mission }
+			has_completed_focus = PRC_enforce_maoism
+			is_subject = no if = { limit = { is_in_faction = yes } all_allied_country = { NOT = { has_war_with = USA } } } USA = { is_subject = no NOT = { has_war_with = ROOT has_government = fascism has_government = neutrality } has_opinion = { target = ROOT value > 24 } }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_invite_the_dixie_mission } }
+				complete_national_focus = { focus = PRC_invite_the_dixie_mission use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_overthrow_the_ussr = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_overthrow_the_ussr }
+			has_completed_focus = PRC_deepen_the_dixie_mission
+			is_subject = no
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_overthrow_the_ussr } }
+				complete_national_focus = { focus = PRC_overthrow_the_ussr use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_two_soviets_together = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_two_soviets_together }
+			has_completed_focus = PRC_enforce_maoism
+			is_subject = no if = { limit = { is_in_faction = yes } all_allied_country = { NOT = { has_war_with = SOV } } } SOV = { is_subject = no has_government = communism NOT = { has_war_with = ROOT } has_opinion = { target = ROOT value > 24 } }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_two_soviets_together } }
+				complete_national_focus = { focus = PRC_two_soviets_together use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_the_end_of_capitalism = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_the_end_of_capitalism }
+			has_completed_focus = PRC_tech_agreement_with_ussr
+			is_subject = no
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_the_end_of_capitalism } }
+				complete_national_focus = { focus = PRC_the_end_of_capitalism use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_purge_the_world_of_fascism = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_purge_the_world_of_fascism }
+			OR = { has_completed_focus = PRC_the_end_of_capitalism has_completed_focus = PRC_overthrow_the_ussr }
+			is_subject = no
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_purge_the_world_of_fascism } }
+				complete_national_focus = { focus = PRC_purge_the_world_of_fascism use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_establish_yanan_university = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_establish_yanan_university }
+			has_completed_focus = PRC_yanan_rectification_movement
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_establish_yanan_university } }
+				complete_national_focus = { focus = PRC_establish_yanan_university use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_seek_support_from_ussr = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_seek_support_from_ussr }
+			OR = { has_completed_focus = PRC_reclaim_the_grasp_of_power has_completed_focus = PRC_leadership_of_mao }
+			SOV = { exists = yes }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_seek_support_from_ussr } }
+				complete_national_focus = { focus = PRC_seek_support_from_ussr use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_ask_for_soviet_lend_lease = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_ask_for_soviet_lend_lease }
+			has_completed_focus = PRC_invite_otto_braun
+			has_completed_focus = PRC_seek_support_from_ussr
+			has_war = yes PRC_neighboring_SOV = yes SOV = { exists = yes is_subject = no has_civil_war = no NOT = { has_war_with = ROOT any_allied_country = { has_war_with = ROOT } } has_opinion = { target = ROOT value > 24 } } if = { limit = { is_in_faction = yes } all_allied_country = { NOT = { has_war_with = SOV } } }
+			NOT = { SOV = { OR = { exists = no is_subject = yes has_civil_war = yes has_war_with = ROOT any_allied_country = { has_war_with = ROOT } } } if = { limit = { ROOT = { is_in_faction = yes } } any_allied_country = { has_war_with = SOV } } }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_ask_for_soviet_lend_lease } }
+				complete_national_focus = { focus = PRC_ask_for_soviet_lend_lease use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_request_guarantees = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_request_guarantees }
+			has_completed_focus = PRC_ask_for_soviet_lend_lease
+			power_balance_value = { id = PRC_communist_power_struggle value > 0.3 } has_war = no SOV = { exists = yes }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_request_guarantees } }
+				complete_national_focus = { focus = PRC_request_guarantees use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_bolshevik_aid = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_bolshevik_aid }
+			has_completed_focus = PRC_reclaim_the_grasp_of_power
+			any_country = { is_major = yes has_government = communism }
+			NOT = { NOT = { any_country = { is_major = yes has_government = communism } } }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_bolshevik_aid } }
+				complete_national_focus = { focus = PRC_bolshevik_aid use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_a_stronger_united_front = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_a_stronger_united_front }
+			has_completed_focus = PRC_bolshevik_aid
+			is_in_faction_with = CHI
+			NOT = { NOT = { is_in_faction_with = CHI } }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_a_stronger_united_front } }
+				complete_national_focus = { focus = PRC_a_stronger_united_front use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_playing_both_sides = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_playing_both_sides }
+			has_completed_focus = PRC_a_stronger_united_front
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_playing_both_sides } }
+				complete_national_focus = { focus = PRC_playing_both_sides use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_the_fight_of_a_people = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_the_fight_of_a_people }
+			has_completed_focus = PRC_playing_both_sides
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_the_fight_of_a_people } }
+				complete_national_focus = { focus = PRC_the_fight_of_a_people use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_supreme_infiltration = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_supreme_infiltration }
+			has_completed_focus = PRC_the_fight_of_a_people
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_supreme_infiltration } }
+				complete_national_focus = { focus = PRC_supreme_infiltration use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_bolshevik_urbanization = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_bolshevik_urbanization }
+			has_completed_focus = PRC_bolshevik_aid
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_bolshevik_urbanization } }
+				complete_national_focus = { focus = PRC_bolshevik_urbanization use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_bolshevik_urbanization_2 = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_bolshevik_urbanization_2 }
+			has_completed_focus = PRC_bolshevik_urbanization
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_bolshevik_urbanization_2 } }
+				complete_national_focus = { focus = PRC_bolshevik_urbanization_2 use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_bolshevik_urban_industrialization = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_bolshevik_urban_industrialization }
+			has_completed_focus = PRC_bolshevik_urbanization
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_bolshevik_urban_industrialization } }
+				complete_national_focus = { focus = PRC_bolshevik_urban_industrialization use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_bolshevik_urbanization_completed = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_bolshevik_urbanization_completed }
+			OR = { has_completed_focus = PRC_bolshevik_urbanization_2 has_completed_focus = PRC_bolshevik_urban_industrialization }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_bolshevik_urbanization_completed } }
+				complete_national_focus = { focus = PRC_bolshevik_urbanization_completed use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_invite_otto_braun = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_invite_otto_braun }
+			has_completed_focus = PRC_bolshevik_aid
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_invite_otto_braun } }
+				complete_national_focus = { focus = PRC_invite_otto_braun use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_invite_pavel_mif = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_invite_pavel_mif }
+			has_completed_focus = PRC_invite_otto_braun
+			has_country_flag = PRC_pavel_mif_alive
+			NOT = { NOT = { has_country_flag = PRC_pavel_mif_alive } }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_invite_pavel_mif } }
+				complete_national_focus = { focus = PRC_invite_pavel_mif use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_rebuild_28_bolshevik = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_rebuild_28_bolshevik }
+			has_completed_focus = PRC_invite_pavel_mif
+			power_balance_value = { id = PRC_communist_power_struggle value > 0.25 }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_rebuild_28_bolshevik } }
+				complete_national_focus = { focus = PRC_rebuild_28_bolshevik use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_aggressive_pursuit_of_diplomacy = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_aggressive_pursuit_of_diplomacy }
+			has_completed_focus = PRC_rebuild_28_bolshevik
+			is_in_faction = yes
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_aggressive_pursuit_of_diplomacy } }
+				complete_national_focus = { focus = PRC_aggressive_pursuit_of_diplomacy use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_with_inspiration_from_nkvd = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_with_inspiration_from_nkvd }
+			has_completed_focus = PRC_invite_otto_braun
+			has_completed_focus = PRC_seek_support_from_ussr
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_with_inspiration_from_nkvd } }
+				complete_national_focus = { focus = PRC_with_inspiration_from_nkvd use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_invite_soviet_general = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_invite_soviet_general }
+			has_completed_focus = PRC_with_inspiration_from_nkvd
+			SOV = { exists = yes }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_invite_soviet_general } }
+				complete_national_focus = { focus = PRC_invite_soviet_general use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_embrace_stalinism = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_embrace_stalinism }
+			OR = { has_completed_focus = PRC_bolshevik_urbanization_completed has_completed_focus = PRC_the_fight_of_a_people has_completed_focus = PRC_rebuild_28_bolshevik }
+			power_balance_value = { id = PRC_communist_power_struggle value > 0.5 }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_embrace_stalinism } }
+				complete_national_focus = { focus = PRC_embrace_stalinism use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_soviet_technological_cooperation = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_soviet_technological_cooperation }
+			has_completed_focus = PRC_embrace_stalinism
+			SOV = { exists = yes is_subject = no }
+			NOT = { SOV = { exists = no is_subject = yes } }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_soviet_technological_cooperation } }
+				complete_national_focus = { focus = PRC_soviet_technological_cooperation use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_reestablish_moscow_sun_yat_sen_university = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_reestablish_moscow_sun_yat_sen_university }
+			has_completed_focus = PRC_soviet_technological_cooperation
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_reestablish_moscow_sun_yat_sen_university } }
+				complete_national_focus = { focus = PRC_reestablish_moscow_sun_yat_sen_university use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_sino_allied_pact_of_non_aggression = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_sino_allied_pact_of_non_aggression }
+			has_completed_focus = PRC_soviet_technological_cooperation
+			OR = { USA = { exists = yes has_government = democratic } ENG = { exists = yes has_government = democratic } FRA = { exists = yes has_government = democratic } }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_sino_allied_pact_of_non_aggression } }
+				complete_national_focus = { focus = PRC_sino_allied_pact_of_non_aggression use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_bolshevik_world_revolution = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_bolshevik_world_revolution }
+			has_completed_focus = PRC_soviet_technological_cooperation
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_bolshevik_world_revolution } }
+				complete_national_focus = { focus = PRC_bolshevik_world_revolution use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_party_control = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_party_control }
+			OR = { has_completed_focus = PRC_bolshevik_world_revolution has_completed_focus = PRC_sino_allied_pact_of_non_aggression }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_party_control } }
+				complete_national_focus = { focus = PRC_party_control use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_petition_for_freedom = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_petition_for_freedom }
+			OR = { has_completed_focus = PRC_a_truly_united_front has_completed_focus = PRC_part_of_the_comintern }
+			is_subject = yes
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_petition_for_freedom } }
+				complete_national_focus = { focus = PRC_petition_for_freedom use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_scholarly_revolution = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_scholarly_revolution }
+			OR = { has_completed_focus = PRC_reestablish_moscow_sun_yat_sen_university has_completed_focus = PRC_party_control has_completed_focus = PRC_petition_for_freedom }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_scholarly_revolution } }
+				complete_national_focus = { focus = PRC_scholarly_revolution use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_hundred_regiments_offensive = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_hundred_regiments_offensive }
+			OR = { has_completed_focus = PRC_yanan_rectification_movement has_completed_focus = PRC_embrace_stalinism }
+			has_war = yes has_army_manpower = { size > 99999 }
+			NOT = { has_war = no }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_hundred_regiments_offensive } }
+				complete_national_focus = { focus = PRC_hundred_regiments_offensive use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_prepare_for_the_inevitable = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_prepare_for_the_inevitable }
+			has_completed_focus = PRC_hundred_regiments_offensive
+			is_subject = no
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_prepare_for_the_inevitable } }
+				complete_national_focus = { focus = PRC_prepare_for_the_inevitable use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_bring_war_to_neighboring_warlords = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_bring_war_to_neighboring_warlords }
+			has_completed_focus = PRC_the_unwilling_diarchy_focus
+			is_Subject = no any_neighbor_country = { is_chinese_warlord = yes }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_bring_war_to_neighboring_warlords } }
+				complete_national_focus = { focus = PRC_bring_war_to_neighboring_warlords use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_gain_the_peoples_trust = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_gain_the_peoples_trust }
+			has_completed_focus = PRC_the_unwilling_diarchy_focus
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_gain_the_peoples_trust } }
+				complete_national_focus = { focus = PRC_gain_the_peoples_trust use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_mobilization_of_the_people = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_mobilization_of_the_people }
+			has_completed_focus = PRC_the_unwilling_diarchy_focus
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_mobilization_of_the_people } }
+				complete_national_focus = { focus = PRC_mobilization_of_the_people use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_promote_guerilla_warfare = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_promote_guerilla_warfare }
+			OR = { has_completed_focus = PRC_gain_the_peoples_trust has_completed_focus = PRC_mobilization_of_the_people has_completed_focus = PRC_bring_war_to_neighboring_warlords }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_promote_guerilla_warfare } }
+				complete_national_focus = { focus = PRC_promote_guerilla_warfare use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_promote_regular_army = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_promote_regular_army }
+			OR = { has_completed_focus = PRC_gain_the_peoples_trust has_completed_focus = PRC_mobilization_of_the_people has_completed_focus = PRC_bring_war_to_neighboring_warlords }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_promote_regular_army } }
+				complete_national_focus = { focus = PRC_promote_regular_army use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_army_reforms = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_army_reforms }
+			has_completed_focus = PRC_soviet_battle_tactics
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_army_reforms } }
+				complete_national_focus = { focus = PRC_army_reforms use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_strict_training_regiments = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_strict_training_regiments }
+			has_completed_focus = PRC_soviet_battle_tactics
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_strict_training_regiments } }
+				complete_national_focus = { focus = PRC_strict_training_regiments use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_centralized_army_command = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_centralized_army_command }
+			has_completed_focus = PRC_army_reforms
+			has_completed_focus = PRC_strict_training_regiments
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_centralized_army_command } }
+				complete_national_focus = { focus = PRC_centralized_army_command use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_secure_the_lands = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_secure_the_lands }
+			has_completed_focus = PRC_the_battle_behind_the_front_lines
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_secure_the_lands } }
+				complete_national_focus = { focus = PRC_secure_the_lands use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_launch_sabotage_campaigns = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_launch_sabotage_campaigns }
+			has_completed_focus = PRC_the_battle_behind_the_front_lines
+			has_war = yes
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_launch_sabotage_campaigns } }
+				complete_national_focus = { focus = PRC_launch_sabotage_campaigns use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_raiding_parties = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_raiding_parties }
+			OR = { has_completed_focus = PRC_secure_the_lands has_completed_focus = PRC_launch_sabotage_campaigns }
+			has_war = yes
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_raiding_parties } }
+				complete_national_focus = { focus = PRC_raiding_parties use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_promote_womens_suffrage = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_promote_womens_suffrage }
+			has_completed_focus = PRC_mao_zedong_ascends
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_promote_womens_suffrage } }
+				complete_national_focus = { focus = PRC_promote_womens_suffrage use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_a_new_central_committee = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_a_new_central_committee }
+			has_completed_focus = PRC_zhang_guotao_ascends
+			has_country_leader = { character = PRC_zhang_guotao ruling_only = yes }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_a_new_central_committee } }
+				complete_national_focus = { focus = PRC_a_new_central_committee use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_consolidate_politcal_power = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_consolidate_politcal_power }
+			OR = { has_completed_focus = PRC_mao_zedong_ascends has_completed_focus = PRC_zhang_guotao_ascends }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_consolidate_politcal_power } }
+				complete_national_focus = { focus = PRC_consolidate_politcal_power use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_secure_lend_lease_from_soviet = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_secure_lend_lease_from_soviet }
+			OR = { has_completed_focus = PRC_consolidate_politcal_power has_completed_focus = PRC_promote_womens_suffrage has_completed_focus = PRC_a_new_central_committee }
+			has_war = yes PRC_neighboring_SOV = yes SOV = { exists = yes is_subject = no has_civil_war = no NOT = { has_war_with = ROOT any_allied_country = { has_war_with = ROOT } } has_opinion = { target = ROOT value > 24 } } if = { limit = { is_in_faction = yes } all_allied_country = { NOT = { has_war_with = SOV } } }
+			NOT = { SOV = { OR = { exists = no is_subject = yes has_civil_war = yes has_war_with = ROOT any_allied_country = { has_war_with = ROOT } } } if = { limit = { ROOT = { is_in_faction = yes } } any_allied_country = { has_war_with = SOV } } }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_secure_lend_lease_from_soviet } }
+				complete_national_focus = { focus = PRC_secure_lend_lease_from_soviet use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_demand_warlord_loyalty = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_demand_warlord_loyalty }
+			OR = { has_completed_focus = PRC_consolidate_politcal_power has_completed_focus = PRC_promote_womens_suffrage has_completed_focus = PRC_a_new_central_committee }
+			is_in_faction = no is_subject = no
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_demand_warlord_loyalty } }
+				complete_national_focus = { focus = PRC_demand_warlord_loyalty use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_preemptive_strike = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_preemptive_strike }
+			OR = { has_completed_focus = PRC_consolidate_politcal_power has_completed_focus = PRC_promote_womens_suffrage has_completed_focus = PRC_a_new_central_committee }
+			event_target:WTT_current_china_leader = { exists = yes NOT = { has_war_with = ROOT is_ally_with = ROOT original_tag = ROOT } }
+			NOT = { event_target:WTT_current_china_leader = { OR = { exists = no has_war_with = ROOT is_ally_with = ROOT original_tag = ROOT } } }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_preemptive_strike } }
+				complete_national_focus = { focus = PRC_preemptive_strike use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_assume_leadership = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_assume_leadership }
+			OR = { has_completed_focus = PRC_demand_warlord_loyalty has_completed_focus = PRC_secure_lend_lease_from_soviet has_completed_focus = PRC_preemptive_strike }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_assume_leadership } }
+				complete_national_focus = { focus = PRC_assume_leadership use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_extend_emergency_measures = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_extend_emergency_measures }
+			OR = { has_completed_focus = PRC_emergency_supply_protocols has_completed_focus = PRC_emergency_prodction_protocols }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_extend_emergency_measures } }
+				complete_national_focus = { focus = PRC_extend_emergency_measures use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_to_support_the_army = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_to_support_the_army }
+			has_completed_focus = PRC_extend_emergency_measures
+			OR = { has_idea = PRC_emergency_supply_protocols_idea has_idea = PRC_emergency_prodction_protocols_idea }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_to_support_the_army } }
+				complete_national_focus = { focus = PRC_to_support_the_army use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_lessons_of_the_west = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_lessons_of_the_west }
+			OR = { has_completed_focus = PRC_closer_ties_to_sov has_completed_focus = PRC_reach_out_to_the_west }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_lessons_of_the_west } }
+				complete_national_focus = { focus = PRC_lessons_of_the_west use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_the_long_march_towards_progress = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_the_long_march_towards_progress }
+			has_completed_focus = PRC_lessons_of_the_west
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_the_long_march_towards_progress } }
+				complete_national_focus = { focus = PRC_the_long_march_towards_progress use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_every_peasant_a_soldier = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_every_peasant_a_soldier }
+			OR = { has_completed_focus = PRC_lessons_of_the_west has_completed_focus = PRC_extend_emergency_measures }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_every_peasant_a_soldier } }
+				complete_national_focus = { focus = PRC_every_peasant_a_soldier use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_the_march_to_victory = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_the_march_to_victory }
+			has_completed_focus = PRC_every_peasant_a_soldier
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_the_march_to_victory } }
+				complete_national_focus = { focus = PRC_the_march_to_victory use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_the_peoples_republic = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_the_peoples_republic }
+			OR = { has_completed_focus = PRC_towards_one_china has_completed_focus = PRC_allow_autonomous_regions has_completed_focus = PRC_peaceful_reunification }
+			is_subject = no OR = { controls_state = 608 controls_state = 1035 controls_state = 592 }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_the_peoples_republic } }
+				complete_national_focus = { focus = PRC_the_peoples_republic use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_taiwan = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_taiwan }
+			has_completed_focus = PRC_the_peoples_republic
+			is_subject = no NOT = { any_other_country = { is_literally_china_tooltip = yes NOT = { is_subject_of = ROOT } } } 524 = { is_controlled_by_ROOT_or_subject = no }
+			NOT = { 524 = { is_controlled_by_ROOT_or_subject = yes } }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_taiwan } }
+				complete_national_focus = { focus = PRC_taiwan use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_reclaim_tibet = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_reclaim_tibet }
+			has_completed_focus = PRC_the_peoples_republic
+			is_subject = no NOT = { has_war_with = TIB }
+			NOT = { TIB = { OR = { has_war_with = ROOT all_core_state = { state_is_fully_controlled_by_ROOT_or_subject = yes } } } }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_reclaim_tibet } }
+				complete_national_focus = { focus = PRC_reclaim_tibet use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_subjugate_korea = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_subjugate_korea }
+			has_completed_focus = PRC_the_peoples_republic
+			is_subject = no NOT = { any_other_country = { is_literally_china_tooltip = yes NOT = { is_subject_of = ROOT } } } NOT = { any_enemy_country = { original_tag = KOR } }
+			NOT = { KOR = { OR = { has_war_with = ROOT all_core_state = { state_is_fully_controlled_by_ROOT_or_subject = yes } } } }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_subjugate_korea } }
+				complete_national_focus = { focus = PRC_subjugate_korea use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_dare_to_struggle = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_dare_to_struggle }
+			OR = { has_completed_focus = PRC_taiwan has_completed_focus = PRC_subjugate_korea has_completed_focus = PRC_reclaim_tibet }
+			is_subject = no any_other_country = { NOT = { original_tag = TIB original_tag = KOR original_tag = MON original_tag = TAN original_tag = SOV } any_controlled_state = { is_core_of = ROOT } }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_dare_to_struggle } }
+				complete_national_focus = { focus = PRC_dare_to_struggle use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_dare_to_win = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_dare_to_win }
+			OR = { has_completed_focus = PRC_taiwan has_completed_focus = PRC_subjugate_korea has_completed_focus = PRC_reclaim_tibet }
+			is_subject = no NOT = { any_enemy_country = { OR = { original_tag = MON original_tag = TAN original_tag = SOV } } }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_dare_to_win } }
+				complete_national_focus = { focus = PRC_dare_to_win use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_adopt_sun_yat_sens_principles = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_adopt_sun_yat_sens_principles }
+			has_completed_focus = PRC_the_peoples_republic
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_adopt_sun_yat_sens_principles } }
+				complete_national_focus = { focus = PRC_adopt_sun_yat_sens_principles use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_move_capital = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_move_capital }
+			has_completed_focus = PRC_the_peoples_republic
+			608 = { is_owned_and_controlled_by = ROOT }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_move_capital } }
+				complete_national_focus = { focus = PRC_move_capital use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_the_first_premier = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_the_first_premier }
+			has_completed_focus = PRC_the_peoples_republic
+			PRC_zhou_enlai = { is_hired_as_advisor = yes }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_the_first_premier } }
+				complete_national_focus = { focus = PRC_the_first_premier use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_usurp_control_over_yanan = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_usurp_control_over_yanan }
+			OR = { has_completed_focus = PRC_the_unwilling_diarchy_focus has_completed_focus = PRC_burn_the_paper_tigers }
+			NOT = { 1032 = { is_fully_controlled_by = ROOT } }
+			NOT = { 1032 = { is_fully_controlled_by = ROOT } }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_usurp_control_over_yanan } }
+				complete_national_focus = { focus = PRC_usurp_control_over_yanan use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_eight_points_for_attention = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_eight_points_for_attention }
+			OR = { has_completed_focus = PRC_the_unwilling_diarchy_focus has_completed_focus = PRC_burn_the_paper_tigers }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_eight_points_for_attention } }
+				complete_national_focus = { focus = PRC_eight_points_for_attention use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_expel_the_occupiers = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_expel_the_occupiers }
+			OR = { has_completed_focus = PRC_the_unwilling_diarchy_focus has_completed_focus = PRC_burn_the_paper_tigers }
+			OR = { is_in_faction = no is_faction_leader = yes } JAP = { exists = yes NOT = { is_ally_with = ROOT has_war_with = ROOT } any_controlled_state = { is_core_of = ROOT } has_civil_war = no }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_expel_the_occupiers } }
+				complete_national_focus = { focus = PRC_expel_the_occupiers use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_restore_territorial_integrity = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_restore_territorial_integrity }
+			OR = { has_completed_focus = PRC_the_unwilling_diarchy_focus has_completed_focus = PRC_burn_the_paper_tigers }
+			any_other_country = { NOT = { has_wargoal_against = ROOT is_justifying_wargoal_against = ROOT has_war_with = ROOT any_allied_country = { has_war_with = ROOT } any_enemy_country = { is_ally_with = ROOT } } custom_trigger_tooltip = { tooltip = CHI_request_territory_trigger_tt any_controlled_state = { is_core_of = ROOT controller = { is_literally_china_tooltip = no } OR = { NOT = { is_owned_by = controller } controller = { has_government = ROOT } } } } }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_restore_territorial_integrity } }
+				complete_national_focus = { focus = PRC_restore_territorial_integrity use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_rally_the_industry = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_rally_the_industry }
+			has_completed_focus = PRC_put_an_end_to_the_sufan
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_rally_the_industry } }
+				complete_national_focus = { focus = PRC_rally_the_industry use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_reestablish_the_state_bank = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_reestablish_the_state_bank }
+			OR = { has_completed_focus = PRC_halt_land_revolution has_completed_focus = PRC_expedite_land_revolution }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_reestablish_the_state_bank } }
+				complete_national_focus = { focus = PRC_reestablish_the_state_bank use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_rural_survey = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_rural_survey }
+			OR = { has_completed_focus = PRC_ban_special_goods_trade has_completed_focus = PRC_allow_special_goods_trade }
+			OR = { has_completed_focus = PRC_promote_paper_bills has_completed_focus = PRC_promote_the_silver_dollar }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_rural_survey } }
+				complete_national_focus = { focus = PRC_rural_survey use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_great_production_movement = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_great_production_movement }
+			has_completed_focus = PRC_rural_survey
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_great_production_movement } }
+				complete_national_focus = { focus = PRC_great_production_movement use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_resource_extraction_focus = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_resource_extraction_focus }
+			has_completed_focus = PRC_great_production_movement
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_resource_extraction_focus } }
+				complete_national_focus = { focus = PRC_resource_extraction_focus use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_agricultural_reform = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_agricultural_reform }
+			has_completed_focus = PRC_rural_survey
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_agricultural_reform } }
+				complete_national_focus = { focus = PRC_agricultural_reform use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_agricultural_reform_boom = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_agricultural_reform_boom }
+			has_completed_focus = PRC_agricultural_reform
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_agricultural_reform_boom } }
+				complete_national_focus = { focus = PRC_agricultural_reform_boom use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_industrialization_efforts = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_industrialization_efforts }
+			has_completed_focus = PRC_agricultural_reform
+			has_completed_focus = PRC_great_production_movement
+			num_of_controlled_factories > 24
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_industrialization_efforts } }
+				complete_national_focus = { focus = PRC_industrialization_efforts use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_construct_the_banqiao_dam = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_construct_the_banqiao_dam }
+			OR = { has_completed_focus = PRC_establish_shorter_market_plans has_completed_focus = PRC_initialize_five_year_plan }
+			controls_state = 607 607 = { dam < 1 }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_construct_the_banqiao_dam } }
+				complete_national_focus = { focus = PRC_construct_the_banqiao_dam use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_connecting_the_country = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_connecting_the_country }
+			OR = { has_completed_focus = PRC_establish_shorter_market_plans has_completed_focus = PRC_initialize_five_year_plan }
+			num_of_controlled_states > 4
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_connecting_the_country } }
+				complete_national_focus = { focus = PRC_connecting_the_country use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_urbanization_two = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_urbanization_two }
+			has_completed_focus = PRC_urbanization
+			ROOT = { OR = { controls_state = 744 controls_state = 615 } }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_urbanization_two } }
+				complete_national_focus = { focus = PRC_urbanization_two use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_found_the_academy_of_science = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_found_the_academy_of_science }
+			OR = { has_completed_focus = PRC_urbanization has_completed_focus = PRC_rural_region_development }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_found_the_academy_of_science } }
+				complete_national_focus = { focus = PRC_found_the_academy_of_science use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_rural_region_development_two = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_rural_region_development_two }
+			has_completed_focus = PRC_rural_region_development
+			any_controlled_state = { has_state_category = rural is_owned_by = ROOT NOT = { has_dynamic_modifier = { modifier = PRC_rural_development_state_modifier_bonus } } }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_rural_region_development_two } }
+				complete_national_focus = { focus = PRC_rural_region_development_two use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_finalize_industrial_plan = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_finalize_industrial_plan }
+			OR = { has_completed_focus = PRC_urbanization_two has_completed_focus = PRC_rural_region_development_two }
+			has_completed_focus = PRC_found_the_academy_of_science
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_finalize_industrial_plan } }
+				complete_national_focus = { focus = PRC_finalize_industrial_plan use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_long_march_to_recovery = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_long_march_to_recovery }
+			has_completed_focus = PRC_put_an_end_to_the_sufan
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_long_march_to_recovery } }
+				complete_national_focus = { focus = PRC_long_march_to_recovery use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_three_rules_of_discipline = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_three_rules_of_discipline }
+			has_completed_focus = PRC_long_march_to_recovery
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_three_rules_of_discipline } }
+				complete_national_focus = { focus = PRC_three_rules_of_discipline use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_red_army_reborn = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_red_army_reborn }
+			OR = { has_completed_focus = PRC_three_rules_of_discipline has_completed_focus = PRC_master_the_terrain has_completed_focus = PRC_reinforce_base_area }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_red_army_reborn } }
+				complete_national_focus = { focus = PRC_red_army_reborn use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_equipment_from_copper_coins = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_equipment_from_copper_coins }
+			has_completed_focus = PRC_red_army_reborn
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_equipment_from_copper_coins } }
+				complete_national_focus = { focus = PRC_equipment_from_copper_coins use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_request_for_aid = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_request_for_aid }
+			has_completed_focus = PRC_red_army_reborn
+			has_war = yes SOV = { exists = yes is_subject = no has_civil_war = no has_government = ROOT NOT = { has_war_with = ROOT } }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_request_for_aid } }
+				complete_national_focus = { focus = PRC_request_for_aid use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_he_long_second_army = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_he_long_second_army }
+			has_completed_focus = PRC_red_army_reborn
+			has_country_flag = PRC_he_long_has_arrived
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_he_long_second_army } }
+				complete_national_focus = { focus = PRC_he_long_second_army use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_master_the_terrain = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_master_the_terrain }
+			has_completed_focus = PRC_long_march_to_recovery
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_master_the_terrain } }
+				complete_national_focus = { focus = PRC_master_the_terrain use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_reinforce_base_area = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_reinforce_base_area }
+			has_completed_focus = PRC_long_march_to_recovery
+			622 = { is_fully_controlled_by = ROOT } 1046 = { is_fully_controlled_by = ROOT }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_reinforce_base_area } }
+				complete_national_focus = { focus = PRC_reinforce_base_area use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_to_steal_an_army = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_to_steal_an_army }
+			OR = { has_completed_focus = PRC_request_for_aid has_completed_focus = PRC_he_long_second_army has_completed_focus = PRC_equipment_from_copper_coins }
+			OR = { has_completed_focus = PRC_asymmetric_warfare has_completed_focus = PRC_conventional_warfare has_completed_focus = PRC_indirect_fire }
+			has_war = yes
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_to_steal_an_army } }
+				complete_national_focus = { focus = PRC_to_steal_an_army use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_revolutionary_war_of_the_masses = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_revolutionary_war_of_the_masses }
+			OR = { has_completed_focus = PRC_request_for_aid has_completed_focus = PRC_he_long_second_army has_completed_focus = PRC_equipment_from_copper_coins }
+			OR = { has_completed_focus = PRC_asymmetric_warfare has_completed_focus = PRC_conventional_warfare has_completed_focus = PRC_indirect_fire }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_revolutionary_war_of_the_masses } }
+				complete_national_focus = { focus = PRC_revolutionary_war_of_the_masses use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_cooperate_ulanhu = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_cooperate_ulanhu }
+			has_completed_focus = PRC_red_army_reborn
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_cooperate_ulanhu } }
+				complete_national_focus = { focus = PRC_cooperate_ulanhu use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_lessons_learnt = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_lessons_learnt }
+			has_completed_focus = PRC_to_steal_an_army
+			has_completed_focus = PRC_revolutionary_war_of_the_masses
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_lessons_learnt } }
+				complete_national_focus = { focus = PRC_lessons_learnt use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_prepare_for_third_phase = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_prepare_for_third_phase }
+			has_completed_focus = PRC_lessons_learnt
+			has_army_manpower = { size > 99999 }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_prepare_for_third_phase } }
+				complete_national_focus = { focus = PRC_prepare_for_third_phase use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_peoples_liberation_army_sea = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_peoples_liberation_army_sea }
+			has_completed_focus = PRC_prepare_for_third_phase
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_peoples_liberation_army_sea } }
+				complete_national_focus = { focus = PRC_peoples_liberation_army_sea use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_night_attack = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_night_attack }
+			has_completed_focus = PRC_one_with_the_people
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_night_attack } }
+				complete_national_focus = { focus = PRC_night_attack use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_reorganize_divisions = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_reorganize_divisions }
+			has_completed_focus = PRC_best_of_the_best
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_reorganize_divisions } }
+				complete_national_focus = { focus = PRC_reorganize_divisions use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_role_of_kangda = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_role_of_kangda }
+			OR = { has_completed_focus = PRC_best_of_the_best has_completed_focus = PRC_one_with_the_people }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_role_of_kangda } }
+				complete_national_focus = { focus = PRC_role_of_kangda use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_develop_the_army = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_develop_the_army }
+			has_completed_focus = PRC_role_of_kangda
+			OR = { has_completed_focus = PRC_reorganize_divisions has_completed_focus = PRC_night_attack }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_develop_the_army } }
+				complete_national_focus = { focus = PRC_develop_the_army use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_to_serve_the_people = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_to_serve_the_people }
+			has_completed_focus = PRC_develop_the_army
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_to_serve_the_people } }
+				complete_national_focus = { focus = PRC_to_serve_the_people use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_prepare_for_596 = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_prepare_for_596 }
+			has_completed_focus = PRC_to_serve_the_people
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_prepare_for_596 } }
+				complete_national_focus = { focus = PRC_prepare_for_596 use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_increase_domestic_production_capacity = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_increase_domestic_production_capacity }
+			has_completed_focus = PRC_develop_the_army
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_increase_domestic_production_capacity } }
+				complete_national_focus = { focus = PRC_increase_domestic_production_capacity use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_army_tank_research = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_army_tank_research }
+			has_completed_focus = PRC_increase_domestic_production_capacity
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_army_tank_research } }
+				complete_national_focus = { focus = PRC_army_tank_research use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_army_doctrines = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_army_doctrines }
+			OR = { has_completed_focus = PRC_army_tank_research has_completed_focus = PRC_prepare_for_596 }
+			OR = { has_doctrine = new_mobile_warfare has_doctrine = superior_firepower has_doctrine = grand_battleplan has_doctrine = mass_assault }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_army_doctrines } }
+				complete_national_focus = { focus = PRC_army_doctrines use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_appeal_for_foreign_aid = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_appeal_for_foreign_aid }
+			OR = { has_completed_focus = PRC_army_tank_research has_completed_focus = PRC_prepare_for_596 }
+			SOV = { exists = yes surrender_progress < 0.2 is_subject = no has_government = communism }
+			NOT = { SOV = { OR = { exists = no is_subject = yes surrender_progress > 0.2 NOT = { has_government = communism } } } }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_appeal_for_foreign_aid } }
+				complete_national_focus = { focus = PRC_appeal_for_foreign_aid use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_a_modern_army = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_a_modern_army }
+			has_completed_focus = PRC_army_doctrines
+			has_completed_focus = PRC_appeal_for_foreign_aid
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_a_modern_army } }
+				complete_national_focus = { focus = PRC_a_modern_army use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_establish_pla_air_force = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_establish_pla_air_force }
+			has_completed_focus = PRC_prepare_for_third_phase
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_establish_pla_air_force } }
+				complete_national_focus = { focus = PRC_establish_pla_air_force use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_pilot_training = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_pilot_training }
+			has_completed_focus = PRC_establish_pla_air_force
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_pilot_training } }
+				complete_national_focus = { focus = PRC_pilot_training use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_appoint_chang_qiankun = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_appoint_chang_qiankun }
+			has_completed_focus = PRC_pilot_training
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_appoint_chang_qiankun } }
+				complete_national_focus = { focus = PRC_appoint_chang_qiankun use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_the_northeast_aviation_university_sea = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_the_northeast_aviation_university_sea }
+			has_completed_focus = PRC_appoint_chang_qiankun
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_the_northeast_aviation_university_sea } }
+				complete_national_focus = { focus = PRC_the_northeast_aviation_university_sea use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_form_the_5th_research_institute = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_form_the_5th_research_institute }
+			has_completed_focus = PRC_the_northeast_aviation_university_sea
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_form_the_5th_research_institute } }
+				complete_national_focus = { focus = PRC_form_the_5th_research_institute use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_aviation_infrastructure = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_aviation_infrastructure }
+			has_completed_focus = PRC_pilot_training
+			if = { limit = { has_dlc = "By Blood Alone" } OR = { has_tech = bba_early_transport_plane has_tech = iw_small_airframe has_tech = iw_medium_airframe has_tech = iw_large_airframe } } else = { OR = { has_tech = early_fighter has_tech = early_bomber has_tech = early_transport_plane } }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_aviation_infrastructure } }
+				complete_national_focus = { focus = PRC_aviation_infrastructure use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_anti_air_effort = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_anti_air_effort }
+			has_completed_focus = PRC_aviation_infrastructure
+			has_tech = interwar_antiair
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_anti_air_effort } }
+				complete_national_focus = { focus = PRC_anti_air_effort use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_strengthen_the_air_arsenal = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_strengthen_the_air_arsenal }
+			has_completed_focus = PRC_anti_air_effort
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_strengthen_the_air_arsenal } }
+				complete_national_focus = { focus = PRC_strengthen_the_air_arsenal use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_establish_domestic_aircraft_production = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_establish_domestic_aircraft_production }
+			has_completed_focus = PRC_aviation_infrastructure
+			has_completed_focus = PRC_appoint_chang_qiankun
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_establish_domestic_aircraft_production } }
+				complete_national_focus = { focus = PRC_establish_domestic_aircraft_production use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_air_force_capstone = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_air_force_capstone }
+			OR = { has_completed_focus = PRC_large_plane_focus has_completed_focus = PRC_light_plane_focus has_completed_focus = PRC_medium_plane_focus }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_air_force_capstone } }
+				complete_national_focus = { focus = PRC_air_force_capstone use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_establish_pla_navy = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_establish_pla_navy }
+			has_completed_focus = PRC_prepare_for_third_phase
+			any_owned_state = { is_coastal = yes is_controlled_by = ROOT }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_establish_pla_navy } }
+				complete_national_focus = { focus = PRC_establish_pla_navy use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_dockyard_construction_efforts = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_dockyard_construction_efforts }
+			has_completed_focus = PRC_establish_pla_navy
+			any_owned_state = { is_coastal = yes is_controlled_by = ROOT }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_dockyard_construction_efforts } }
+				complete_national_focus = { focus = PRC_dockyard_construction_efforts use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_naval_mio = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_naval_mio }
+			has_completed_focus = PRC_establish_pla_navy
+			any_owned_state = { is_coastal = yes is_controlled_by = ROOT }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_naval_mio } }
+				complete_national_focus = { focus = PRC_naval_mio use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_destroyers = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_destroyers }
+			OR = { has_completed_focus = PRC_naval_mio has_completed_focus = PRC_dockyard_construction_efforts }
+			any_owned_state = { is_coastal = yes is_controlled_by = ROOT } has_tech = basic_ship_hull_light SOV = { exists = yes is_subject = no has_government = communism }
+			NOT = { SOV = { OR = { exists = no is_subject = yes NOT = { has_government = communism } } } }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_destroyers } }
+				complete_national_focus = { focus = PRC_destroyers use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_submarines = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_submarines }
+			has_completed_focus = PRC_destroyers
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_submarines } }
+				complete_national_focus = { focus = PRC_submarines use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_the_pla_naval_school = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_the_pla_naval_school }
+			has_completed_focus = PRC_dockyard_construction_efforts
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_the_pla_naval_school } }
+				complete_national_focus = { focus = PRC_the_pla_naval_school use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_reappoint_jinguang_as_admiral = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_reappoint_jinguang_as_admiral }
+			has_completed_focus = PRC_the_pla_naval_school
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_reappoint_jinguang_as_admiral } }
+				complete_national_focus = { focus = PRC_reappoint_jinguang_as_admiral use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_naval_infrastructure_effort = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_naval_infrastructure_effort }
+			has_completed_focus = PRC_naval_mio
+			any_core_state = { is_coastal = yes is_controlled_by = ROOT }
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_naval_infrastructure_effort } }
+				complete_national_focus = { focus = PRC_naval_infrastructure_effort use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_cruisers = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_cruisers }
+			OR = { has_completed_focus = PRC_naval_infrastructure_effort has_completed_focus = PRC_the_pla_naval_school }
+			any_owned_state = { is_coastal = yes is_controlled_by = ROOT } has_tech = basic_ship_hull_cruiser SOV = { exists = yes is_subject = no has_government = communism }
+			NOT = { SOV = { OR = { exists = no is_subject = yes NOT = { has_government = communism } } } }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_cruisers } }
+				complete_national_focus = { focus = PRC_cruisers use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_capital_ships = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_capital_ships }
+			OR = { has_completed_focus = PRC_naval_infrastructure_effort has_completed_focus = PRC_the_pla_naval_school }
+			any_owned_state = { is_coastal = yes is_controlled_by = ROOT } has_tech = basic_ship_hull_heavy SOV = { exists = yes is_subject = no has_government = communism }
+			NOT = { SOV = { OR = { exists = no is_subject = yes NOT = { has_government = communism } } } }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_capital_ships } }
+				complete_national_focus = { focus = PRC_capital_ships use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_carriers = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_carriers }
+			has_completed_focus = PRC_capital_ships
+			has_completed_focus = PRC_cruisers
+			any_owned_state = { is_coastal = yes is_controlled_by = ROOT }
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_carriers } }
+				complete_national_focus = { focus = PRC_carriers use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_naval_guns = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_naval_guns }
+			has_completed_focus = PRC_naval_infrastructure_effort
+		}
+		days_mission_timeout = 34 # = 35 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_naval_guns } }
+				complete_national_focus = { focus = PRC_naval_guns use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_naval_ocean_navy = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_naval_ocean_navy }
+			has_completed_focus = PRC_reappoint_jinguang_as_admiral
+			has_completed_focus = PRC_naval_guns
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_naval_ocean_navy } }
+				complete_national_focus = { focus = PRC_naval_ocean_navy use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_naval_capstone = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_naval_capstone }
+			has_completed_focus = PRC_naval_ocean_navy
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_naval_capstone } }
+				complete_national_focus = { focus = PRC_naval_capstone use_side_message = yes }
+			}
+		}
+	}
+
+	PRC_central_military_commision = {
+		icon = generic_research
+		is_good = yes
+		allowed = { always = yes }
+		available = { hidden_trigger = { always = no } }
+		activation = {
+			is_ai = no
+			NOT = { has_completed_focus = PRC_central_military_commision }
+			has_completed_focus = PRC_naval_capstone
+			has_completed_focus = PRC_air_force_capstone
+			has_completed_focus = PRC_a_modern_army
+		}
+		days_mission_timeout = 69 # = 70 - 1（原版 cost x 7 再减去任务激活占用的那天）
+		timeout_effect = {
+			if = {
+				limit = { NOT = { has_completed_focus = PRC_central_military_commision } }
+				complete_national_focus = { focus = PRC_central_military_commision use_side_message = yes }
 			}
 		}
 	}
