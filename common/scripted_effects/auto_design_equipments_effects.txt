@@ -5,7 +5,7 @@
 # 每个设计通过 design_team 挂最优设计师 MIO（无匹配 MIO 时不挂，见下方选择逻辑）。
 # 无设计器的陆军装备（步兵/支援/火炮/防空/反坦克/摩托化/机械化）也挂设计师：
 # 原版写法（history/countries/JAP - Japan.txt）：无名变体 + design_team + show_position=no + mark_older_equipment_obsolete。
-auto_design = {
+auto_design_equipments_effects = {
 	# ===== 设计师 MIO 选择 =====
 	# MIO 都是各国 include 通用原型生成的国别 token，无法直接引用；
 	# 用"原型独有的 trait token"识别设计师类型（trait 随 include 继承）。
@@ -2768,5 +2768,14 @@ auto_design = {
 				turret_type_slot = tank_light_three_man_tank_turret
 			}
 		}
+	}
+}
+
+auto_design = {
+	if = {
+		limit = { NOT = { has_country_flag = auto_design_done } }
+		set_country_flag = auto_design_done
+		add_daily_mastery = { amount = 1 days = 3650 }
+		auto_design_equipments_effects = yes
 	}
 }
