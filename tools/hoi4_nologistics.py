@@ -551,6 +551,72 @@ def install_inv_hook(h, base):
     return "installed" if _write_patch(h, entry, patch) else None
 
 
+# ---- 登陆其他限制(国家级获取函数，rcx = CCountry*；玩家国家及其傀儡国生效) ----
+CTY_CONST_HEX = (
+    "000000000000000000000000000000000000000000000000505241504151488b05ebffffff483901756d488b05cfffff"
+    "ff488b004885c0745e488b15c8ffffff48399010010000754e8b90800200003b9020050000754085d2743c3b901c0300"
+    "0073344c8b88100300004d85c974284189d04f8b0cc14939c9741039911c0400007514399134040000750c415941585a"
+    "58b863000000c3415941585a58"
+)
+CTY_AGAINST_HEX = (
+    "000000000000000000000000000000000000000000000000505241504151488b05ebffffff48390175784183f81a7572"
+    "488b05c9ffffff488b004885c07463488b15c2ffffff4839901001000075538b90800200003b9020050000754585d274"
+    "413b901c03000073394c8b88100300004d85c9742d4189d04f8b0cc14939c9741039911c040000751939913404000075"
+    "11415941585a5848c702487dfeff4889d0c3415941585a58"
+)
+CTY_DATA = (0, 8, 16)  # d_mgr, d_hvt, d_cvt
+CTY_CODE = 24
+GETTER_PRO = bytes.fromhex("4883ec284881c1b8050000")   # sub rsp,0x28; add rcx,0x5b8
+AGAINST_PRO = bytes.fromhex("48895c2410")              # mov [rsp+0x10], rbx
+# (名称, 入口 RVA, 被覆盖的原指令, 机器码)
+CTY_HOOKS = (
+    ("海军每次登陆师数上限", 0x6F2FF0, GETTER_PRO, CTY_CONST_HEX),   # 返回 99
+    ("海军登陆计划数量上限", 0x6F3040, GETTER_PRO, CTY_CONST_HEX),   # 返回 99
+    ("海军登陆准备时间", 0x6F9B40, AGAINST_PRO, CTY_AGAINST_HEX),    # 修正 id 0x1A 取 -0.99
+)
+
+
+def generic_status(h, base, rva, pro):
+    cur = P.read_mem(h, base + rva, len(pro))
+    if cur == pro:
+        return "orig"
+    if len(cur) == len(pro) and cur[0] == 0xE9:
+        return "hooked"
+    return None
+
+
+def generic_install(h, base, rva, pro, cave_hex, data_vals, data_offs, code_off):
+    st = generic_status(h, base, rva, pro)
+    if st == "hooked":
+        return "already"
+    if st != "orig":
+        return None
+    entry = base + rva
+    code = bytearray(bytes.fromhex(cave_hex))
+    cave = alloc_near(h, entry, 0x1000)
+    if not cave:
+        return None
+    for off, val in zip(data_offs, data_vals):
+        struct.pack_into("<Q", code, off, val)
+    code += pro
+    jmp_at = len(code)
+    code += bytes([0xE9]) + struct.pack("<i", (entry + len(pro)) - (cave + jmp_at + 5))
+    if not P.write_mem(h, cave, bytes(code)):
+        return None
+    patch = bytes([0xE9]) + struct.pack("<i", (cave + code_off) - (entry + 5)) + bytes([0x90]) * (len(pro) - 5)
+    return "installed" if _write_patch(h, entry, patch) else None
+
+
+def install_cty_hooks(h, base):
+    res = []
+    for name, rva, pro, hexs in CTY_HOOKS:
+        r = generic_install(h, base, rva, pro, hexs,
+                            (base + COUNTRY_MGR_GLOBAL_RVA, base + HUMAN_VTABLE_RVA, base + COUNTRY_VTABLE_RVA),
+                            CTY_DATA, CTY_CODE)
+        res.append(f"{name}:{r}")
+    return "，".join(res)
+
+
 def remove_hook(h, base):
     ok = False
     if hook_status(h, base) == "hooked":
@@ -561,6 +627,9 @@ def remove_hook(h, base):
         ok = _write_patch(h, base + WING_HOOK_RVA, WING_HOOK_PRO) or ok
     if inv_hook_status(h, base) == "hooked":
         ok = _write_patch(h, base + INV_HOOK_RVA, INV_HOOK_PRO) or ok
+    for _name, rva, pro, _hex in CTY_HOOKS:
+        if generic_status(h, base, rva, pro) == "hooked":
+            ok = _write_patch(h, base + rva, pro) or ok
     return ok
 
 
@@ -581,7 +650,8 @@ def wait_and_install(wait_seconds):
                 r2 = install_ship_hook(h, base)
                 r3 = install_wing_hook(h, base)
                 r4 = install_inv_hook(h, base)
-                log(f"陆军补丁: {r}，舰船补丁: {r2}，空军补丁: {r3}，登陆制海权补丁: {r4} (pid {pid})")
+                r5 = install_cty_hooks(h, base)
+                log(f"陆军补丁: {r}，舰船补丁: {r2}，空军补丁: {r3}，登陆制海权补丁: {r4}，登陆其他限制: {r5} (pid {pid})")
                 return r is not None
         time.sleep(0.3)
     log("等待 hoi4.exe 超时")
