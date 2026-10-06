@@ -26,7 +26,9 @@
    - 空降每次师数上限：校验时对玩家直接判定“允许”。
    - 空降准备时间：与海军共用同一补丁(修正 id 0xE)，约剩原来的 1%。
 4. 使用 mod 也可以解锁成就(对所有人生效，没有“玩家”的概念)
-   - 把成就管理器的 IsAchievementsOk() 直接改成返回“可以”。注意：这会让成就在 mod/作弊状态下也被允许。
+   - 成就管理器里有个“游戏/mod 未被修改”标志(a2)，由一次字符串比较的结果决定；补丁把这次比较的判断
+     `test eax,eax` 改成 `xor eax,eax`，标志恒为真。这和创意工坊那份可解锁成就的 hoi4.exe 的唯一一处改动完全一致。
+   - 注意：这会让成就在 mod 状态下也被允许；是否同时放过其他作弊检测我没有验证。
 
 兼容性(防止游戏更新后失效)
 --------------------------
@@ -276,7 +278,7 @@ SIGS = {
     "GET_AIRPLAN": "48 83 EC 28 48 81 C1 B8 05 00 00 48 8D 54 24 30 41 B8 87 01 00 00 E8 ?? ?? ?? ??",
     "AGAINST": "48 89 5C 24 10 48 89 6C 24 18 48 89 74 24 20 57 48 83 EC 20 48 8B F1 49 8B F9",
     "SKIPCAP": "48 8D 8D B8 05 00 00 41 B8 86 01 00 00 48 8D 54 24 60 E8 ?? ?? ?? ?? 48 8B 08",
-    "ACH": "80 B9 A3 00 00 00 00 75 24 80 B9 A1 00 00 00 00 74 1E 80 B9 A2 00 00 00 00",
+    "ACH": "85 C0 0F 94 C3 E8 ?? ?? ?? ??",
     "MGR": "83 3B 00 48 8B 3D ?? ?? ?? ?? 75 04 33 C0 EB 08 48 8B CB E8 ?? ?? ?? ?? 48 8B 5C 24 48 48 63 C8 48 8B 87 10 03 00 00 48 8B 04 C8",
 }
 
@@ -349,10 +351,13 @@ HOOKS = (
     ("登陆/空降:准备时间", "AGAINST", 5, "AGAINST", ("mgr", "hvt", "cvt", "yes"), 0, None, "cave"),
     ("空降:每次师数上限", "SKIPCAP", 7, "SKIPCAP", ("mgr", "hvt", "cvt", "yes"), 0x43,
      bytes.fromhex("b0014883c428"), "cave"),
-    ("成就:mod 下也可解锁", "ACH", 7, None, (), 0, None, "direct"),
+    ("成就:mod 校验恒通过", "ACH", 2, None, (), 0, None, "direct"),
 )
-# 直接改写(不需要机器码)的补丁：mov al,1 ; ret
-DIRECT_PATCH = bytes.fromhex("b001c3")
+# 直接改写(不需要机器码)的补丁，键 = 特征码键。
+#   ACH：成就管理器的 a2 标志(“游戏/mod 未被修改”)由 test eax,eax;sete bl 得到(eax = 某个字符串比较结果)；
+#        把 85 C0(test eax,eax) 改成 31 C0(xor eax,eax)，ZF 恒为 1，bl 恒为 1，a2 恒为真(与创意工坊那份
+#        补丁版 hoi4.exe 的唯一一处改动相同：文件偏移 0x16E60A，0x85 -> 0x31)。
+DIRECT_PATCHES = {"ACH": bytes.fromhex("31c0")}
 # 需要 vtable 的类
 VTABLE_CLASSES = {"hvt": "CHuman", "cvt": "CCountry", "svt": "CShip", "tvt": "CTaskForce",
                   "wvt": "CAirWing", "xvt": "CStrategicNavy"}
@@ -398,6 +403,7 @@ def install_all(h, base, img):
     R, problems = resolve(img)
     out = [("特征码问题", p) for p in problems]
     todo = []
+    sigkey_of = {h_[0]: h_[1] for h_ in HOOKS}
     for name, sigkey, pro_len, cavekey, keys, yes_delta, yes_check, kind in HOOKS:
         entry = R.get("entry:" + name)
         if entry is None:
@@ -406,7 +412,7 @@ def install_all(h, base, img):
         pro = img.bytes_at(entry, pro_len)
         cur = P.read_mem(h, base + entry, pro_len)
         if cur != pro and ((kind == "cave" and len(cur) == pro_len and cur[0] == 0xE9)
-                           or (kind == "direct" and cur[:3] == DIRECT_PATCH)):
+                           or (kind == "direct" and cur[:2] == DIRECT_PATCHES[sigkey])):
             out.append((name, "已存在"))
             continue
         if cur != pro:
@@ -434,7 +440,8 @@ def install_all(h, base, img):
     for name, entry, pro, cavekey, keys, yes_delta, kind in todo:
         e = base + entry
         if kind == "direct":
-            patch = DIRECT_PATCH + bytes([0x90]) * (len(pro) - len(DIRECT_PATCH))
+            dp = DIRECT_PATCHES[sigkey_of[name]]
+            patch = dp + bytes([0x90]) * (len(pro) - len(dp))
             out.append((name, "安装成功" if P.patch_code(h, e, patch) else "写入失败"))
             continue
         code = bytearray(bytes.fromhex(CAVES[cavekey]))
