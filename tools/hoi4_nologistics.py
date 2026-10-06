@@ -34,6 +34,7 @@
      把“当前游戏是否铁人”恒当作“是”：`and cl,1` -> `mov cl,1`。
    - 副作用：其他脚本里的 is_ironman = yes/no 也会按“铁人”判断。成就另有 难度>1、开局日期<1936.1.2、
      无自定义难度、游戏规则允许成就 这几条，本脚本不改，不满足仍然不会解锁。
+   - 开始界面右下角的奖杯图标(红叉=无法获得成就)由另一个函数判断，其中“非铁人 -> 无法获得成就”也一并改成恒为铁人。
 
 兼容性(防止游戏更新后失效)
 --------------------------
@@ -286,6 +287,7 @@ SIGS = {
     "ACH": "85 C0 0F 94 C3 E8 ?? ?? ?? ??",
     "MGR": "83 3B 00 48 8B 3D ?? ?? ?? ?? 75 04 33 C0 EB 08 48 8B CB E8 ?? ?? ?? ?? 48 8B 5C 24 48 48 63 C8 48 8B 87 10 03 00 00 48 8B 04 C8",
     "IRON": "80 E1 01 38 4F 58 0F 94 C0 48 83 C4 30",
+    "ACHUI": "45 0F B6 E8 48 89 95 E0 00 00 00",
 }
 
 CAVES = {
@@ -359,6 +361,7 @@ HOOKS = (
      bytes.fromhex("b0014883c428"), "cave"),
     ("成就:mod 校验恒通过", "ACH", 2, None, (), 0, None, "direct"),
     ("成就:非铁人也算铁人", "IRON", 3, None, (), 0, None, "direct"),
+    ("成就:状态面板不要求铁人", "ACHUI", 4, None, (), 0, None, "direct"),
 )
 # 直接改写(不需要机器码)的补丁，键 = 特征码键。
 #   ACH：成就管理器的 a2 标志(“游戏/mod 未被修改”)由 test eax,eax;sete bl 得到(eax = 某个字符串比较结果)；
@@ -366,7 +369,9 @@ HOOKS = (
 #        补丁版 hoi4.exe 的唯一一处改动相同：文件偏移 0x16E60A，0x85 -> 0x31)。
 #   IRON：脚本触发器 is_ironman 的求值 = (游戏标志 & 1) == 触发器值；成就的 possible 条件里都带 is_ironman = yes。
 #        把 `and cl,1`(80 E1 01) 改成 `mov cl,1; nop`(B1 01 90)，等于“当前永远是铁人”，非铁人存档也能解锁。
-DIRECT_PATCHES = {"ACH": bytes.fromhex("31c0"), "IRON": bytes.fromhex("b10190")}
+#   ACHUI：开始界面/游戏内的“能否获得成就”面板函数，第 3 个参数(r8b)是“铁人模式”，非铁人时面板直接判“无法获得成就”；
+#        把入口的 `movzx r13d,r8b`(44 0F B6 E8) 改成 `push 1; pop r13`(6A 01 41 5D)，面板恒按铁人处理。
+DIRECT_PATCHES = {"ACH": bytes.fromhex("31c0"), "IRON": bytes.fromhex("b10190"), "ACHUI": bytes.fromhex("6a01415d")}
 # 需要 vtable 的类
 VTABLE_CLASSES = {"hvt": "CHuman", "cvt": "CCountry", "svt": "CShip", "tvt": "CTaskForce",
                   "wvt": "CAirWing", "xvt": "CStrategicNavy"}
