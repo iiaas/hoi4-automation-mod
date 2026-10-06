@@ -28,7 +28,6 @@ on_actions = {
 				auto_build = yes
 				auto_focus_shine = yes
 				auto_import_resources = yes
-				auto_production_naval = yes
 			}
 		}
 	}
