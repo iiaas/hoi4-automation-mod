@@ -1,83 +1,13 @@
-###################################################################################################################
-###################################################################################################################
-###################################################################################################################
-
-complete_special_project_1937 = {
-	complete_special_project = { project = sp:sp_naval_torpedo_cruiser }
-	complete_special_project = { project = sp:sp_naval_super_heavy_battleship }
-	complete_special_project = { project = sp:sp_naval_cruiser_submarine }
-	complete_special_project = { project = sp:sp_naval_midget_submarine }
-	complete_special_project = { project = sp:sp_naval_support_ships }
-	complete_special_project = { project = sp:sp_land_super_heavy_howitzer }
-}
-
-complete_special_project_1938 = {
+# 科技与专项项目已不在这里列举：
+#   * 科技：tools/hoi4_nologistics.py 的每日钩子在引擎内遍历科技库自动解锁。
+#   * 专项项目：同一个脚本挂在 complete_special_project 的执行函数上，把下面这个占位效果要完成的项目
+#     换成“引擎判定可开始且未完成”的项目。占位项目必须是 sp_air_radar（补丁靠它认出占位对象），
+#     没装补丁时它就只是完成 sp_air_radar 一次。
+autocore_complete_special_project = {
 	complete_special_project = { project = sp:sp_air_radar }
-	complete_special_project = { project = sp:sp_land_flamethrower_tank }
-	complete_special_project = { project = sp:sp_land_military_engineering_vehicles }
-	complete_special_project = { project = sp:sp_land_super_heavy_railway_gun }
-	complete_special_project = { project = sp:sp_land_multi_charge_large_caliber_gun }
-	complete_special_project = { project = sp:sp_land_stronghold_network }
 }
 
-complete_special_project_1940 = {
-	complete_special_project = { project = sp:sp_nuclear_reactor }
-	complete_special_project = { project = sp:sp_air_jet_engine }
-	complete_special_project = { project = sp:sp_naval_fleet_submarine }
-	complete_special_project = { project = sp:sp_land_self_propelled_super_heavy_howitzer }
-	complete_special_project = { project = sp:sp_naval_escort_carrier }
-}
-
-complete_special_project_1941 = {
-	complete_special_project = { project = sp:sp_commercial_nuclear_reactor }
-	complete_special_project = { project = sp:sp_nuclear_bomb }
-	complete_special_project = { project = sp:sp_land_land_cruiser }
-	complete_special_project = { project = sp:sp_naval_underway_replenishment }
-}
-
-complete_special_project_1942 = {
-	complete_special_project = { project = sp:sp_nuclear_engines }
-	complete_special_project = { project = sp:sp_thermo_nuclear_bomb }
-	complete_special_project = { project = sp:sp_rockets_ballistic_missile }
-	complete_special_project = { project = sp:sp_rockets_flying_bomb }
-	complete_special_project = { project = sp:sp_rocket_interceptor }
-	complete_special_project = { project = sp:sp_naval_aip_engine }
-	complete_special_project = { project = sp:sp_land_large_caliber_kinetic_energy_sabot }
-	complete_special_project = { project = sp:sp_naval_proximity_fuze }
-	complete_special_project = { project = sp:sp_naval_ice_carrier }
-}
-
-complete_special_project_1943 = {
-	complete_special_project = { project = sp:sp_naval_modern_battleship }
-	complete_special_project = { project = sp:sp_naval_modern_carrier }
-	complete_special_project = { project = sp:sp_naval_nuclear_submarine }
-	complete_special_project = { project = sp:sp_naval_rocket_launching_submarine }
-	complete_special_project = { project = sp:sp_rockets_medium_range_ballistic_missile }
-	complete_special_project = { project = sp:sp_rockets_ground_to_air_missile }
-	complete_special_project = { project = sp:sp_air_bouncing_bomb }
-	complete_special_project = { project = sp:sp_air_intercontinental_bomber }
-	complete_special_project = { project = sp:sp_air_mothership_aircraft }
-	complete_special_project = { project = sp:sp_naval_submarine_carrier }
-}
-
-complete_special_project_1944 = {
-	complete_special_project = { project = sp:sp_air_axial_jet_engine }
-	complete_special_project = { project = sp:sp_air_helicopter }
-	complete_special_project = { project = sp:sp_naval_nuclear_torpedo }
-	complete_special_project = { project = sp:sp_naval_nuclear_missile_submarine }
-	complete_special_project = { project = sp:sp_nuclear_warheads }
-	complete_special_project = { project = sp:sp_naval_anechoic_tiles }
-	complete_special_project = { project = sp:sp_air_earthshaker_bomb }
-}
-
-complete_special_project_1945 = {
-	complete_special_project = { project = sp:sp_air_supersonic_jet }
-	complete_special_project = { project = sp:sp_rockets_long_range_ballistic_missile }
-}
-
-# 科技本身已不在这里：由 tools/hoi4_nologistics.py 的每日钩子在引擎内遍历科技库自动解锁。
-# 这里只剩科技之外的内容：开局一次性的 add_daily_mastery / auto_design，以及按年份写死的专项项目。
-# 每个年份段各自一个永久 flag，防止专项项目的一次性奖励被按天重复触发。
+# 开局一次性的 add_daily_mastery / auto_design 用永久 flag 防止重复。
 auto_research = {
 	if = {
 		limit = { NOT = { has_country_flag = auto_research_pre1936_done } }
@@ -85,68 +15,10 @@ auto_research = {
 		add_daily_mastery = { amount = 1 days = 3650 }
 		auto_design = yes
 	}
-	if = {
-		limit = {
-			date > 1937.1.1
-			NOT = { has_country_flag = auto_research_1937_done }
-		}
-		complete_special_project_1937 = yes
-		set_country_flag = auto_research_1937_done
-	}
-	if = {
-		limit = {
-			date > 1938.1.1
-			NOT = { has_country_flag = auto_research_1938_done }
-		}
-		complete_special_project_1938 = yes
-		set_country_flag = auto_research_1938_done
-	}
-	if = {
-		limit = {
-			date > 1940.1.1
-			NOT = { has_country_flag = auto_research_1940_done }
-		}
-		complete_special_project_1940 = yes
-		set_country_flag = auto_research_1940_done
-	}
-	if = {
-		limit = {
-			date > 1941.1.1
-			NOT = { has_country_flag = auto_research_1941_done }
-		}
-		complete_special_project_1941 = yes
-		set_country_flag = auto_research_1941_done
-	}
-	if = {
-		limit = {
-			date > 1942.1.1
-			NOT = { has_country_flag = auto_research_1942_done }
-		}
-		complete_special_project_1942 = yes
-		set_country_flag = auto_research_1942_done
-	}
-	if = {
-		limit = {
-			date > 1943.1.1
-			NOT = { has_country_flag = auto_research_1943_done }
-		}
-		complete_special_project_1943 = yes
-		set_country_flag = auto_research_1943_done
-	}
-	if = {
-		limit = {
-			date > 1944.1.1
-			NOT = { has_country_flag = auto_research_1944_done }
-		}
-		complete_special_project_1944 = yes
-		set_country_flag = auto_research_1944_done
-	}
-	if = {
-		limit = {
-			date > 1945.1.1
-			NOT = { has_country_flag = auto_research_1945_done }
-		}
-		complete_special_project_1945 = yes
-		set_country_flag = auto_research_1945_done
+	# 每天最多完成 8 个专项项目(没有可完成的就什么也不做)
+	for_loop_effect = {
+		start = 0
+		end = 8
+		autocore_complete_special_project = yes
 	}
 }

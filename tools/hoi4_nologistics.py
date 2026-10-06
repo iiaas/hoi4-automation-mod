@@ -61,6 +61,13 @@
    - 注意：游戏日期是引擎里的“小时数”(国家管理器 +0x468)，各年 1 月 1 日的小时数由 1936.1.1 = 60759359 推算(机器码里写死)。
    - 没有处理专项项目(special project)：它们仍由 mod 脚本 auto_research_technology_effects.txt 按年份写死的列表完成。
 
+9. 自动完成专项项目(special project)(只对玩家本国；不再列举项目名)
+   - mod 里只剩一个占位效果 `complete_special_project = { project = sp:sp_air_radar }`，每天由 on_daily 调用若干次。
+     补丁挂在这个效果的执行函数上：认出占位对象后，把它要完成的项目换成“玩家项目池里第一个 没完成 且 引擎判定可开始
+     (CanStart，即项目的 available 条件，如已研究所需科技)的项目”再执行；没有这样的项目就直接返回，什么也不做。
+   - 因此项目会在科技到位后依次完成，不再按写死的年份。其它地方对别的项目用 complete_special_project 不受影响。
+   - 没装补丁(没有 Python)时，占位效果会老老实实完成 sp_air_radar 一次，其余不动。
+
 兼容性(防止游戏更新后失效)
 --------------------------
 - 所有补丁入口都用“特征码”在 hoi4.exe 代码段里定位(跳过地址相关的 4 字节位移)，不再写死地址；
@@ -321,6 +328,9 @@ SIGS = {
     "UNLOCK": "48 89 5C 24 10 57 48 83 EC 50 48 8D 05 ?? ?? ?? ??",
     "VISIBLE": "40 53 48 83 EC 20 48 8B D9 48 8B 89 18 01 00 00 48 85 C9 75 08",
     "SETTECH": "48 89 5C 24 10 55 56 57 41 54 41 55 41 56 41 57 48 83 EC 70 4C 8B E2 48 8B E9",
+    "SPEXEC": "48 89 54 24 10 55 53 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 C8 48 81 EC 38 01 00 00 48 8B FA",
+    "SPISCOMP": "48 8B 49 28 E9 ?? ?? ?? ?? CC CC CC CC CC CC CC 48 8B 49 28",
+    "SPCANSTART": "48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 20 57 48 83 EC 50 48 8B FA 48 8B D9",
 }
 
 CAVES = {
@@ -403,6 +413,19 @@ CAVES = {
         "ff1582faffff84c0751a4889f1ba01000000ff1578faffff4889f14889faff1574faffff4801df49ffcc7fcae9"
         "4cffffff4883c4505d415f415e415d415c5f5e5b415b415a415941585a5958"
     ),
+    "SPROJ": (
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000005051524150"
+        "415141524153535657415441554883ec384989cc4989d5488b05b5ffffff488b004885c00f846c010000488b15"
+        "aaffffff483990100100000f85580100008b90800200003b90200500000f854601000085d20f843e0100003b90"
+        "1c0300000f83320100004c8b88100300004d85c90f84220100004189d04f8b0cc14d85c90f8412010000418b41"
+        "08413945080f8504010000498b81a80f00004885c00f84f4000000488b40184885c00f84e70000004863781c48"
+        "85ff0f8eda000000488b70104885f60f84cd000000488b1d23ffffff488b034c39e074694885c00f85b5000000"
+        "458b9424900000004989f34989f84d85c00f8e9e000000498b4b204885c974344883b9300200000c752a48b873"
+        "705f6169725f7248398120020000751781b92802000061646172750b4539531875664c8923eb0c4981c3c00100"
+        "0049ffc8ebae4989f54885ff7e364c89e9ff1591feffff84c0751d4c89e931d2ff158afeffff84c0740e418b45"
+        "184189842490000000eb234981c5c001000048ffcfebc54883c438415d415c5f5e5b415b415a415941585a5958"
+        "c34883c438415d415c5f5e5b415b415a415941585a5958"
+    ),
 }
 
 # 特征码 MGR：国家管理器全局指针。命中处 +3 起是 `mov rdi,[rip+disp32]`(7 字节)，解码得到全局地址。
@@ -422,6 +445,7 @@ HOOKS = (
     ("空降:每次师数上限", "SKIPCAP", 7, "SKIPCAP", ("mgr", "hvt", "cvt", "yes"), 0x43,
      bytes.fromhex("b0014883c428"), "cave"),
     ("自动国策", "DAILY", 5, "FOCUS", ("mgr", "hvt", "complete", "vecins", "tmv", "contains", "addsize", "unlock", "visible", "setfn", "bss"), 0, None, "cave"),
+    ("自动专项项目", "SPEXEC", 5, "SPROJ", ("mgr", "hvt", "spiscomp", "spcanstart", "bss"), 0, None, "cave"),
     ("成就:mod 校验恒通过", "ACH", 2, None, (), 0, None, "direct"),
     ("成就:非铁人也算铁人", "IRON", 3, None, (), 0, None, "direct"),
     ("成就:状态面板不要求铁人", "ACHUI", 4, None, (), 0, None, "direct"),
@@ -436,10 +460,11 @@ HOOKS = (
 #        把入口的 `movzx r13d,r8b`(44 0F B6 E8) 改成 `push 1; pop r13`(6A 01 41 5D)，面板恒按铁人处理。
 DIRECT_PATCHES = {"ACH": bytes.fromhex("31c0"), "IRON": bytes.fromhex("b10190"), "ACHUI": bytes.fromhex("6a01415d")}
 # 机器码需要额外的零初始化数据区(bss)，紧跟在补丁代码后面；大小(字节)
-CAVE_BSS = {"FOCUS": 4640}
+CAVE_BSS = {"SPROJ": 32, "FOCUS": 4640}
 # 需要用特征码解析出入口地址、供机器码调用的引擎函数：键 -> 特征码键
 SIG_FUNCS = {"complete": "COMPLETE", "vecins": "VECINS", "contains": "CONTAINS", "addsize": "ADDSIZE",
-             "unlock": "UNLOCK", "visible": "VISIBLE", "setfn": "SETTECH"}
+             "unlock": "UNLOCK", "visible": "VISIBLE", "setfn": "SETTECH",
+             "spiscomp": "SPISCOMP", "spcanstart": "SPCANSTART"}
 # 缺了也不影响整个补丁的可选键(机器码里值为 0 就跳过对应功能：MIO 特性自动解锁)
 OPT_KEYS = ("tmv", "contains", "addsize", "unlock", "visible", "setfn")
 # 需要 vtable 的类
