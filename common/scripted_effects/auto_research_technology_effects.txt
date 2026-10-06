@@ -479,7 +479,6 @@ complete_special_project_1945 = {
 # on_research_complete 效果(蓝图/经验等一次性奖励)，按天调用 auto_research 若不加锁会导致
 # 这些一次性奖励每天重复发放。flag 保证每个年份段的科技只真正下发一次。
 auto_research = {
-	auto_mio_complete_trait = yes
 	if = {
 		limit = { NOT = { has_country_flag = auto_research_pre1936_done } }
 		set_technology_before_1936 = yes

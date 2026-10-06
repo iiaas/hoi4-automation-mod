@@ -26,7 +26,6 @@ on_actions = {
 				limit = { is_ai = no }
 				auto_research = yes
 				auto_build = yes
-				auto_focus_shine = yes
 				auto_import_resources = yes
 			}
 		}

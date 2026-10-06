@@ -36,6 +36,22 @@
      无自定义难度、游戏规则允许成就 这几条，本脚本不改，不满足仍然不会解锁。
    - 开始界面右下角的奖杯图标(红叉=无法获得成就)由另一个函数判断，其中“非铁人 -> 无法获得成就”也一并改成恒为铁人。
 
+6. 自动国策(只对玩家本国；不再需要任何 mod 脚本，不再列举国策 id)
+   - 挂在国策进度对象(CNationalFocusProgress)的每日更新入口。引擎自己维护着一份“当前可开始国策”列表
+     (前置已完成、available 条件成立)，补丁每天遍历这份列表：
+       * 没有 mutually_exclusive 的国策：第一次出现时开始计时，满 (国策原版天数 - 1，最少 1 天) 后调用引擎
+         自带的“完成国策”函数(与脚本效果 complete_national_focus 走的是同一个函数)；
+       * 带 mutually_exclusive 的互斥线不自动，留给玩家；玩家手选的当前国策也跳过；
+       * 计时中的国策同时加上国策树高亮(等价 activate_shine_on_focus)，完成后引擎自动取消高亮。
+   - 计时状态放在补丁自带的数据区里(读档/换国家会按新的进度对象重置计时)。
+   - 任何国家都适用(玩家玩哪棵国策树就自动哪棵)。
+7. 自动解锁 MIO 特性(只对玩家本国；不再列举特性 id)
+   - 与自动国策同一个每日钩子：遍历玩家国家的 MIO(与脚本里 every_military_industrial_organization 一样，
+     只处理当前可见的 MIO)，对每个 MIO 模板里的每个特性：没解锁就“+1 规模并解锁”，与效果 complete_mio_trait
+     走同一对引擎函数(无视前置条件)，已解锁的跳过。
+   - 特性数组的元素大小不写死：用 RTTI 查到的 CTraitTemplate vtable 在内存里自动测出来。
+   - 这一项缺少任何一个特征码时只会自动跳过，不影响其它功能。
+
 兼容性(防止游戏更新后失效)
 --------------------------
 - 所有补丁入口都用“特征码”在 hoi4.exe 代码段里定位(跳过地址相关的 4 字节位移)，不再写死地址；
@@ -288,6 +304,13 @@ SIGS = {
     "MGR": "83 3B 00 48 8B 3D ?? ?? ?? ?? 75 04 33 C0 EB 08 48 8B CB E8 ?? ?? ?? ?? 48 8B 5C 24 48 48 63 C8 48 8B 87 10 03 00 00 48 8B 04 C8",
     "IRON": "80 E1 01 38 4F 58 0F 94 C0 48 83 C4 30",
     "ACHUI": "45 0F B6 E8 48 89 95 E0 00 00 00",
+    "DAILY": "48 89 5C 24 18 55 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 C0 48 81 EC 40 01 00 00 48 8B F9 41 B9 02 00 00 00",
+    "COMPLETE": "4C 89 4C 24 20 53 48 83 EC 50 49 8B D9",
+    "VECINS": "48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 57 41 56 41 57 48 83 EC 20 48 63 41 0C 4C 8B F1 8B 49 08 49 8B D8 48 63 EA 3B C1 0F 85 ?? ?? ?? ?? FF C0 66 0F 6E C1 49 8B 4E 10 41 B8 08 00 00 00 0F 5B C0 F3 0F 59 05 ?? ?? ?? ?? F3 0F 2C F0 3B C6 0F 4F F0 48 8B 01 8B D6 48 C1 E2 03 FF 50 08 48 8B 0B 4C 8D 3C ED 00 00 00 00 4D 8B C7 48 8B F8 49 89 0C 07 48 8B C8",
+    "CONTAINS": "48 89 5C 24 08 48 89 74 24 10 48 89 7C 24 18 41 56 48 83 EC 20 48 8B 3A",
+    "ADDSIZE": "48 89 5C 24 08 48 89 74 24 10 57 48 83 EC 40 8B F2 48 8B F9 48 81 C1 20 01 00 00",
+    "UNLOCK": "48 89 5C 24 10 57 48 83 EC 50 48 8D 05 ?? ?? ?? ??",
+    "VISIBLE": "40 53 48 83 EC 20 48 8B D9 48 8B 89 18 01 00 00 48 85 C9 75 08",
 }
 
 CAVES = {
@@ -334,6 +357,29 @@ CAVES = {
         "20050000753085d2742c3b901c03000073244c8b88100300004d85c974184189d04f8b0cc14939e9750c415941"
         "585a58ff2588ffffff415941585a58"
     ),
+    "FOCUS": (
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000050515241504151415241"
+        "535356574154415541564157554883ec504989cc488b058bffffff488b004885c00f8415030000488b1580ffff"
+        "ff483990100100000f85010300008b90800200003b90200500000f85ef02000085d20f84e70200003b901c0300"
+        "000f83db0200004c8b88100300004d85c90f84cb0200004189d04f8b2cc14d85ed0f84bb0200004d396c24080f"
+        "85b0020000488b1d5bffffff4c3923741c4c892348c7430800000000488dbb20020000b90002000031c0f348ab"
+        "48ff4308418b8c248400000085c90f8e5f01000083f9407605b940000000498b7424784885f60f844701000048"
+        "8d7b204189cef348a54531ff4539f70f83310100004489f8488b74c32041ffc74885f674e7493b74241074e083"
+        "be94050000007fd7488dbb2002000031c94531d281f900010000732189c848c1e004488b14074839f2746c4885"
+        "d275094d85d275044c8d1407ffc1ebd74d85d2749d498932488b430849894208418b4c242c498b5424208b4608"
+        "4531c04139c87d184e8b0cc24939f10f8470ffffff413941087c0541ffc0ebe34889742420498d4c24204489c2"
+        "4c8d442420ff151efeffffe948ffffff89c848c1e0044c8d1407488b8668050000489941b9a086010049f7f948"
+        "ffc84883f8017d05b801000000488b5308492b52084839c20f8c0dffffff49c70200000000c744242000000000"
+        "0f57c00f1144242848c74424380000000048c74424400f0000004c89e94889f24d8d45084c8d4c2420ff1598fd"
+        "ffff48ff4310e9c6feffff48833d97fdffff000f840701000048833d91fdffff000f84f900000048833d8bfdff"
+        "ff000f84eb00000048833d85fdffff000f84dd000000498b85680f00004885c00f84cd0000004c8bb030010000"
+        "4d85f60f84bd0000004c63b83c01000031ed4c39fd0f8dab000000498b34ee48ffc54885f674eb48833d41fdff"
+        "ff00740d4889f1ff1536fdffff84c074d4488b86100100004885c074c8488b78304885ff74bf4c63603c4d85e4"
+        "7eb6488b05edfcffff48390775aabbd80300004983fc017e18bb0800000081fb0010000073924839041f740583"
+        "c308ebed4889f9488d9640010000ff15bdfcffff84c0751a4889f1ba01000000ff15b3fcffff4889f14889faff"
+        "15affcffff4801df49ffcc7fcae94cffffff4883c4505d415f415e415d415c5f5e5b415b415a415941585a5958"
+    ),
 }
 
 # 特征码 MGR：国家管理器全局指针。命中处 +3 起是 `mov rdi,[rip+disp32]`(7 字节)，解码得到全局地址。
@@ -352,6 +398,7 @@ HOOKS = (
     ("登陆/空降:准备时间", "AGAINST", 5, "AGAINST", ("mgr", "hvt", "cvt", "yes"), 0, None, "cave"),
     ("空降:每次师数上限", "SKIPCAP", 7, "SKIPCAP", ("mgr", "hvt", "cvt", "yes"), 0x43,
      bytes.fromhex("b0014883c428"), "cave"),
+    ("自动国策", "DAILY", 5, "FOCUS", ("mgr", "hvt", "complete", "vecins", "tmv", "contains", "addsize", "unlock", "visible", "bss"), 0, None, "cave"),
     ("成就:mod 校验恒通过", "ACH", 2, None, (), 0, None, "direct"),
     ("成就:非铁人也算铁人", "IRON", 3, None, (), 0, None, "direct"),
     ("成就:状态面板不要求铁人", "ACHUI", 4, None, (), 0, None, "direct"),
@@ -365,9 +412,17 @@ HOOKS = (
 #   ACHUI：开始界面/游戏内的“能否获得成就”面板函数，第 3 个参数(r8b)是“铁人模式”，非铁人时面板直接判“无法获得成就”；
 #        把入口的 `movzx r13d,r8b`(44 0F B6 E8) 改成 `push 1; pop r13`(6A 01 41 5D)，面板恒按铁人处理。
 DIRECT_PATCHES = {"ACH": bytes.fromhex("31c0"), "IRON": bytes.fromhex("b10190"), "ACHUI": bytes.fromhex("6a01415d")}
+# 机器码需要额外的零初始化数据区(bss)，紧跟在补丁代码后面；大小(字节)
+CAVE_BSS = {"FOCUS": 4640}
+# 需要用特征码解析出入口地址、供机器码调用的引擎函数：键 -> 特征码键
+SIG_FUNCS = {"complete": "COMPLETE", "vecins": "VECINS", "contains": "CONTAINS", "addsize": "ADDSIZE",
+             "unlock": "UNLOCK", "visible": "VISIBLE"}
+# 缺了也不影响整个补丁的可选键(机器码里值为 0 就跳过对应功能：MIO 特性自动解锁)
+OPT_KEYS = ("tmv", "contains", "addsize", "unlock", "visible")
 # 需要 vtable 的类
 VTABLE_CLASSES = {"hvt": "CHuman", "cvt": "CCountry", "svt": "CShip", "tvt": "CTaskForce",
-                  "wvt": "CAirWing", "xvt": "CStrategicNavy"}
+                  "wvt": "CAirWing", "xvt": "CStrategicNavy",
+                  "tmv": "CTraitTemplate@NIndustrialOrganisation"}
 
 
 def resolve(img):
@@ -391,6 +446,12 @@ def resolve(img):
             R[key] = v
         else:
             problems.append(f"{cls}: RTTI 未找到 vtable")
+    for key, sk in SIG_FUNCS.items():
+        hits = img.find_sig(SIGS[sk])
+        if len(hits) == 1:
+            R[key] = hits[0]
+        else:
+            problems.append(f"引擎函数 {key}: 特征码{'未命中' if not hits else '命中 %d 处(不唯一)' % len(hits)}")
     # 各钩子入口
     for name, sigkey, pro_len, cavekey, keys, yes_delta, yes_check, kind in HOOKS:
         hits = img.find_sig(SIGS[sigkey])
@@ -402,7 +463,7 @@ def resolve(img):
 
 
 def need_keys(keys, R):
-    return all(k in R or k == "yes" for k in keys)
+    return all(k in R or k in ("yes", "bss") + OPT_KEYS for k in keys)
 
 
 def install_all(h, base, img):
@@ -452,18 +513,22 @@ def install_all(h, base, img):
             out.append((name, "安装成功" if P.patch_code(h, e, patch) else "写入失败"))
             continue
         code = bytearray(bytes.fromhex(CAVES[cavekey]))
+        cave = arena + cur_off
         vals = []
         for k in keys:
             if k == "mgr":
                 vals.append(base + R["mgr"])
             elif k == "yes":
                 vals.append(base + entry + yes_delta if yes_delta else 0)
+            elif k == "bss":
+                vals.append(cave + ((len(code) + len(pro) + 5 + 15) & ~15))
+            elif k in OPT_KEYS and k not in R:
+                vals.append(0)
             else:
                 vals.append(base + R[k])
         for i, v in enumerate(vals):
             struct.pack_into("<Q", code, 8 * i, v)
         code_off = 8 * len(keys)
-        cave = arena + cur_off
         code += pro                                   # 被覆盖的原指令搬进补丁
         jmp_at = len(code)
         code += bytes([0xE9]) + struct.pack("<i", (e + len(pro)) - (cave + jmp_at + 5))
@@ -472,7 +537,7 @@ def install_all(h, base, img):
             continue
         patch = bytes([0xE9]) + struct.pack("<i", (cave + code_off) - (e + 5)) + bytes([0x90]) * (len(pro) - 5)
         out.append((name, "安装成功" if P.patch_code(h, e, patch) else "写入失败"))
-        cur_off += (len(code) + 15) & ~15
+        cur_off += ((len(code) + 15) & ~15) + CAVE_BSS.get(cavekey, 0)
     return out
 
 
