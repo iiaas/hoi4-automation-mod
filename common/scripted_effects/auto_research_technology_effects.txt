@@ -1,24 +1,10 @@
-# 科技与专项项目已不在这里列举：
-#   * 科技：tools/hoi4_nologistics.py 的每日钩子在引擎内遍历科技库自动解锁。
-#   * 专项项目：同一个脚本挂在 complete_special_project 的执行函数上，把下面这个占位效果要完成的项目
-#     换成“引擎判定可开始且未完成”的项目。占位项目必须是 sp_air_radar（补丁靠它认出占位对象），
-#     没装补丁时它就只是完成 sp_air_radar 一次。
-autocore_complete_special_project = {
-	complete_special_project = { project = sp:sp_air_radar }
-}
-
-# 开局一次性的 add_daily_mastery / auto_design 用永久 flag 防止重复。
+# 科技与专项项目已不在 mod 脚本里：由 tools/hoi4_nologistics.py 的每日钩子在引擎内遍历并完成。
+# 这里只剩开局一次性的 add_daily_mastery / auto_design，用永久 flag 防止重复。
 auto_research = {
 	if = {
 		limit = { NOT = { has_country_flag = auto_research_pre1936_done } }
 		set_country_flag = auto_research_pre1936_done
 		add_daily_mastery = { amount = 1 days = 3650 }
 		auto_design = yes
-	}
-	# 每天最多完成 8 个专项项目(没有可完成的就什么也不做)
-	for_loop_effect = {
-		start = 0
-		end = 8
-		autocore_complete_special_project = yes
 	}
 }
