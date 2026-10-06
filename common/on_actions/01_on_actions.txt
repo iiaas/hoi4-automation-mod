@@ -27,6 +27,7 @@ on_actions = {
 				auto_research = yes
 				auto_build = yes
 				auto_import_resources = yes
+				auto_production_naval = yes
 			}
 		}
 	}
