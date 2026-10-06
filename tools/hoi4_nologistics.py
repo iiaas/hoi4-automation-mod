@@ -553,26 +553,35 @@ def install_inv_hook(h, base):
 
 # ---- 登陆其他限制(国家级获取函数，rcx = CCountry*；玩家国家及其傀儡国生效) ----
 CTY_CONST_HEX = (
-    "000000000000000000000000000000000000000000000000505241504151488b05ebffffff483901756d488b05cfffff"
-    "ff488b004885c0745e488b15c8ffffff48399010010000754e8b90800200003b9020050000754085d2743c3b901c0300"
-    "0073344c8b88100300004d85c974284189d04f8b0cc14939c9741039911c0400007514399134040000750c415941585a"
-    "58b863000000c3415941585a58"
+    "0000000000000000000000000000000000000000000000000000000000000000505241504151488b05e3ffffff483901"
+    "756d488b05c7ffffff488b004885c0745e488b15c0ffffff48399010010000754e8b90800200003b9020050000754085"
+    "d2743c3b901c03000073344c8b88100300004d85c974284189d04f8b0cc14939c9741039911c04000075143991340400"
+    "00750c415941585a58b863000000c3415941585a58"
+)
+CTY_SKIPCAP_HEX = (
+    "0000000000000000000000000000000000000000000000000000000000000000505241504151488b05e3ffffff483945"
+    "00756d488b05c6ffffff488b004885c0745e488b15bfffffff48399010010000754e8b90800200003b90200500007540"
+    "85d2743c3b901c03000073344c8b88100300004d85c974284189d04f8b0cc14939e9741039951c040000751439953404"
+    "0000750c415941585a58ff2578ffffff415941585a58"
 )
 CTY_AGAINST_HEX = (
-    "000000000000000000000000000000000000000000000000505241504151488b05ebffffff48390175784183f81a7572"
-    "488b05c9ffffff488b004885c07463488b15c2ffffff4839901001000075538b90800200003b9020050000754585d274"
-    "413b901c03000073394c8b88100300004d85c9742d4189d04f8b0cc14939c9741039911c040000751939913404000075"
-    "11415941585a5848c702487dfeff4889d0c3415941585a58"
+    "0000000000000000000000000000000000000000000000000000000000000000505241504151488b05e3ffffff483901"
+    "757e4183f81a74064183f80e7572488b05bbffffff488b004885c07463488b15b4ffffff4839901001000075538b9080"
+    "0200003b9020050000754585d274413b901c03000073394c8b88100300004d85c9742d4189d04f8b0cc14939c9741039"
+    "911c04000075193991340400007511415941585a5848c702487dfeff4889d0c3415941585a58"
 )
-CTY_DATA = (0, 8, 16)  # d_mgr, d_hvt, d_cvt
-CTY_CODE = 24
+CTY_DATA = (0, 8, 16, 24)  # d_mgr, d_hvt, d_cvt, d_yes
+CTY_CODE = 32
 GETTER_PRO = bytes.fromhex("4883ec284881c1b8050000")   # sub rsp,0x28; add rcx,0x5b8
 AGAINST_PRO = bytes.fromhex("48895c2410")              # mov [rsp+0x10], rbx
-# (名称, 入口 RVA, 被覆盖的原指令, 机器码)
+SKIP_PRO = bytes.fromhex("488d8db8050000")             # lea rcx,[rbp+0x5b8] (函数中段，rbp = 国家)
+# (名称, 入口 RVA, 被覆盖的原指令, 机器码, “未超上限”分支 RVA 或 0)
 CTY_HOOKS = (
-    ("海军每次登陆师数上限", 0x6F2FF0, GETTER_PRO, CTY_CONST_HEX),   # 返回 99
-    ("海军登陆计划数量上限", 0x6F3040, GETTER_PRO, CTY_CONST_HEX),   # 返回 99
-    ("海军登陆准备时间", 0x6F9B40, AGAINST_PRO, CTY_AGAINST_HEX),    # 修正 id 0x1A 取 -0.99
+    ("海军每次登陆师数上限", 0x6F2FF0, GETTER_PRO, CTY_CONST_HEX, 0),    # 返回 99
+    ("海军登陆计划数量上限", 0x6F3040, GETTER_PRO, CTY_CONST_HEX, 0),    # 返回 99
+    ("空降计划数量上限", 0x6EB530, GETTER_PRO, CTY_CONST_HEX, 0),        # 返回 99
+    ("登陆/空降准备时间", 0x6F9B40, AGAINST_PRO, CTY_AGAINST_HEX, 0),    # 修正 id 0x1A/0xE 取 -0.99
+    ("空降每次师数上限", 0x102D8D4, SKIP_PRO, CTY_SKIPCAP_HEX, 0x102D965),  # 玩家直接跳到“未超上限”
 )
 
 
@@ -609,9 +618,10 @@ def generic_install(h, base, rva, pro, cave_hex, data_vals, data_offs, code_off)
 
 def install_cty_hooks(h, base):
     res = []
-    for name, rva, pro, hexs in CTY_HOOKS:
+    for name, rva, pro, hexs, yes in CTY_HOOKS:
         r = generic_install(h, base, rva, pro, hexs,
-                            (base + COUNTRY_MGR_GLOBAL_RVA, base + HUMAN_VTABLE_RVA, base + COUNTRY_VTABLE_RVA),
+                            (base + COUNTRY_MGR_GLOBAL_RVA, base + HUMAN_VTABLE_RVA, base + COUNTRY_VTABLE_RVA,
+                             base + yes if yes else 0),
                             CTY_DATA, CTY_CODE)
         res.append(f"{name}:{r}")
     return "，".join(res)
@@ -627,7 +637,7 @@ def remove_hook(h, base):
         ok = _write_patch(h, base + WING_HOOK_RVA, WING_HOOK_PRO) or ok
     if inv_hook_status(h, base) == "hooked":
         ok = _write_patch(h, base + INV_HOOK_RVA, INV_HOOK_PRO) or ok
-    for _name, rva, pro, _hex in CTY_HOOKS:
+    for _name, rva, pro, _hex, _yes in CTY_HOOKS:
         if generic_status(h, base, rva, pro) == "hooked":
             ok = _write_patch(h, base + rva, pro) or ok
     return ok
