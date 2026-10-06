@@ -585,7 +585,11 @@ def main():
         sys.exit(0 if apply_air(3600) else 1)
     if game_cmd:  # Steam 启动：先拉起游戏，再起一个只活几秒的安装进程
         import subprocess
-        subprocess.Popen(game_cmd, cwd=str(Path(game_cmd[0]).parent), creationflags=0x00000008)
+        try:
+            subprocess.Popen(game_cmd, cwd=str(Path(game_cmd[0]).parent), creationflags=0x00000008)
+        except OSError as e:  # 启动项写错(例如多了引号)时在日志里留下原因
+            log(f"启动游戏失败: {e!r}；收到的参数: {game_cmd!r}")
+            return
         subprocess.Popen([sys.executable, str(Path(__file__).resolve()), "--install"],
                          creationflags=0x00000008 | 0x08000000, close_fds=True)
         log(f"已启动游戏: {game_cmd[0]}")
