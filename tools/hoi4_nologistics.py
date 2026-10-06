@@ -504,6 +504,53 @@ def install_wing_hook(h, base):
     return "installed" if _write_patch(h, entry, patch) else None
 
 
+# 登陆无视制海权：0xEA1250(rcx=国家海军状态对象，+0x10 是国家编号；rdx=海区)判断“我方是否控制该海区”，
+# 登陆路线校验与“Insufficient Naval Dominance”提示都靠它。玩家/傀儡国直接返回 1。
+INV_HOOK_RVA = 0xEA1250
+INV_HOOK_PRO = bytes.fromhex("4883ec28488bc2")   # sub rsp,0x28; mov rax,rdx (7 字节)
+INV_OBJ_VTABLE_RVA = 0x2973260                    # 该对象的 vtable，用来确认 rcx 类型
+INV_CAVE_HEX = (
+    "000000000000000000000000000000000000000000000000505241504151488b05ebffffff4839017576488b05cfffff"
+    "ff488b004885c07467488b15c8ffffff4839901001000075578b90800200003b9020050000754985d27445448b411041"
+    "39d07430443b801c03000073334c8b88100300004d85c974274f8b0cc14d85c9741e4139911c04000075154139913404"
+    "0000750c415941585a58b801000000c3415941585a58"
+)
+INV_DATA = (0, 8, 16)  # d_mgr, d_hvt, d_xvt
+INV_CODE = 24
+
+
+def inv_hook_status(h, base):
+    cur = P.read_mem(h, base + INV_HOOK_RVA, 7)
+    if cur == INV_HOOK_PRO:
+        return "orig"
+    if len(cur) == 7 and cur[0] == 0xE9:
+        return "hooked"
+    return None
+
+
+def install_inv_hook(h, base):
+    st = inv_hook_status(h, base)
+    if st == "hooked":
+        return "already"
+    if st != "orig":
+        return None
+    entry = base + INV_HOOK_RVA
+    code = bytearray(bytes.fromhex(INV_CAVE_HEX))
+    cave = alloc_near(h, entry, 0x1000)
+    if not cave:
+        return None
+    for off, val in zip(INV_DATA, (base + COUNTRY_MGR_GLOBAL_RVA, base + HUMAN_VTABLE_RVA,
+                                   base + INV_OBJ_VTABLE_RVA)):
+        struct.pack_into("<Q", code, off, val)
+    code += INV_HOOK_PRO
+    jmp_at = len(code)
+    code += b"\xE9" + struct.pack("<i", (entry + len(INV_HOOK_PRO)) - (cave + jmp_at + 5))
+    if not P.write_mem(h, cave, bytes(code)):
+        return None
+    patch = b"\xE9" + struct.pack("<i", (cave + INV_CODE) - (entry + 5)) + b"\x90\x90"
+    return "installed" if _write_patch(h, entry, patch) else None
+
+
 def remove_hook(h, base):
     ok = False
     if hook_status(h, base) == "hooked":
@@ -512,6 +559,8 @@ def remove_hook(h, base):
         ok = _write_patch(h, base + SHIP_HOOK_RVA, SHIP_HOOK_PRO) or ok
     if wing_hook_status(h, base) == "hooked":
         ok = _write_patch(h, base + WING_HOOK_RVA, WING_HOOK_PRO) or ok
+    if inv_hook_status(h, base) == "hooked":
+        ok = _write_patch(h, base + INV_HOOK_RVA, INV_HOOK_PRO) or ok
     return ok
 
 
@@ -531,7 +580,8 @@ def wait_and_install(wait_seconds):
                 r = install_hook(h, base)
                 r2 = install_ship_hook(h, base)
                 r3 = install_wing_hook(h, base)
-                log(f"陆军补丁: {r}，舰船补丁: {r2}，空军补丁: {r3} (pid {pid})")
+                r4 = install_inv_hook(h, base)
+                log(f"陆军补丁: {r}，舰船补丁: {r2}，空军补丁: {r3}，登陆制海权补丁: {r4} (pid {pid})")
                 return r is not None
         time.sleep(0.3)
     log("等待 hoi4.exe 超时")
