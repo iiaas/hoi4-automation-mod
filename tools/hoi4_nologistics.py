@@ -575,13 +575,13 @@ CTY_CODE = 32
 GETTER_PRO = bytes.fromhex("4883ec284881c1b8050000")   # sub rsp,0x28; add rcx,0x5b8
 AGAINST_PRO = bytes.fromhex("48895c2410")              # mov [rsp+0x10], rbx
 SKIP_PRO = bytes.fromhex("488d8db8050000")             # lea rcx,[rbp+0x5b8] (函数中段，rbp = 国家)
-# (名称, 入口 RVA, 被覆盖的原指令, 机器码, “未超上限”分支 RVA 或 0)
+# (名称, 入口 RVA, 被覆盖的原指令, 机器码, “允许”分支 RVA 或 0)
 CTY_HOOKS = (
     ("海军每次登陆师数上限", 0x6F2FF0, GETTER_PRO, CTY_CONST_HEX, 0),    # 返回 99
     ("海军登陆计划数量上限", 0x6F3040, GETTER_PRO, CTY_CONST_HEX, 0),    # 返回 99
     ("空降计划数量上限", 0x6EB530, GETTER_PRO, CTY_CONST_HEX, 0),        # 返回 99
     ("登陆/空降准备时间", 0x6F9B40, AGAINST_PRO, CTY_AGAINST_HEX, 0),    # 修正 id 0x1A/0xE 取 -0.99
-    ("空降每次师数上限", 0x102D8D4, SKIP_PRO, CTY_SKIPCAP_HEX, 0x102D965),  # 玩家直接跳到“未超上限”
+    ("空降每次师数上限", 0x102D8D4, SKIP_PRO, CTY_SKIPCAP_HEX, 0x102D917),  # 玩家直接跳到“允许”(mov al,1; ret)
 )
 
 
