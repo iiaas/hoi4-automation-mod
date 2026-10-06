@@ -29,6 +29,11 @@
    - 成就管理器里有个“游戏/mod 未被修改”标志(a2)，由一次字符串比较的结果决定；补丁把这次比较的判断
      `test eax,eax` 改成 `xor eax,eax`，标志恒为真。这和创意工坊那份可解锁成就的 hoi4.exe 的唯一一处改动完全一致。
    - 注意：这会让成就在 mod 状态下也被允许；是否同时放过其他作弊检测我没有验证。
+5. 非铁人模式也可以解锁成就(对所有人生效)
+   - common/achievements.txt 里每个成就的 possible 都有 `is_ironman = yes`。补丁让 is_ironman 触发器
+     把“当前游戏是否铁人”恒当作“是”：`and cl,1` -> `mov cl,1`。
+   - 副作用：其他脚本里的 is_ironman = yes/no 也会按“铁人”判断。成就另有 难度>1、开局日期<1936.1.2、
+     无自定义难度、游戏规则允许成就 这几条，本脚本不改，不满足仍然不会解锁。
 
 兼容性(防止游戏更新后失效)
 --------------------------
@@ -280,6 +285,7 @@ SIGS = {
     "SKIPCAP": "48 8D 8D B8 05 00 00 41 B8 86 01 00 00 48 8D 54 24 60 E8 ?? ?? ?? ?? 48 8B 08",
     "ACH": "85 C0 0F 94 C3 E8 ?? ?? ?? ??",
     "MGR": "83 3B 00 48 8B 3D ?? ?? ?? ?? 75 04 33 C0 EB 08 48 8B CB E8 ?? ?? ?? ?? 48 8B 5C 24 48 48 63 C8 48 8B 87 10 03 00 00 48 8B 04 C8",
+    "IRON": "80 E1 01 38 4F 58 0F 94 C0 48 83 C4 30",
 }
 
 CAVES = {
@@ -352,12 +358,15 @@ HOOKS = (
     ("空降:每次师数上限", "SKIPCAP", 7, "SKIPCAP", ("mgr", "hvt", "cvt", "yes"), 0x43,
      bytes.fromhex("b0014883c428"), "cave"),
     ("成就:mod 校验恒通过", "ACH", 2, None, (), 0, None, "direct"),
+    ("成就:非铁人也算铁人", "IRON", 3, None, (), 0, None, "direct"),
 )
 # 直接改写(不需要机器码)的补丁，键 = 特征码键。
 #   ACH：成就管理器的 a2 标志(“游戏/mod 未被修改”)由 test eax,eax;sete bl 得到(eax = 某个字符串比较结果)；
 #        把 85 C0(test eax,eax) 改成 31 C0(xor eax,eax)，ZF 恒为 1，bl 恒为 1，a2 恒为真(与创意工坊那份
 #        补丁版 hoi4.exe 的唯一一处改动相同：文件偏移 0x16E60A，0x85 -> 0x31)。
-DIRECT_PATCHES = {"ACH": bytes.fromhex("31c0")}
+#   IRON：脚本触发器 is_ironman 的求值 = (游戏标志 & 1) == 触发器值；成就的 possible 条件里都带 is_ironman = yes。
+#        把 `and cl,1`(80 E1 01) 改成 `mov cl,1; nop`(B1 01 90)，等于“当前永远是铁人”，非铁人存档也能解锁。
+DIRECT_PATCHES = {"ACH": bytes.fromhex("31c0"), "IRON": bytes.fromhex("b10190")}
 # 需要 vtable 的类
 VTABLE_CLASSES = {"hvt": "CHuman", "cvt": "CCountry", "svt": "CShip", "tvt": "CTaskForce",
                   "wvt": "CAirWing", "xvt": "CStrategicNavy"}
@@ -412,7 +421,7 @@ def install_all(h, base, img):
         pro = img.bytes_at(entry, pro_len)
         cur = P.read_mem(h, base + entry, pro_len)
         if cur != pro and ((kind == "cave" and len(cur) == pro_len and cur[0] == 0xE9)
-                           or (kind == "direct" and cur[:2] == DIRECT_PATCHES[sigkey])):
+                           or (kind == "direct" and cur[:len(DIRECT_PATCHES[sigkey])] == DIRECT_PATCHES[sigkey])):
             out.append((name, "已存在"))
             continue
         if cur != pro:
