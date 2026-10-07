@@ -86,7 +86,7 @@
      通知里的“某某”取参数里自带的文字。补丁并行完成国策时用模式 1，文字是“自动国策”；
      引擎自己完成的当前国策(国策槽)不动，仍是原来的弹窗。
 
-13. AI 控制玩家陆军和空军(实验功能，默认关闭；游戏运行中用 --ai on / --ai off 随时开关)
+13. AI 控制玩家陆军和空军(实验功能，装补丁后默认开启；游戏运行中用 --ai on / --ai off 随时开关)
    - 引擎里每个国家(包括玩家)都有一套 AI 对象 CCountryAI(政治/外交/内政/军事大臣等模块)，玩家那套没有被驱动：
      CCountryAI::Update 开头要先过“这个国家是不是 AI 国家”的判断，玩家过不了。
    - 补丁一(AI陆军:放行玩家)：只在 CCountryAI::Update 调用该判断时(靠返回地址限定)，开关打开后对玩家本国返回“是”。
@@ -789,7 +789,7 @@ def ai_switch(cmd):
             log("写入失败")
             return 1
     on, restricted, _s, _c, ai, ticks = struct.unpack("<QQQQQQ", P.read_mem(h, bss, 48))
-    log(f"AI 控制玩家陆军: {({0: '关', 1: '开(只跑军事大臣)', 2: '开(全部模块)'}).get(on & 0xFF, '?')}；玩家国家 AI 对象=0x{ai:X}；已限制为只跑军事大臣={'是' if restricted else '否'}；累计更新次数={ticks}")
+    log(f"AI 控制玩家陆军: {({0: '关', 1: '开(前4个模块+命令过滤)', 2: '开(全部模块)'}).get(on & 0xFF, '?')}；玩家国家 AI 对象=0x{ai:X}；已限制模块列表={'是' if restricted else '否'}；累计更新次数={ticks}")
     return 0
 
 
@@ -851,6 +851,7 @@ def main():
     res = install_all(h, base, img)
     log(f"补丁结果 (pid {pid}): " + "；".join(f"{n}:{r}" for n, r in res))
     if shared.get("aibss"):
+        P.write_mem(h, shared["aibss"], bytes([1]) + bytes(7))   # AI 控制默认开启(--ai off 可关)
         try:
             STATE.write_text(json.dumps({"pid": pid, "aibss": shared["aibss"]}), encoding="utf-8")
         except OSError:
