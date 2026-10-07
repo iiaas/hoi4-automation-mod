@@ -370,6 +370,7 @@ SIGS = {
     "SPCANSTART": "48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 20 57 48 83 EC 50 48 8B FA 48 8B D9",
     "SPPOPUP": "48 89 5C 24 10 48 89 6C 24 18 56 57 41 56 48 83 EC 30 4C 8B F2 48 8B F1 80 3D ?? ?? ?? ?? 00",
     "AIUPD": "48 89 5C 24 08 57 48 83 EC 40 48 8B F9 E8 ?? ?? ?? ?? 48 8B D8 48 85 C0 0F 84 ?? ?? ?? ?? 80 7F 60 00 0F 84 ?? ?? ?? ?? 83 B8 84 04 00 00 00 0F 8E ?? ?? ?? ?? 48 8B C8 E8",
+    "AREASYNC": "48 89 5C 24 18 48 89 6C 24 20 56 57 41 56 48 83 EC 20 4C 89 7C 24 48 49 8B E8 4C 63 79 54 48 8B DA",
     "POSTB": "40 53 48 83 EC 40 80 3D ?? ?? ?? ?? 00 48 8B D9 0F 84 ?? ?? ?? ?? 80 3D ?? ?? ?? ?? 00 75 ?? 48 8B CA E8 ?? ?? ?? ??",
     "POSTA": "48 89 5C 24 10 57 48 83 EC 40 48 8B F9 48 8B DA 48 8B 0D ?? ?? ?? ?? 48 8B 01 FF ?? ?? ?? ?? ?? 8B 17 44 8B 00",
     "SPFACTORY": "40 53 48 83 EC 20 B9 E8 02 00 00",
@@ -439,6 +440,12 @@ CAVES = {
         "4424187569488b05dfffffff803800745d488b05bbffffff488b004885c0744e488b15b4ffffff483990100100"
         "00753e8b90800200003b9020050000753085d2742c3b901c03000073244c8b80100300004d85c074184d8b04d0"
         "4d85c0740f4c39c1750a41585a58b801000000c341585a58"
+    ),
+    "AREASYNC": (
+        "000000000000000000000000000000000000000000000000535657415441554156488b05d8ffffff4885c0747e"
+        "488b40204885c0747548394108746f83782c047c69488b58204885db7460488b5b184885db74574c8b1dadffff"
+        "ff4c391b754b488b73188b7b244885f6743f81ff0001000077374989cc4989d54d89c64883ec2885ff7e19ffcf"
+        "488b0cfe4885c974f14c89ea4d89f0ff1574ffffffebe34883c4284c89e14c89ea4d89f0415e415d415c5f5e5b"
     ),
     "POSTB": (
         "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
@@ -557,6 +564,7 @@ HOOKS = (
     ("专项项目:完成不弹窗", "SPPOPUP", 1, None, (), 0, None, "direct"),
     ("AI陆军:状态维护", "AIUPD", 5, "AIUPD", ("mgr", "hvt", "bss"), 0, None, "cave"),
     ("AI陆军:放行玩家", "AIGATE", 6, "AIGATE", ("mgr", "hvt", "aiupd_ret", "aibss"), 0, None, "cave"),
+    ("AI陆军:控制区变更同步给玩家", "AREASYNC", 5, "AREASYNC", ("aibss", "mmv", "self"), 0, None, "cave"),
     ("AI陆军:只放行军事/空军命令(B)", "POSTB", 6, "POSTB", ("mgr", "hvt", "aibss", "w00", "w01", "w02", "w03", "w04", "w05", "w06", "w07", "w08", "w09", "w10", "w11", "w12", "w13", "w14", "w15", "w16", "w17", "w18", "w19", "w20", "w21", "w22", "w23", "w24", "w25", "w26", "w27", "w28", "w29", "w30", "w31", "w32", "w33", "w34", "w35", "w36", "w37", "w38", "w39", "w40", "w41", "w42", "w43", "w44", "w45", "w46", "w47", "w48", "w49", "w50", "w51", "w52", "w53", "w54", "w55", "w56", "w57", "w58", "w59", "w60", "w61", "w62", "w63", "w64", "w65", "w66", "w67", "w68", "w69", "w70", "w71", "w72", "w73", "w74", "w75", "w76", "w77", "w78", "w79"), 0, None, "cave"),
     ("AI陆军:只放行军事/空军命令(A)", "POSTA", 5, "POSTA", ("mgr", "hvt", "aibss", "w00", "w01", "w02", "w03", "w04", "w05", "w06", "w07", "w08", "w09", "w10", "w11", "w12", "w13", "w14", "w15", "w16", "w17", "w18", "w19", "w20", "w21", "w22", "w23", "w24", "w25", "w26", "w27", "w28", "w29", "w30", "w31", "w32", "w33", "w34", "w35", "w36", "w37", "w38", "w39", "w40", "w41", "w42", "w43", "w44", "w45", "w46", "w47", "w48", "w49", "w50", "w51", "w52", "w53", "w54", "w55", "w56", "w57", "w58", "w59", "w60", "w61", "w62", "w63", "w64", "w65", "w66", "w67", "w68", "w69", "w70", "w71", "w72", "w73", "w74", "w75", "w76", "w77", "w78", "w79"), 0, None, "cave"),
     ("成就:mod 校验恒通过", "ACH", 2, None, (), 0, None, "direct"),
@@ -585,7 +593,7 @@ SIG_FUNCS = {"complete": "COMPLETE", "vecins": "VECINS", "setfocus": "SETFOCUS",
 OPT_KEYS = ("setfocus", "validfocus", "tmv", "contains", "addsize", "unlock", "visible", "setfn", "spexec", "spiscomp", "spcanstart", "spfactory", "wupd")
 # 需要 vtable 的类
 AI_WHITELIST = ['CAiDiscardForceConcentrationTargetCommand', 'CAiStoreForceConcentrationTargetCommand', 'CAiStoreTotalWantedNrDivisionsCommand', 'CArmyGroupCommand', 'CAssignToArmyGroupCommand', 'CAssignToTheaterGroupCommand', 'CAttachAirWingToArmyCommand', 'CCancelMovementCommand', 'CCreateAreaDefenseCommand', 'CDeployAirWingCommand', 'CDetachAirWingFromArmyCommand', 'CDisbandTheaterGroupCommand', 'CMoveAirGroupAndAirTheatreToFreeCommand', 'CMoveAirWingAndAirGroupToAirTheatreCommand', 'CMoveAirWingToAirGroupCommand', 'CMoveArmiesInTheaterCommand', 'CMoveArmyGroupInTheaterCommand', 'COrderAddNewCompletePlanCommand', 'COrderAssignCommand', 'COrderBlockSectionsCommand', 'COrderChildFrontRatioCommand', 'COrderConnectCommand', 'COrderDeleteAllCommand', 'COrderDeleteCommand', 'COrderEditRootCommand', 'COrderExecuteCommand', 'COrderGroupCommand', 'COrderInsertFrontCommand', 'COrderMembersFairSplitCommand', 'COrderMergeRootsCommand', 'COrderNewFallbackCommand', 'COrderNewFrontCommand', 'COrderNewRootCommand', 'COrderReconnectCommand', 'COrderReorderChildFrontCommand', 'COrderReshapeCommand', 'COrderSetCollapseCommand', 'COrderSetInvasionSourceCommand', 'COrderSetParadropSourceCommand', 'COrderSetParadropTargetCommand', 'COrderSetPathCommand', 'COrderSetTrainingCommand', 'COrderUnassignCommand', 'CRemoveFromArmyGroupCommand', 'CReorderAirTheatersCommand', 'CReorderTheatersCommand', 'CSetArmyLeaderCommand', 'CSetOrderGroupExecutionTypeCommand', 'CSetTheaterGroupPriorityCommand', 'CSetTheatreCommand', 'CSetWingReinforcementPriorityCommand', 'CStratAirCancelTransferCommand', 'CStratAirChangeAggressivnessCommand', 'CStratAirConsolidateCommand', 'CStratAirDayNightCommand', 'CStratAirEnableMissionCommand', 'CStratAirMoveEquipmentCommand', 'CStratAirMoveEquipmentToReservesCommand', 'CStratAirSetMissionCommand', 'CStratAirSplitCommand', 'CStratAirTransferCommand', 'CStrategicRedeploymentCommand', 'COrderReplaceRootCommands', 'CMassMoveCommand', 'CSetOrderGroupCohesionTypeCommand', 'CEditAreaDefenseStateCommand', 'CSetAreaDefenseSettingCommand', 'CSetArmyLeaderPreferredTacticCommand', 'CSetCountryReinforcementPriorityCommand', 'CSetPreferredTacticCommand']
-VTABLE_CLASSES = {"hvt": "CHuman", "cvt": "CCountry", "svt": "CShip", "tvt": "CTaskForce",
+VTABLE_CLASSES = {"hvt": "CHuman", "mmv": "CAIMilitaryMinister", "cvt": "CCountry", "svt": "CShip", "tvt": "CTaskForce",
                   "wvt": "CAirWing", "xvt": "CStrategicNavy",
                   "tmv": "CTraitTemplate@NIndustrialOrganisation"}
 WL_KEYS = {f"w{i:02d}" for i in range(80)}
@@ -643,7 +651,7 @@ def resolve(img):
 
 
 def need_keys(keys, R):
-    return all(k in R or k in ("yes", "bss", "aiupd_ret", "aibss") + OPT_KEYS or k in WL_KEYS for k in keys)
+    return all(k in R or k in ("yes", "bss", "aiupd_ret", "aibss", "self") + OPT_KEYS or k in WL_KEYS for k in keys)
 
 
 shared = {}   # 装完后留给 --ai 开关用的地址(AI 开关字节所在的数据区)
@@ -713,6 +721,8 @@ def install_all(h, base, img):
                     shared["aibss"] = vals[-1]
             elif k == "aiupd_ret":
                 vals.append(base + R["entry:AI陆军:状态维护"] + 0x3D)
+            elif k == "self":
+                vals.append(e)
             elif k == "aibss":
                 vals.append(shared.get("aibss", 0))
             elif (k in OPT_KEYS or k in WL_KEYS) and k not in R:
