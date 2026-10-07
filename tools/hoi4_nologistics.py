@@ -86,16 +86,19 @@
      通知里的“某某”取参数里自带的文字。补丁并行完成国策时用模式 1，文字是“自动国策”；
      引擎自己完成的当前国策(国策槽)不动，仍是原来的弹窗。
 
-13. AI 控制玩家陆军(实验功能，默认关闭；游戏运行中用 --ai on / --ai off 随时开关)
+13. AI 控制玩家陆军和空军(实验功能，默认关闭；游戏运行中用 --ai on / --ai off 随时开关)
    - 引擎里每个国家(包括玩家)都有一套 AI 对象 CCountryAI(政治/外交/内政/军事大臣等模块)，玩家那套没有被驱动：
-     CCountryAI::Update 开头要先过“这个国家是不是 AI 国家”的判断(查国家管理器里的 AI 国家集合)，玩家过不了。
+     CCountryAI::Update 开头要先过“这个国家是不是 AI 国家”的判断，玩家过不了。
    - 补丁一(AI陆军:放行玩家)：只在 CCountryAI::Update 调用该判断时(靠返回地址限定)，开关打开后对玩家本国返回“是”。
-   - 补丁二(AI陆军:状态维护)：玩家的 CCountryAI 开关打开时，把它的模块列表临时缩成只剩“军事大臣”(其余模块——
-     政治/外交/内政/情报等——不运行，研究/生产/外交仍然完全由你控制)；关闭开关时按原样恢复(模块数、第 0 项)。
-   - 军事大臣会像对 AI 国家一样自动新建战区/战线、画进攻箭头；空军也是它管的：它的更新里有生成空军“设置任务/启用任务”
-     命令(CStratAirSetMissionCommand / CStratAirEnableMissionCommand)的函数(RVA 0x10B5260 / 0x10B5740)，实测玩家的军事大臣
-     打开开关后每隔几天就会调用它们，所以空军任务也由 AI 接管，不需要单独的开关。你自己的命令不受影响，需要时关掉开关即可。
-   - 暂未限制在某个战区内：打开后作用于玩家全部陆军(以后要按战区名过滤再加)。
+   - 补丁二(AI陆军:状态维护)：开关为 on 时，玩家的 CCountryAI 只让前 4 个模块(政治/外交/内政/军事大臣)运行，
+     其余(密码/情报/行动/特工)不运行；关闭时恢复原样。实测：只跑军事大臣时空军没有任何任务(空军 AI 的输入要
+     政治、外交、内政三个大臣一起运行后才有，和游戏开始时先 observe 让整套 AI 跑过一遍再切回玩家是同一个原因)。
+   - 补丁三(AI陆军:只放行军事/空军命令 A/B)：AI 所有命令都经过引擎的两个“发布 AI 命令”函数。开关为 on 时，
+     对玩家本国只放行陆军(战线/编队/战区/师数需求/部队移动…)和空军(任务/转场/部署…)类命令(白名单
+     AI_WHITELIST，约 70 类)，其余(生产、贸易、外交、法律、科研、海军…)命令直接销毁，所以政治/外交/内政
+     大臣虽然运行了，但不会真的替你做这些事。
+   - on=只放行军事/空军命令；full=所有模块都运行且不过滤(调试用，会崩溃，不要用)；off=关闭；status=查看。
+   - 暂未限制在某个战区内：打开后作用于玩家全部陆军和空军。已设置的手动任务可能被 AI 改掉。
    - 用法：pythonw 本脚本 --ai on|off|status(游戏运行时执行，日志在 %TEMP% 下的 hoi4_nologistics.log)。
 
 兼容性(防止游戏更新后失效)
@@ -367,6 +370,8 @@ SIGS = {
     "SPCANSTART": "48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 20 57 48 83 EC 50 48 8B FA 48 8B D9",
     "SPPOPUP": "48 89 5C 24 10 48 89 6C 24 18 56 57 41 56 48 83 EC 30 4C 8B F2 48 8B F1 80 3D ?? ?? ?? ?? 00",
     "AIUPD": "48 89 5C 24 08 57 48 83 EC 40 48 8B F9 E8 ?? ?? ?? ?? 48 8B D8 48 85 C0 0F 84 ?? ?? ?? ?? 80 7F 60 00 0F 84 ?? ?? ?? ?? 83 B8 84 04 00 00 00 0F 8E ?? ?? ?? ?? 48 8B C8 E8",
+    "POSTB": "40 53 48 83 EC 40 80 3D ?? ?? ?? ?? 00 48 8B D9 0F 84 ?? ?? ?? ?? 80 3D ?? ?? ?? ?? 00 75 ?? 48 8B CA E8 ?? ?? ?? ??",
+    "POSTA": "48 89 5C 24 10 57 48 83 EC 40 48 8B F9 48 8B DA 48 8B 0D ?? ?? ?? ?? 48 8B 01 FF ?? ?? ?? ?? ?? 8B 17 44 8B 00",
     "SPFACTORY": "40 53 48 83 EC 20 B9 E8 02 00 00",
     "CONVOY": "4C 89 4C 24 20 4C 89 44 24 18 48 89 54 24 10 48 89 4C 24 08 55 53 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 ?? 48 81 EC 88 00 00 00",
 }
@@ -423,17 +428,59 @@ CAVES = {
     ),
     "AIUPD": (
         "000000000000000000000000000000000000000000000000505241504151488b05dbffffff488b004885c00f84"
-        "c0000000488b15d0ffffff483990100100000f85ac0000008b90800200003b90200500000f859a00000085d20f"
-        "84920000003b901c0300000f83860000004c8b80100300004d85c0747a4d8b04d04d85c074714c394108756b4c"
-        "8b0d83ffffff4989492049ff4128418039007436493949087450488b41204885c074478b512c83fa047c3f4c8b"
-        "004d894110418951184c8b40184c8900c7412c0100000049894908eb20493949087512488b41204d8b41104c89"
-        "00418b511889512c49c7410800000000415941585a58"
+        "b5000000488b15d0ffffff483990100100000f85a10000008b90800200003b90200500000f858f00000085d20f"
+        "84870000003b901c030000737f4c8b80100300004d85c074734d8b04d04d85c0746a4c39410875644c8b0d87ff"
+        "ffff4989492049ff412841803901752f493949087449488b41204885c074408b512c83fa057c384c8b004d8941"
+        "1041895118c7412c0400000049894908eb20493949087512488b41204d8b41104c8900418b511889512c49c741"
+        "0800000000415941585a58"
     ),
     "AIGATE": (
         "000000000000000000000000000000000000000000000000000000000000000050524150488b05e5ffffff4839"
         "4424187569488b05dfffffff803800745d488b05bbffffff488b004885c0744e488b15b4ffffff483990100100"
         "00753e8b90800200003b9020050000753085d2742c3b901c03000073244c8b80100300004d85c074184d8b04d0"
         "4d85c0740f4c39c1750a41585a58b801000000c341585a58"
+    ),
+    "POSTB": (
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "00000000000000000000000000000000000000000000000000000000000000000000505241504151488b056bfd"
+        "ffff4885c0747b8038017576488b054afdffff488b004885c074674c8b0543fdffff4c3980100100007557448b"
+        "8080020000443b802005000075474585c07442448b0a4539c1753a4c8b094c8d0523fdffffb8500000004d3908"
+        "74264983c008ffc875f3415941585a584883ec284889c9488b01ba01000000ff104883c42831c0c3415941585a"
+        "58"
+    ),
+    "POSTA": (
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "00000000000000000000000000000000000000000000000000000000000000000000505241504151488b056bfd"
+        "ffff4885c0747b8038017576488b054afdffff488b004885c074674c8b0543fdffff4c3980100100007557448b"
+        "8080020000443b802005000075474585c07442448b094539c1753a4c8b0a4c8d0523fdffffb8500000004d3908"
+        "74264983c008ffc875f3415941585a584883ec284889d1488b01ba01000000ff104883c42831c0c3415941585a"
+        "58"
     ),
     "FOCUS": (
         "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
@@ -510,6 +557,8 @@ HOOKS = (
     ("专项项目:完成不弹窗", "SPPOPUP", 1, None, (), 0, None, "direct"),
     ("AI陆军:状态维护", "AIUPD", 5, "AIUPD", ("mgr", "hvt", "bss"), 0, None, "cave"),
     ("AI陆军:放行玩家", "AIGATE", 6, "AIGATE", ("mgr", "hvt", "aiupd_ret", "aibss"), 0, None, "cave"),
+    ("AI陆军:只放行军事/空军命令(B)", "POSTB", 6, "POSTB", ("mgr", "hvt", "aibss", "w00", "w01", "w02", "w03", "w04", "w05", "w06", "w07", "w08", "w09", "w10", "w11", "w12", "w13", "w14", "w15", "w16", "w17", "w18", "w19", "w20", "w21", "w22", "w23", "w24", "w25", "w26", "w27", "w28", "w29", "w30", "w31", "w32", "w33", "w34", "w35", "w36", "w37", "w38", "w39", "w40", "w41", "w42", "w43", "w44", "w45", "w46", "w47", "w48", "w49", "w50", "w51", "w52", "w53", "w54", "w55", "w56", "w57", "w58", "w59", "w60", "w61", "w62", "w63", "w64", "w65", "w66", "w67", "w68", "w69", "w70", "w71", "w72", "w73", "w74", "w75", "w76", "w77", "w78", "w79"), 0, None, "cave"),
+    ("AI陆军:只放行军事/空军命令(A)", "POSTA", 5, "POSTA", ("mgr", "hvt", "aibss", "w00", "w01", "w02", "w03", "w04", "w05", "w06", "w07", "w08", "w09", "w10", "w11", "w12", "w13", "w14", "w15", "w16", "w17", "w18", "w19", "w20", "w21", "w22", "w23", "w24", "w25", "w26", "w27", "w28", "w29", "w30", "w31", "w32", "w33", "w34", "w35", "w36", "w37", "w38", "w39", "w40", "w41", "w42", "w43", "w44", "w45", "w46", "w47", "w48", "w49", "w50", "w51", "w52", "w53", "w54", "w55", "w56", "w57", "w58", "w59", "w60", "w61", "w62", "w63", "w64", "w65", "w66", "w67", "w68", "w69", "w70", "w71", "w72", "w73", "w74", "w75", "w76", "w77", "w78", "w79"), 0, None, "cave"),
     ("成就:mod 校验恒通过", "ACH", 2, None, (), 0, None, "direct"),
     ("成就:非铁人也算铁人", "IRON", 3, None, (), 0, None, "direct"),
     ("成就:状态面板不要求铁人", "ACHUI", 4, None, (), 0, None, "direct"),
@@ -535,9 +584,12 @@ SIG_FUNCS = {"complete": "COMPLETE", "vecins": "VECINS", "setfocus": "SETFOCUS",
 # 缺了也不影响整个补丁的可选键(机器码里值为 0 就跳过对应功能：MIO 特性自动解锁)
 OPT_KEYS = ("setfocus", "validfocus", "tmv", "contains", "addsize", "unlock", "visible", "setfn", "spexec", "spiscomp", "spcanstart", "spfactory", "wupd")
 # 需要 vtable 的类
+AI_WHITELIST = ['CAiDiscardForceConcentrationTargetCommand', 'CAiStoreForceConcentrationTargetCommand', 'CAiStoreTotalWantedNrDivisionsCommand', 'CArmyGroupCommand', 'CAssignToArmyGroupCommand', 'CAssignToTheaterGroupCommand', 'CAttachAirWingToArmyCommand', 'CCancelMovementCommand', 'CCreateAreaDefenseCommand', 'CDeployAirWingCommand', 'CDetachAirWingFromArmyCommand', 'CDisbandTheaterGroupCommand', 'CMoveAirGroupAndAirTheatreToFreeCommand', 'CMoveAirWingAndAirGroupToAirTheatreCommand', 'CMoveAirWingToAirGroupCommand', 'CMoveArmiesInTheaterCommand', 'CMoveArmyGroupInTheaterCommand', 'COrderAddNewCompletePlanCommand', 'COrderAssignCommand', 'COrderBlockSectionsCommand', 'COrderChildFrontRatioCommand', 'COrderConnectCommand', 'COrderDeleteAllCommand', 'COrderDeleteCommand', 'COrderEditRootCommand', 'COrderExecuteCommand', 'COrderGroupCommand', 'COrderInsertFrontCommand', 'COrderMembersFairSplitCommand', 'COrderMergeRootsCommand', 'COrderNewFallbackCommand', 'COrderNewFrontCommand', 'COrderNewRootCommand', 'COrderReconnectCommand', 'COrderReorderChildFrontCommand', 'COrderReshapeCommand', 'COrderSetCollapseCommand', 'COrderSetInvasionSourceCommand', 'COrderSetParadropSourceCommand', 'COrderSetParadropTargetCommand', 'COrderSetPathCommand', 'COrderSetTrainingCommand', 'COrderUnassignCommand', 'CRemoveFromArmyGroupCommand', 'CReorderAirTheatersCommand', 'CReorderTheatersCommand', 'CSetArmyLeaderCommand', 'CSetOrderGroupExecutionTypeCommand', 'CSetTheaterGroupPriorityCommand', 'CSetTheatreCommand', 'CSetWingReinforcementPriorityCommand', 'CStratAirCancelTransferCommand', 'CStratAirChangeAggressivnessCommand', 'CStratAirConsolidateCommand', 'CStratAirDayNightCommand', 'CStratAirEnableMissionCommand', 'CStratAirMoveEquipmentCommand', 'CStratAirMoveEquipmentToReservesCommand', 'CStratAirSetMissionCommand', 'CStratAirSplitCommand', 'CStratAirTransferCommand', 'CStrategicRedeploymentCommand', 'COrderReplaceRootCommands', 'CMassMoveCommand', 'CSetOrderGroupCohesionTypeCommand', 'CEditAreaDefenseStateCommand', 'CSetAreaDefenseSettingCommand', 'CSetArmyLeaderPreferredTacticCommand', 'CSetCountryReinforcementPriorityCommand', 'CSetPreferredTacticCommand']
 VTABLE_CLASSES = {"hvt": "CHuman", "cvt": "CCountry", "svt": "CShip", "tvt": "CTaskForce",
                   "wvt": "CAirWing", "xvt": "CStrategicNavy",
                   "tmv": "CTraitTemplate@NIndustrialOrganisation"}
+WL_KEYS = {f"w{i:02d}" for i in range(80)}
+VTABLE_CLASSES.update({f"w{i:02d}": c for i, c in enumerate(AI_WHITELIST)})
 
 
 def resolve(img):
@@ -591,7 +643,7 @@ def resolve(img):
 
 
 def need_keys(keys, R):
-    return all(k in R or k in ("yes", "bss", "aiupd_ret", "aibss") + OPT_KEYS for k in keys)
+    return all(k in R or k in ("yes", "bss", "aiupd_ret", "aibss") + OPT_KEYS or k in WL_KEYS for k in keys)
 
 
 shared = {}   # 装完后留给 --ai 开关用的地址(AI 开关字节所在的数据区)
@@ -663,7 +715,7 @@ def install_all(h, base, img):
                 vals.append(base + R["entry:AI陆军:状态维护"] + 0x3D)
             elif k == "aibss":
                 vals.append(shared.get("aibss", 0))
-            elif k in OPT_KEYS and k not in R:
+            elif (k in OPT_KEYS or k in WL_KEYS) and k not in R:
                 vals.append(0)
             else:
                 vals.append(base + R[k])
@@ -732,12 +784,12 @@ def ai_switch(cmd):
         return 1
     h = P.open_process(pid)
     bss = st["aibss"]
-    if cmd in ("on", "off"):
-        if not P.write_mem(h, bss, bytes([1 if cmd == "on" else 0]) + bytes(7)):
+    if cmd in ("on", "full", "off"):
+        if not P.write_mem(h, bss, bytes([{"on": 1, "full": 2, "off": 0}[cmd]]) + bytes(7)):
             log("写入失败")
             return 1
     on, restricted, _s, _c, ai, ticks = struct.unpack("<QQQQQQ", P.read_mem(h, bss, 48))
-    log(f"AI 控制玩家陆军: {'开' if on & 0xFF else '关'}；玩家国家 AI 对象=0x{ai:X}；已限制为只跑军事大臣={'是' if restricted else '否'}；累计更新次数={ticks}")
+    log(f"AI 控制玩家陆军: {({0: '关', 1: '开(只跑军事大臣)', 2: '开(全部模块)'}).get(on & 0xFF, '?')}；玩家国家 AI 对象=0x{ai:X}；已限制为只跑军事大臣={'是' if restricted else '否'}；累计更新次数={ticks}")
     return 0
 
 
@@ -747,7 +799,7 @@ def main():
     ap.add_argument("--install", action="store_true", help="给运行中的游戏装补丁后退出")
     ap.add_argument("--remove", action="store_true", help="撤销补丁")
     ap.add_argument("--status", action="store_true", help="只显示特征码定位结果，不写入")
-    ap.add_argument("--ai", choices=("on", "off", "status"), help="开/关/查看 “AI 控制玩家陆军”(游戏运行中随时可切)")
+    ap.add_argument("--ai", choices=("on", "full", "off", "status"), help="开/关/查看 “AI 控制玩家陆军”(游戏运行中随时可切)")
     ap.add_argument("--uninstall", action="store_true", help="清理旧版开机启动项")
     ap.add_argument("--wait-game", type=int, default=300)
     args, game_cmd = ap.parse_known_args()
