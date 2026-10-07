@@ -14,7 +14,7 @@
    - 陆军师(每次更新)：经验 = 经验总量/兵力，低于 0.3 就抬到 0.3；当前补给低于约 5000 小时就补到 10000 小时；
      燃油补满。补充兵员稀释经验后，下一次更新就会被抬回，永远不低于训练有素。
    - 海军舰船(每次更新)：经验低于 0.3 抬到 0.3。
-   - 空军联队(每次更新)：经验低于 300(联队经验的训练有素门槛)抬到 300。
+   - 空军联队(每次更新)：经验低于 300(联队经验的训练有素门槛)抬到 300，并调用引擎的“按经验更新修正”函数(否则界面显示训练有素、修正仍是 0 级)。
    - 海军/空军只处理经验，不处理补给与燃油。
 2. 海军登陆去除限制
    - 无视制海权不足：登陆路线校验里“我方是否控制该海区”对玩家恒为“是”(不再提示 Insufficient Naval Dominance)。
@@ -309,6 +309,7 @@ SIGS = {
     "ARMY": "48 89 5C 24 10 57 48 83 EC 20 48 8B 01 48 8D 54 24 30 48 8B D9 FF 90 C8 01 00 00",
     "SHIP": "40 57 48 83 EC 20 48 8B F9 48 8B 89 18 07 00 00 48 85 C9 0F 8E ?? ?? ?? ??",
     "WING": "41 55 48 83 EC 60 4C 8B E9 E8 ?? ?? ?? ?? 41 39 45 7C 0F 8E ?? ?? ?? ??",
+    "WUPD": "40 57 48 83 EC 40 48 8B 41 38",
     "INV": "48 83 EC 28 48 8B C2 48 8D 51 10 48 8B 88 E8 00 00 00 E8 ?? ?? ?? ?? 83 F8 01",
     "GET_DIVCAP": "48 83 EC 28 48 81 C1 B8 05 00 00 48 8D 54 24 30 41 B8 20 00 00 00 E8 ?? ?? ?? ??",
     "GET_PLANCAP": "48 83 EC 28 48 81 C1 B8 05 00 00 48 8D 54 24 30 41 B8 83 01 00 00 E8 ?? ?? ?? ??",
@@ -350,9 +351,10 @@ CAVES = {
         "3981080700007d0748898108070000415941585a58"
     ),
     "WING": (
-        "000000000000000000000000000000000000000000000000505241504151488b05ebffffff4839017555488b05"
-        "cfffffff488b004885c07446488b15c8ffffff4839901001000075368b90800200003b9020050000752885d274"
-        "24448b81c40900004139d075184881b91802000080c3c9017d0b48c7811802000080c3c901415941585a58"
+        "000000000000000000000000000000000000000000000000000000000000000050515241504151415241534883"
+        "ec20488b05daffffff4839017563488b05beffffff488b004885c07454488b15b7ffffff483990100100007544"
+        "8b90800200003b9020050000753685d27432448b81c40900004139d075264881b91802000080c3c9017d1948c7"
+        "811802000080c3c901488b0581ffffff4885c07402ffd04883c420415b415a415941585a5958"
     ),
     "INV": (
         "000000000000000000000000000000000000000000000000505241504151488b05ebffffff4839017546488b05"
@@ -432,7 +434,7 @@ MGR_INSN_OFFSET = 3
 HOOKS = (
     ("陆军:经验/补给/燃油", "ARMY", 5, "ARMY", ("mgr", "hvt"), 0, None, "cave"),
     ("海军:舰船经验", "SHIP", 6, "SHIP", ("mgr", "hvt", "svt", "tvt"), 0, None, "cave"),
-    ("空军:联队经验", "WING", 6, "WING", ("mgr", "hvt", "wvt"), 0, None, "cave"),
+    ("空军:联队经验", "WING", 6, "WING", ("mgr", "hvt", "wvt", "wupd"), 0, None, "cave"),
     ("登陆:无视制海权", "INV", 7, "INV", ("mgr", "hvt", "xvt"), 0, None, "cave"),
     ("海军:每次登陆师数上限", "GET_DIVCAP", 11, "CONST", ("mgr", "hvt", "cvt", "yes"), 0, None, "cave"),
     ("海军:登陆计划数量上限", "GET_PLANCAP", 11, "CONST", ("mgr", "hvt", "cvt", "yes"), 0, None, "cave"),
@@ -460,9 +462,10 @@ CAVE_BSS = {"FOCUS": 4640}
 # 需要用特征码解析出入口地址、供机器码调用的引擎函数：键 -> 特征码键
 SIG_FUNCS = {"complete": "COMPLETE", "vecins": "VECINS", "contains": "CONTAINS", "addsize": "ADDSIZE",
              "unlock": "UNLOCK", "visible": "VISIBLE", "setfn": "SETTECH",
-             "spexec": "SPEXEC", "spiscomp": "SPISCOMP", "spcanstart": "SPCANSTART", "spfactory": "SPFACTORY"}
+             "spexec": "SPEXEC", "spiscomp": "SPISCOMP", "spcanstart": "SPCANSTART", "spfactory": "SPFACTORY",
+             "wupd": "WUPD"}
 # 缺了也不影响整个补丁的可选键(机器码里值为 0 就跳过对应功能：MIO 特性自动解锁)
-OPT_KEYS = ("tmv", "contains", "addsize", "unlock", "visible", "setfn", "spexec", "spiscomp", "spcanstart", "spfactory")
+OPT_KEYS = ("tmv", "contains", "addsize", "unlock", "visible", "setfn", "spexec", "spiscomp", "spcanstart", "spfactory", "wupd")
 # 需要 vtable 的类
 VTABLE_CLASSES = {"hvt": "CHuman", "cvt": "CCountry", "svt": "CShip", "tvt": "CTaskForce",
                   "wvt": "CAirWing", "xvt": "CStrategicNavy",
