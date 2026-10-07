@@ -86,6 +86,16 @@
      通知里的“某某”取参数里自带的文字。补丁并行完成国策时用模式 1，文字是“自动国策”；
      引擎自己完成的当前国策(国策槽)不动，仍是原来的弹窗。
 
+13. AI 控制玩家陆军(实验功能，默认关闭；游戏运行中用 --ai on / --ai off 随时开关)
+   - 引擎里每个国家(包括玩家)都有一套 AI 对象 CCountryAI(政治/外交/内政/军事大臣等模块)，玩家那套没有被驱动：
+     CCountryAI::Update 开头要先过“这个国家是不是 AI 国家”的判断(查国家管理器里的 AI 国家集合)，玩家过不了。
+   - 补丁一(AI陆军:放行玩家)：只在 CCountryAI::Update 调用该判断时(靠返回地址限定)，开关打开后对玩家本国返回“是”。
+   - 补丁二(AI陆军:状态维护)：玩家的 CCountryAI 开关打开时，把它的模块列表临时缩成只剩“军事大臣”(其余模块——
+     政治/外交/内政/情报等——不运行，研究/生产/外交仍然完全由你控制)；关闭开关时按原样恢复(模块数、第 0 项)。
+   - 军事大臣会像对 AI 国家一样自动新建战区/战线、画进攻箭头；你自己的命令不受影响，需要时关掉开关即可。
+   - 暂未限制在某个战区内：打开后作用于玩家全部陆军(以后要按战区名过滤再加)。
+   - 用法：pythonw 本脚本 --ai on|off|status(游戏运行时执行，日志在 %TEMP%\hoi4_nologistics.log)。
+
 兼容性(防止游戏更新后失效)
 --------------------------
 - 所有补丁入口都用“特征码”在 hoi4.exe 代码段里定位(跳过地址相关的 4 字节位移)，不再写死地址；
@@ -106,6 +116,7 @@
 """
 import argparse
 import ctypes
+import json
 import os
 import re
 import struct
@@ -353,6 +364,7 @@ SIGS = {
     "SPISCOMP": "48 8B 49 28 E9 ?? ?? ?? ?? CC CC CC CC CC CC CC 48 8B 49 28",
     "SPCANSTART": "48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 20 57 48 83 EC 50 48 8B FA 48 8B D9",
     "SPPOPUP": "48 89 5C 24 10 48 89 6C 24 18 56 57 41 56 48 83 EC 30 4C 8B F2 48 8B F1 80 3D ?? ?? ?? ?? 00",
+    "AIUPD": "48 89 5C 24 08 57 48 83 EC 40 48 8B F9 E8 ?? ?? ?? ?? 48 8B D8 48 85 C0 0F 84 ?? ?? ?? ?? 80 7F 60 00 0F 84 ?? ?? ?? ?? 83 B8 84 04 00 00 00 0F 8E ?? ?? ?? ?? 48 8B C8 E8",
     "SPFACTORY": "40 53 48 83 EC 20 B9 E8 02 00 00",
     "CONVOY": "4C 89 4C 24 20 4C 89 44 24 18 48 89 54 24 10 48 89 4C 24 08 55 53 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 ?? 48 81 EC 88 00 00 00",
 }
@@ -406,6 +418,20 @@ CAVES = {
         "00000000000000000000000000000000505241504151488b05e3ffffff488b004885c07450488b15dcffffff48"
         "39901001000075408b90800200003b9020050000753285d2742e3b901c03000073264c8b80100300004d85c074"
         "1a4d8b04d04d85c07411488b5120493b50087507415941585a58c3415941585a58"
+    ),
+    "AIUPD": (
+        "000000000000000000000000000000000000000000000000505241504151488b05dbffffff488b004885c00f84"
+        "c0000000488b15d0ffffff483990100100000f85ac0000008b90800200003b90200500000f859a00000085d20f"
+        "84920000003b901c0300000f83860000004c8b80100300004d85c0747a4d8b04d04d85c074714c394108756b4c"
+        "8b0d83ffffff4989492049ff4128418039007436493949087450488b41204885c074478b512c83fa047c3f4c8b"
+        "004d894110418951184c8b40184c8900c7412c0100000049894908eb20493949087512488b41204d8b41104c89"
+        "00418b511889512c49c7410800000000415941585a58"
+    ),
+    "AIGATE": (
+        "000000000000000000000000000000000000000000000000000000000000000050524150488b05e5ffffff4839"
+        "4424187569488b05dfffffff803800745d488b05bbffffff488b004885c0744e488b15b4ffffff483990100100"
+        "00753e8b90800200003b9020050000753085d2742c3b901c03000073244c8b80100300004d85c074184d8b04d0"
+        "4d85c0740f4c39c1750a41585a58b801000000c341585a58"
     ),
     "FOCUS": (
         "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
@@ -480,6 +506,8 @@ HOOKS = (
       "spexec", "spiscomp", "spcanstart", "spfactory", "bss"), 0, None, "cave"),
     ("运输船:玩家船队不被击沉", "CONVOY", 5, "CONVOY", ("mgr", "hvt"), 0, None, "cave"),
     ("专项项目:完成不弹窗", "SPPOPUP", 1, None, (), 0, None, "direct"),
+    ("AI陆军:状态维护", "AIUPD", 5, "AIUPD", ("mgr", "hvt", "bss"), 0, None, "cave"),
+    ("AI陆军:放行玩家", "AIGATE", 6, "AIGATE", ("mgr", "hvt", "aiupd_ret", "aibss"), 0, None, "cave"),
     ("成就:mod 校验恒通过", "ACH", 2, None, (), 0, None, "direct"),
     ("成就:非铁人也算铁人", "IRON", 3, None, (), 0, None, "direct"),
     ("成就:状态面板不要求铁人", "ACHUI", 4, None, (), 0, None, "direct"),
@@ -494,7 +522,9 @@ HOOKS = (
 #        把入口的 `movzx r13d,r8b`(44 0F B6 E8) 改成 `push 1; pop r13`(6A 01 41 5D)，面板恒按铁人处理。
 DIRECT_PATCHES = {"SPPOPUP": bytes.fromhex("c3"), "ACH": bytes.fromhex("31c0"), "IRON": bytes.fromhex("b10190"), "ACHUI": bytes.fromhex("6a01415d")}
 # 机器码需要额外的零初始化数据区(bss)，紧跟在补丁代码后面；大小(字节)
-CAVE_BSS = {"FOCUS": 4640}
+CAVE_BSS = {"FOCUS": 4640, "AIUPD": 64}
+# 不能直接用特征码定位、而是从别的函数里的 call 目标推出来的入口：键 = (宿主特征码键, call 指令相对宿主入口的偏移)
+DERIVED = {"AIGATE": ("AIUPD", 0x38)}
 # 需要用特征码解析出入口地址、供机器码调用的引擎函数：键 -> 特征码键
 SIG_FUNCS = {"complete": "COMPLETE", "vecins": "VECINS", "setfocus": "SETFOCUS", "validfocus": "VALIDFOCUS", "contains": "CONTAINS", "addsize": "ADDSIZE",
              "unlock": "UNLOCK", "visible": "VISIBLE", "setfn": "SETTECH",
@@ -537,6 +567,19 @@ def resolve(img):
             problems.append(f"引擎函数 {key}: 特征码{'未命中' if not hits else '命中 %d 处(不唯一)' % len(hits)}")
     # 各钩子入口
     for name, sigkey, pro_len, cavekey, keys, yes_delta, yes_check, kind in HOOKS:
+        if sigkey in DERIVED:                       # 从宿主函数里的 call 指令推出入口
+            host, off = DERIVED[sigkey]
+            hh = img.find_sig(SIGS[host])
+            if len(hh) != 1:
+                problems.append(f"{name}: 宿主特征码 {host} {'未命中' if not hh else '不唯一'}")
+                continue
+            o = hh[0] + off
+            b = img.bytes_at(o, 5)
+            if b[0] != 0xE8:
+                problems.append(f"{name}: 宿主 {host}+0x{off:X} 处不是 call 指令")
+                continue
+            R["entry:" + name] = o + 5 + struct.unpack("<i", b[1:])[0]
+            continue
         hits = img.find_sig(SIGS[sigkey])
         if len(hits) != 1:
             problems.append(f"{name}: 特征码{'未命中' if not hits else '命中 %d 处(不唯一)' % len(hits)}")
@@ -546,7 +589,10 @@ def resolve(img):
 
 
 def need_keys(keys, R):
-    return all(k in R or k in ("yes", "bss") + OPT_KEYS for k in keys)
+    return all(k in R or k in ("yes", "bss", "aiupd_ret", "aibss") + OPT_KEYS for k in keys)
+
+
+shared = {}   # 装完后留给 --ai 开关用的地址(AI 开关字节所在的数据区)
 
 
 def install_all(h, base, img):
@@ -588,12 +634,16 @@ def install_all(h, base, img):
         if not arena:
             return out + [("补丁", "分配内存失败")]
     cur_off = 0
+    shared.clear()
     for name, entry, pro, cavekey, keys, yes_delta, kind in todo:
         e = base + entry
         if kind == "direct":
             dp = DIRECT_PATCHES[sigkey_of[name]]
             patch = dp + bytes([0x90]) * (len(pro) - len(dp))
             out.append((name, "安装成功" if P.patch_code(h, e, patch) else "写入失败"))
+            continue
+        if cavekey == "AIGATE" and "aibss" not in shared:
+            out.append((name, "依赖的 AI陆军:状态维护 未安装，跳过"))
             continue
         code = bytearray(bytes.fromhex(CAVES[cavekey]))
         cave = arena + cur_off
@@ -605,6 +655,12 @@ def install_all(h, base, img):
                 vals.append(base + entry + yes_delta if yes_delta else 0)
             elif k == "bss":
                 vals.append(cave + ((len(code) + len(pro) + 5 + 15) & ~15))
+                if cavekey == "AIUPD":
+                    shared["aibss"] = vals[-1]
+            elif k == "aiupd_ret":
+                vals.append(base + R["entry:AI陆军:状态维护"] + 0x3D)
+            elif k == "aibss":
+                vals.append(shared.get("aibss", 0))
             elif k in OPT_KEYS and k not in R:
                 vals.append(0)
             else:
@@ -659,12 +715,37 @@ def attach(wait_seconds):
     return None
 
 
+STATE = Path(os.environ.get("TEMP", str(HERE))) / "hoi4_nologistics_state.json"
+
+
+def ai_switch(cmd):
+    """--ai on/off/status：读写补丁数据区里的开关字节(游戏线程下一次更新就生效，可随时切换)。"""
+    pid = P.find_pid("hoi4.exe")
+    try:
+        st = json.loads(STATE.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        st = {}
+    if not pid or st.get("pid") != pid or not st.get("aibss"):
+        log("游戏没在运行，或本次启动没有装上 AI 补丁(看日志里“AI陆军”两项)")
+        return 1
+    h = P.open_process(pid)
+    bss = st["aibss"]
+    if cmd in ("on", "off"):
+        if not P.write_mem(h, bss, bytes([1 if cmd == "on" else 0]) + bytes(7)):
+            log("写入失败")
+            return 1
+    on, restricted, _s, _c, ai, ticks = struct.unpack("<QQQQQQ", P.read_mem(h, bss, 48))
+    log(f"AI 控制玩家陆军: {'开' if on & 0xFF else '关'}；玩家国家 AI 对象=0x{ai:X}；已限制为只跑军事大臣={'是' if restricted else '否'}；累计更新次数={ticks}")
+    return 0
+
+
 def main():
     global _quiet
     ap = argparse.ArgumentParser()
     ap.add_argument("--install", action="store_true", help="给运行中的游戏装补丁后退出")
     ap.add_argument("--remove", action="store_true", help="撤销补丁")
     ap.add_argument("--status", action="store_true", help="只显示特征码定位结果，不写入")
+    ap.add_argument("--ai", choices=("on", "off", "status"), help="开/关/查看 “AI 控制玩家陆军”(游戏运行中随时可切)")
     ap.add_argument("--uninstall", action="store_true", help="清理旧版开机启动项")
     ap.add_argument("--wait-game", type=int, default=300)
     args, game_cmd = ap.parse_known_args()
@@ -678,6 +759,8 @@ def main():
             except FileNotFoundError:
                 pass
         return
+    if args.ai:
+        return ai_switch(args.ai)
     if args.status or args.remove:
         a = attach(args.wait_game if not args.status else 5)
         if not a:
@@ -713,6 +796,11 @@ def main():
     h, base, img, pid = a
     res = install_all(h, base, img)
     log(f"补丁结果 (pid {pid}): " + "；".join(f"{n}:{r}" for n, r in res))
+    if shared.get("aibss"):
+        try:
+            STATE.write_text(json.dumps({"pid": pid, "aibss": shared["aibss"]}), encoding="utf-8")
+        except OSError:
+            pass
 
 
 if __name__ == "__main__":
