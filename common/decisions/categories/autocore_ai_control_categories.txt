@@ -1,6 +1,7 @@
 # autoCore：AI 控制开关(配合 tools/hoi4_nologistics.py 的引擎补丁)
 autocore_ai_control_category = {
 	icon = generic_research
+	priority = 9999	# 排在决议面板最上方
 	visible = {
 		is_ai = no
 	}
