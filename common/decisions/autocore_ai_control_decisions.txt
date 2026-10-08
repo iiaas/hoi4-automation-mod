@@ -1,7 +1,7 @@
 # autoCore：开启/关闭“AI 控制玩家陆军和空军”。
 # 引擎补丁每次玩家 AI 更新时扫描玩家的国家旗标：值为 7700 的旗标 = 关闭，值为 7701 = 开启
 # (补丁只能按旗标值识别，旗标名在引擎里是运行时编号)。autocore_ai_on 只用于决议显示。
-# 默认关闭：从没点过决议时 AI 不接管(命令行 --ai on 仍可临时打开)。
+# 默认关闭：从没点过决议(没有值为 7701/7711 的旗标)时 AI 不接管；开关完全以旗标为准，随存档保存。
 autocore_ai_control_category = {
 	autocore_ai_control_turn_off = {
 		icon = generic_political_discourse

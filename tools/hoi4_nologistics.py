@@ -73,7 +73,7 @@
    - “专项项目完成”弹窗由一个只负责显示窗口的函数创建(不做任何游戏逻辑)，补丁把它的第一条指令改成 ret，
      项目完成时不再弹窗(对所有人生效；单人游戏里只有玩家会看到这个弹窗)。
 
-12. AI 控制玩家陆军和空军(实验功能，默认关闭；用 mod 决议“AI 控制”或游戏运行中用 --ai on / --ai off 开关)
+12. AI 控制玩家陆军和空军(实验功能，默认关闭；只能用 mod 决议“AI 控制”开关)
    - 引擎里每个国家(包括玩家)都有一套 AI 对象 CCountryAI(政治/外交/内政/军事大臣等模块)，玩家那套没有被驱动：
      CCountryAI::Update 开头要先过“这个国家是不是 AI 国家”的判断，玩家过不了。
    - 补丁一(AI陆军:放行玩家)：只在 CCountryAI::Update 调用该判断时(靠返回地址限定)，开关打开后对玩家本国返回“是”。
@@ -86,7 +86,6 @@
      对玩家本国只放行陆军(战线/编队/战区/师数需求/部队移动…)和空军(任务/转场/部署…)类命令(白名单
      AI_WHITELIST，约 80 类)，其余(生产、贸易、外交、法律、科研、海军…)命令直接销毁，所以政治/外交/内政
      大臣虽然运行了，但不会真的替你做这些事。
-   - on=只放行军事/空军命令；full=所有模块都运行且不过滤(调试用，会崩溃，不要用)；off=关闭；status=查看。
    - 暂未限制在某个战区内：打开后作用于玩家全部陆军和空军。已设置的手动任务可能被 AI 改掉。
    - 补丁四(AI陆军:控制区变更同步给玩家)：引擎重建“控制区”(CControllerArea)时，会调 0x108EA90 把每个 AI 国家的
      AI 将军(CAIGeneral)里引用的旧控制区换成新的，但玩家的将军不在通知名单里，留着已释放的指针，运行一段时间后
@@ -97,13 +96,14 @@
      另见第 2 项“登陆计划是否已满”判断对玩家恒为“未满”，否则设置登陆出发港的命令会被判无效。
    - 决议开关：mod 决议“AI 控制 → 开启/关闭 AI 控制”(common/decisions/autocore_ai_control_*.txt)给玩家设
      国家旗标 autocore_ai_control，值 7700=关、7701=开；补丁二每次玩家 AI 更新时扫描玩家旗标容器
-     ([国家+0x230]，+8 数组/+0x14 数量，每项 0x30 字节、+0x28 为值)，见到这两个值就改开关。旗标随存档保存。
-     换局(玩家的 CCountryAI 对象变了，或游戏日期倒退，即读档/开新局)时两个开关先重置为关，再按新存档里的旗标恢复，
-     否则同一个游戏进程里上一局打开的开关会带到新局，决议显示“关”而实际是开。
+     ([国家+0x230]，+8 数组/+0x14 数量，每项 0x30 字节、+0x28 为值)，据此重算开关。
+     开关完全以旗标为准、不在补丁里留状态：每次都从“关”算起，有 7701/7711 才开，结果一次写回(不先清零，
+     免得别的线程上的命令过滤读到短暂的“关”而放行全部命令)。旗标随存档保存，所以读档、开新局、换国家都自动正确，
+     不会把上一局的开关带过来。
    - AI 选国策(独立开关，补丁数据区第 2 个字节)：决议“开启/关闭 AI 选国策”设国家旗标 autocore_focus_ai，
      值 7710=关、7711=开。只开这一项时玩家 CCountryAI 只跑模块 0(政治大臣)，命令过滤只放行国策命令；
-     与陆空 AI 同时开时跑前 4 个模块，两类命令都放行。--ai on/off 只改陆空开关，不影响它。
-   - 用法：pythonw 本脚本 --ai on|off|status(游戏运行时执行，日志在 %TEMP% 下的 hoi4_nologistics.log)。
+     与陆空 AI 同时开时跑前 4 个模块，两类命令都放行。
+   - 查看状态：pythonw 本脚本 --ai status(游戏运行时执行，结果写在 %TEMP% 下的 hoi4_nologistics.log)。
 
 兼容性(防止游戏更新后失效)
 --------------------------
@@ -441,15 +441,13 @@ CAVES = {
     ),
     "AIUPD": (
         "000000000000000000000000000000000000000000000000505241504151488b05dbffffff488b004885c00f84"
-        "68010000488b15d0ffffff483990100100000f85540100008b90800200003b90200500000f854201000085d20f"
-        "843a0100003b901c0300000f832e0100004c8b80100300004d85c00f841e0100004d8b04d04d85c00f84110100"
-        "004c3941080f85070100004c8b0d77ffffff8b9068040000493949207506413b513073066641c7010000418951"
-        "304989492049ff4128498b80300200004885c074668b5014488b40084885c0745a81fa00100000775285d2744e"
-        "ffca4c8d045249c1e004460fb74400284181f8141e0000742f4181f8151e000074204181f81e1e000074104181"
-        "f81f1e000075c841c6410101ebc141c6410100ebba41c60101ebb441c60100ebae418039027444ba0400000041"
-        "803901740cba010000004180790101752d493949087422488b41204885c0743e448b412c4183f8057c34458941"
-        "184c8b004d8941104989490889512ceb20493949087512488b41204d8b41104c8900418b511889512c49c74108"
-        "00000000415941585a58"
+        "30010000488b15d0ffffff483990100100000f851c0100008b90800200003b90200500000f850a01000085d20f"
+        "84020100003b901c0300000f83f60000004c8b80100300004d85c00f84e60000004d8b04d04d85c00f84d90000"
+        "004c3941080f85cf0000004c8b0d77ffffff4989492049ff41284531db498b80300200004885c074498b501448"
+        "8b40084885c0743d81fa00100000773585d27431ffca4c8d045249c1e004460fb74400284181f8151e00007506"
+        "4183cb01ebdd4181f81f1e000075d44181cb00010000ebcb66458919ba0400000041803901740cba0100000041"
+        "80790101752d493949087422488b41204885c0743e448b412c4183f8057c34458941184c8b004d894110498949"
+        "0889512ceb20493949087512488b41204d8b41104c8900418b511889512c49c7410800000000415941585a58"
     ),
     "AIGATE": (
         "000000000000000000000000000000000000000000000000000000000000000050524150488b05e5ffffff4839"
@@ -641,7 +639,7 @@ def need_keys(keys, R):
     return all(k in R or k in ("yes", "bss", "aiupd_ret", "aibss", "self") + OPT_KEYS or k in WL_KEYS for k in keys)
 
 
-shared = {}   # 装完后留给 --ai 开关用的地址(AI 开关字节所在的数据区)
+shared = {}   # 装完后留给 --ai status 用的地址(AI 开关字节所在的数据区)
 
 
 def install_all(h, base, img):
@@ -769,8 +767,8 @@ def attach(wait_seconds):
 STATE = Path(os.environ.get("TEMP", str(HERE))) / "hoi4_nologistics_state.json"
 
 
-def ai_switch(cmd):
-    """--ai on/off/status：读写补丁数据区里的开关字节(游戏线程下一次更新就生效，可随时切换)。"""
+def ai_status():
+    """--ai status：读补丁数据区里的开关状态(开关只由决议旗标决定，这里只读不写)。"""
     pid = P.find_pid("hoi4.exe")
     try:
         st = json.loads(STATE.read_text(encoding="utf-8"))
@@ -781,12 +779,8 @@ def ai_switch(cmd):
         return 1
     h = P.open_process(pid)
     bss = st["aibss"]
-    if cmd in ("on", "full", "off"):
-        if not P.write_mem(h, bss, bytes([{"on": 1, "full": 2, "off": 0}[cmd]])):
-            log("写入失败")
-            return 1
     on, restricted, _s, _c, ai, ticks = struct.unpack("<QQQQQQ", P.read_mem(h, bss, 48))
-    log(f"AI 控制玩家陆军: {({0: '关', 1: '开(前4个模块+命令过滤)', 2: '开(全部模块)'}).get(on & 0xFF, '?')}；AI 选国策: {'开' if (on >> 8) & 0xFF == 1 else '关'}；玩家国家 AI 对象=0x{ai:X}；已限制模块列表={'是' if restricted else '否'}；累计更新次数={ticks}")
+    log(f"AI 控制玩家陆军: {'开' if on & 0xFF == 1 else '关'}；AI 选国策: {'开' if (on >> 8) & 0xFF == 1 else '关'}；玩家国家 AI 对象=0x{ai:X}；已限制模块列表={'是' if restricted else '否'}；累计更新次数={ticks}")
     return 0
 
 
@@ -796,7 +790,7 @@ def main():
     ap.add_argument("--install", action="store_true", help="给运行中的游戏装补丁后退出")
     ap.add_argument("--remove", action="store_true", help="撤销补丁")
     ap.add_argument("--status", action="store_true", help="只显示特征码定位结果，不写入")
-    ap.add_argument("--ai", choices=("on", "full", "off", "status"), help="开/关/查看 “AI 控制玩家陆军”(游戏运行中随时可切)")
+    ap.add_argument("--ai", choices=("status",), help="查看 AI 控制/AI 选国策 的开关状态(开关用游戏里的决议切换)")
     ap.add_argument("--uninstall", action="store_true", help="清理旧版开机启动项")
     ap.add_argument("--wait-game", type=int, default=300)
     args, game_cmd = ap.parse_known_args()
@@ -811,7 +805,7 @@ def main():
                 pass
         return
     if args.ai:
-        return ai_switch(args.ai)
+        return ai_status()
     if args.status or args.remove:
         a = attach(args.wait_game if not args.status else 5)
         if not a:
