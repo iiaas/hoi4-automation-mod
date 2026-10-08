@@ -1,5 +1,0 @@
-﻿l_english:
- autocore_focus_ai_turn_on:0 "Enable AI Focus Selection"
- autocore_focus_ai_turn_on_desc:0 "Let the AI pick national focuses for you using vanilla logic."
- autocore_focus_ai_turn_off:0 "Disable AI Focus Selection"
- autocore_focus_ai_turn_off_desc:0 "Stop letting the AI pick national focuses."

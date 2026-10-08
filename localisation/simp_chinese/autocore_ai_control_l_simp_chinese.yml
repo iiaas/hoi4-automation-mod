@@ -1,7 +1,10 @@
 ﻿l_simp_chinese:
  autocore_ai_control_category:0 "AI 控制"
- autocore_ai_control_category_desc:0 "开启或关闭 AI 对本国陆军和空军的接管(需要 tools/hoi4_nologistics.py 补丁)。开启时，AI 负责划战线、制定进攻/登陆/空降计划、编组集团军、指派将领和空军任务；生产、科研、外交、海军等仍由你操作。"
- autocore_ai_control_turn_off:0 "关闭 AI 控制"
+ autocore_ai_control_turn_off:0 "关闭 AI 控制军队"
  autocore_ai_control_turn_off_desc:0 "停止让 AI 指挥本国陆军和空军。已有的战线和计划保留，之后由你接手。"
- autocore_ai_control_turn_on:0 "开启 AI 控制"
+ autocore_ai_control_turn_on:0 "开启 AI 控制军队"
  autocore_ai_control_turn_on_desc:0 "让 AI 接管本国陆军和空军的指挥。你手动设置的战线和任务可能会被 AI 修改。"
+ autocore_focus_ai_turn_on:0 "开启 AI 选择国策"
+ autocore_focus_ai_turn_on_desc:0 "由 AI 按原版逻辑为本国挑选国策(你手选的当前国策不会被取消)。"
+ autocore_focus_ai_turn_off:0 "关闭 AI 选择国策"
+ autocore_focus_ai_turn_off_desc:0 "停止让 AI 挑选国策，之后由你自己选。"
