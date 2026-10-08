@@ -69,4 +69,38 @@ autocore_ai_control_category = {
 			factor = 0
 		}
 	}
+
+	# AI 贸易：旗标 autocore_trade_ai 值 7720=关、7721=开；autocore_trade_ai_on 只用于显示
+	autocore_trade_ai_turn_off = {
+		icon = generic_political_discourse
+		visible = {
+			is_ai = no
+			has_country_flag = autocore_trade_ai_on
+		}
+		cost = 0
+		fire_only_once = no
+		complete_effect = {
+			set_country_flag = { flag = autocore_trade_ai value = 7720 }
+			clr_country_flag = autocore_trade_ai_on
+		}
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	autocore_trade_ai_turn_on = {
+		icon = generic_political_discourse
+		visible = {
+			is_ai = no
+			NOT = { has_country_flag = autocore_trade_ai_on }
+		}
+		cost = 0
+		fire_only_once = no
+		complete_effect = {
+			set_country_flag = { flag = autocore_trade_ai value = 7721 }
+			set_country_flag = autocore_trade_ai_on
+		}
+		ai_will_do = {
+			factor = 0
+		}
+	}
 }

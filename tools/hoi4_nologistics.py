@@ -103,6 +103,9 @@
    - AI 选国策(独立开关，补丁数据区第 2 个字节)：决议“开启/关闭 AI 选国策”设国家旗标 autocore_focus_ai，
      值 7710=关、7711=开。只开这一项时玩家 CCountryAI 只跑模块 0(政治大臣)，命令过滤只放行国策命令；
      与陆空 AI 同时开时跑前 4 个模块，两类命令都放行。
+   - AI 贸易(独立开关，补丁数据区第 3 个字节)：决议“开启/关闭 AI 贸易”设国家旗标 autocore_trade_ai，值 7720=关、
+     7721=开。原版由内政大臣(模块 2)用 CCreateTradeCommand 下单/取消进口；只开国策和贸易时玩家 CCountryAI 跑前 3 个
+     模块(政治/外交/内政)，命令过滤只放行对应开关的命令(外交、生产等照样销毁)；开了 AI 控制则跑前 4 个模块。
    - 查看状态：pythonw 本脚本 --ai status(游戏运行时执行，结果写在 %TEMP% 下的 hoi4_nologistics.log)。
 
 兼容性(防止游戏更新后失效)
@@ -441,19 +444,20 @@ CAVES = {
     ),
     "AIUPD": (
         "000000000000000000000000000000000000000000000000505241504151488b05dbffffff488b004885c00f84"
-        "30010000488b15d0ffffff483990100100000f851c0100008b90800200003b90200500000f850a01000085d20f"
-        "84020100003b901c0300000f83f60000004c8b80100300004d85c00f84e60000004d8b04d04d85c00f84d90000"
-        "004c3941080f85cf0000004c8b0d77ffffff4989492049ff41284531db498b80300200004885c074498b501448"
-        "8b40084885c0743d81fa00100000773585d27431ffca4c8d045249c1e004460fb74400284181f8151e00007506"
-        "4183cb01ebdd4181f81f1e000075d44181cb00010000ebcb66458919ba0400000041803901740cba0100000041"
-        "80790101752d493949087422488b41204885c0743e448b412c4183f8057c34458941184c8b004d894110498949"
-        "0889512ceb20493949087512488b41204d8b41104c8900418b511889512c49c7410800000000415941585a58"
+        "4d010000488b15d0ffffff483990100100000f85390100008b90800200003b90200500000f852701000085d20f"
+        "841f0100003b901c0300000f83130100004c8b80100300004d85c00f84030100004d8b04d04d85c00f84f60000"
+        "004c3941080f85ec0000004c8b0d77ffffff4989492049ff41284531db498b80300200004885c0745b8b501448"
+        "8b40084885c0744f81fa00100000774785d27443ffca4c8d045249c1e004460fb74400284181f8151e00007506"
+        "4183cb01ebdd4181f81f1e000075094181cb00010000ebcb4181f8291e000075c24181cb00000100ebb9458919"
+        "ba04000000418039017418ba030000004180790201740cba010000004180790101752d493949087422488b4120"
+        "4885c0743e448b412c4183f8057c34458941184c8b004d8941104989490889512ceb20493949087512488b4120"
+        "4d8b41104c8900418b511889512c49c7410800000000415941585a58"
     ),
     "AIGATE": (
         "000000000000000000000000000000000000000000000000000000000000000050524150488b05e5ffffff4839"
-        "442418756a488b05dfffffff66833800745d488b05baffffff488b004885c0744e488b15b3ffffff4839901001"
-        "0000753e8b90800200003b9020050000753085d2742c3b901c03000073244c8b80100300004d85c074184d8b04"
-        "d04d85c0740f4c39c1750a41585a58b801000000c341585a58"
+        "4424187569488b05dfffffff833800745d488b05bbffffff488b004885c0744e488b15b4ffffff483990100100"
+        "00753e8b90800200003b9020050000753085d2742c3b901c03000073244c8b80100300004d85c074184d8b04d0"
+        "4d85c0740f4c39c1750a41585a58b801000000c341585a58"
     ),
     "AREASYNC": (
         "000000000000000000000000000000000000000000000000535657415441554156488b05d8ffffff4885c0747e"
@@ -480,12 +484,12 @@ CAVES = {
         "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
-        "000000000000505241504151488b05d3fcffff4885c00f84c00000008038020f84b7000000668338000f84ad00"
-        "0000488b05a0fcffff488b004885c00f849a0000004c8b0595fcffff4c3980100100000f8586000000448b8080"
-        "020000443b802005000075764585c07471448b0a4539c175694c8b09488b0569fcffff4c3b0d6afcffff74324c"
-        "3b0d69fcffff74294c3b0d68fcffff742080380175214c8d0562fcffffb8600000004d3908742e4983c008ffc8"
-        "75f3eb0680780101741e415941585a584883ec284889c9488b01ba01000000ff104883c42831c0c3415941585a"
-        "58"
+        "0000000000000000000000000000505241504151488b05cbfcffff4885c00f84d80000008038020f84cf000000"
+        "8338000f84c6000000488b0599fcffff488b004885c00f84b30000004c8b058efcffff4c3980100100000f859f"
+        "000000448b8080020000443b80200500000f858b0000004585c00f8482000000448b0a4539c1757a4c8b09488b"
+        "055afcffff4c3b0d5bfcffff743b4c3b0d5afcffff74324c3b0d59fcffff74294c3b0d58fcffff742880380175"
+        "294c8d0552fcffffb8600000004d390874364983c008ffc875f3eb0e807801017426eb0680780201741e415941"
+        "585a584883ec284889c9488b01ba01000000ff104883c42831c0c3415941585a58"
     ),
     "FOCUS": (
         "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
@@ -551,7 +555,7 @@ HOOKS = (
     ("AI陆军:状态维护", "AIUPD", 5, "AIUPD", ("mgr", "hvt", "bss"), 0, None, "cave"),
     ("AI陆军:放行玩家", "AIGATE", 6, "AIGATE", ("mgr", "hvt", "aiupd_ret", "aibss"), 0, None, "cave"),
     ("AI陆军:控制区变更同步给玩家", "AREASYNC", 5, "AREASYNC", ("aibss", "mmv", "self"), 0, None, "cave"),
-    ("AI陆军:只放行军事/空军/国策命令", "POSTB", 6, "POSTB", ("mgr", "hvt", "aibss", "f0", "f1", "f2", "w00", "w01", "w02", "w03", "w04", "w05", "w06", "w07", "w08", "w09", "w10", "w11", "w12", "w13", "w14", "w15", "w16", "w17", "w18", "w19", "w20", "w21", "w22", "w23", "w24", "w25", "w26", "w27", "w28", "w29", "w30", "w31", "w32", "w33", "w34", "w35", "w36", "w37", "w38", "w39", "w40", "w41", "w42", "w43", "w44", "w45", "w46", "w47", "w48", "w49", "w50", "w51", "w52", "w53", "w54", "w55", "w56", "w57", "w58", "w59", "w60", "w61", "w62", "w63", "w64", "w65", "w66", "w67", "w68", "w69", "w70", "w71", "w72", "w73", "w74", "w75", "w76", "w77", "w78", "w79", "w80", "w81", "w82", "w83", "w84", "w85", "w86", "w87", "w88", "w89", "w90", "w91", "w92", "w93", "w94", "w95"), 0, None, "cave"),
+    ("AI陆军:只放行军事/空军/国策/贸易命令", "POSTB", 6, "POSTB", ("mgr", "hvt", "aibss", "f0", "f1", "f2", "t0", "w00", "w01", "w02", "w03", "w04", "w05", "w06", "w07", "w08", "w09", "w10", "w11", "w12", "w13", "w14", "w15", "w16", "w17", "w18", "w19", "w20", "w21", "w22", "w23", "w24", "w25", "w26", "w27", "w28", "w29", "w30", "w31", "w32", "w33", "w34", "w35", "w36", "w37", "w38", "w39", "w40", "w41", "w42", "w43", "w44", "w45", "w46", "w47", "w48", "w49", "w50", "w51", "w52", "w53", "w54", "w55", "w56", "w57", "w58", "w59", "w60", "w61", "w62", "w63", "w64", "w65", "w66", "w67", "w68", "w69", "w70", "w71", "w72", "w73", "w74", "w75", "w76", "w77", "w78", "w79", "w80", "w81", "w82", "w83", "w84", "w85", "w86", "w87", "w88", "w89", "w90", "w91", "w92", "w93", "w94", "w95"), 0, None, "cave"),
     ("成就:mod 校验恒通过", "ACH", 2, None, (), 0, None, "direct"),
     ("成就:非铁人也算铁人", "IRON", 3, None, (), 0, None, "direct"),
     ("成就:状态面板不要求铁人", "ACHUI", 4, None, (), 0, None, "direct"),
@@ -575,10 +579,10 @@ SIG_FUNCS = {"complete": "COMPLETE", "vecins": "VECINS", "setfocus": "SETFOCUS",
              "spexec": "SPEXEC", "spiscomp": "SPISCOMP", "spcanstart": "SPCANSTART", "spfactory": "SPFACTORY",
              "wupd": "WUPD"}
 # 缺了也不影响整个补丁的可选键(机器码里值为 0 就跳过对应功能：MIO 特性自动解锁)
-OPT_KEYS = ("f0", "f1", "f2", "setfocus", "validfocus", "tmv", "contains", "addsize", "unlock", "visible", "setfn", "spexec", "spiscomp", "spcanstart", "spfactory", "wupd")
+OPT_KEYS = ("f0", "f1", "f2", "t0", "setfocus", "validfocus", "tmv", "contains", "addsize", "unlock", "visible", "setfn", "spexec", "spiscomp", "spcanstart", "spfactory", "wupd")
 # 需要 vtable 的类
 AI_WHITELIST = ['CAiDiscardForceConcentrationTargetCommand', 'CAiStoreForceConcentrationTargetCommand', 'CAiStoreTotalWantedNrDivisionsCommand', 'CArmyGroupCommand', 'CAssignToArmyGroupCommand', 'CAssignToTheaterGroupCommand', 'CAttachAirWingToArmyCommand', 'CCancelMovementCommand', 'CCreateAreaDefenseCommand', 'CDeployAirWingCommand', 'CDetachAirWingFromArmyCommand', 'CDisbandTheaterGroupCommand', 'CMoveAirGroupAndAirTheatreToFreeCommand', 'CMoveAirWingAndAirGroupToAirTheatreCommand', 'CMoveAirWingToAirGroupCommand', 'CMoveArmiesInTheaterCommand', 'CMoveArmyGroupInTheaterCommand', 'COrderAddNewCompletePlanCommand', 'COrderAssignCommand', 'COrderBlockSectionsCommand', 'COrderChildFrontRatioCommand', 'COrderConnectCommand', 'COrderDeleteAllCommand', 'COrderDeleteCommand', 'COrderEditRootCommand', 'COrderExecuteCommand', 'COrderGroupCommand', 'COrderInsertFrontCommand', 'COrderMembersFairSplitCommand', 'COrderMergeRootsCommand', 'COrderNewFallbackCommand', 'COrderNewFrontCommand', 'COrderNewRootCommand', 'COrderReconnectCommand', 'COrderReorderChildFrontCommand', 'COrderReshapeCommand', 'COrderSetCollapseCommand', 'COrderSetInvasionSourceCommand', 'COrderSetParadropSourceCommand', 'COrderSetParadropTargetCommand', 'COrderSetPathCommand', 'COrderSetTrainingCommand', 'COrderUnassignCommand', 'CRemoveFromArmyGroupCommand', 'CReorderAirTheatersCommand', 'CReorderTheatersCommand', 'CSetArmyLeaderCommand', 'CSetOrderGroupExecutionTypeCommand', 'CSetTheaterGroupPriorityCommand', 'CSetTheatreCommand', 'CSetWingReinforcementPriorityCommand', 'CStratAirCancelTransferCommand', 'CStratAirChangeAggressivnessCommand', 'CStratAirConsolidateCommand', 'CStratAirDayNightCommand', 'CStratAirEnableMissionCommand', 'CStratAirMoveEquipmentCommand', 'CStratAirMoveEquipmentToReservesCommand', 'CStratAirSetMissionCommand', 'CStratAirSplitCommand', 'CStratAirTransferCommand', 'CStrategicRedeploymentCommand', 'COrderReplaceRootCommands', 'CMassMoveCommand', 'CSetOrderGroupCohesionTypeCommand', 'CEditAreaDefenseStateCommand', 'CSetAreaDefenseSettingCommand', 'CSetArmyLeaderPreferredTacticCommand', 'CSetCountryReinforcementPriorityCommand', 'CSetPreferredTacticCommand', 'CAddNavalInvasionTargetCommand', 'CRemoveNavalInvasionTargetCommand', 'CAiOnFailedInvasionCommand', 'COrderRemoveRootCommands', 'COrderReplaceFallbackCommands', 'CDeleteOrderGroupCommand', 'CAutoMergeOrdersCommand', 'CSetOrdersLinkCommand', 'CSetOrderGroupMotorizationCommand', 'CSetOrderGroupLeaderProximityCommand', 'CTransportUnitCommand']
-VTABLE_CLASSES = {"hvt": "CHuman", "f0": "CSetNationalFocusCommand", "f1": "CSetContinuousFocusCommand", "f2": "CBypassNationalFocusCommand", "mmv": "CAIMilitaryMinister", "cvt": "CCountry", "svt": "CShip", "tvt": "CTaskForce",
+VTABLE_CLASSES = {"hvt": "CHuman", "f0": "CSetNationalFocusCommand", "f1": "CSetContinuousFocusCommand", "f2": "CBypassNationalFocusCommand", "t0": "CCreateTradeCommand", "mmv": "CAIMilitaryMinister", "cvt": "CCountry", "svt": "CShip", "tvt": "CTaskForce",
                   "wvt": "CAirWing", "xvt": "CStrategicNavy",
                   "tmv": "CTraitTemplate@NIndustrialOrganisation"}
 WL_KEYS = {f"w{i:02d}" for i in range(96)}
@@ -780,7 +784,7 @@ def ai_status():
     h = P.open_process(pid)
     bss = st["aibss"]
     on, restricted, _s, _c, ai, ticks = struct.unpack("<QQQQQQ", P.read_mem(h, bss, 48))
-    log(f"AI 控制玩家陆军: {'开' if on & 0xFF == 1 else '关'}；AI 选国策: {'开' if (on >> 8) & 0xFF == 1 else '关'}；玩家国家 AI 对象=0x{ai:X}；已限制模块列表={'是' if restricted else '否'}；累计更新次数={ticks}")
+    log(f"AI 控制玩家陆军: {'开' if on & 0xFF == 1 else '关'}；AI 选国策: {'开' if (on >> 8) & 0xFF == 1 else '关'}；AI 贸易: {'开' if (on >> 16) & 0xFF == 1 else '关'}；玩家国家 AI 对象=0x{ai:X}；已限制模块列表={'是' if restricted else '否'}；累计更新次数={ticks}")
     return 0
 
 
@@ -790,7 +794,7 @@ def main():
     ap.add_argument("--install", action="store_true", help="给运行中的游戏装补丁后退出")
     ap.add_argument("--remove", action="store_true", help="撤销补丁")
     ap.add_argument("--status", action="store_true", help="只显示特征码定位结果，不写入")
-    ap.add_argument("--ai", choices=("status",), help="查看 AI 控制/AI 选国策 的开关状态(开关用游戏里的决议切换)")
+    ap.add_argument("--ai", choices=("status",), help="查看 AI 控制/AI 选国策/AI 贸易 的开关状态(开关用游戏里的决议切换)")
     ap.add_argument("--uninstall", action="store_true", help="清理旧版开机启动项")
     ap.add_argument("--wait-game", type=int, default=300)
     args, game_cmd = ap.parse_known_args()

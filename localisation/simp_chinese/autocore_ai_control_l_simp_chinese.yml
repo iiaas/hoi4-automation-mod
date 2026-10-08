@@ -8,3 +8,7 @@
  autocore_focus_ai_turn_on_desc:0 "由 AI 按原版逻辑为本国挑选国策(你手选的当前国策不会被取消)。"
  autocore_focus_ai_turn_off:0 "关闭 AI 选择国策"
  autocore_focus_ai_turn_off_desc:0 "停止让 AI 挑选国策，之后由你自己选。"
+ autocore_trade_ai_turn_on:0 "开启 AI 贸易"
+ autocore_trade_ai_turn_on_desc:0 "由 AI 按原版逻辑为本国进口资源、取消多余的贸易。"
+ autocore_trade_ai_turn_off:0 "关闭 AI 贸易"
+ autocore_trade_ai_turn_off_desc:0 "停止让 AI 管理贸易，已有的贸易保留，之后由你自己管理。"
