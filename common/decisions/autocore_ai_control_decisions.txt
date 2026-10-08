@@ -35,4 +35,38 @@ autocore_ai_control_category = {
 			factor = 0
 		}
 	}
+
+	# AI 选国策：旗标 autocore_focus_ai 值 7710=关、7711=开；autocore_focus_ai_on 只用于显示
+	autocore_focus_ai_turn_off = {
+		icon = generic_political_discourse
+		visible = {
+			is_ai = no
+			has_country_flag = autocore_focus_ai_on
+		}
+		cost = 0
+		fire_only_once = no
+		complete_effect = {
+			set_country_flag = { flag = autocore_focus_ai value = 7710 }
+			clr_country_flag = autocore_focus_ai_on
+		}
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	autocore_focus_ai_turn_on = {
+		icon = generic_political_discourse
+		visible = {
+			is_ai = no
+			NOT = { has_country_flag = autocore_focus_ai_on }
+		}
+		cost = 0
+		fire_only_once = no
+		complete_effect = {
+			set_country_flag = { flag = autocore_focus_ai value = 7711 }
+			set_country_flag = autocore_focus_ai_on
+		}
+		ai_will_do = {
+			factor = 0
+		}
+	}
 }

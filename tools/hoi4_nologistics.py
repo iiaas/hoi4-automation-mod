@@ -37,18 +37,10 @@
      无自定义难度、游戏规则允许成就 这几条，本脚本不改，不满足仍然不会解锁。
    - 开始界面右下角的奖杯图标(红叉=无法获得成就)由另一个函数判断，其中“非铁人 -> 无法获得成就”也一并改成恒为铁人。
 
-6. 自动国策(只对玩家本国；不再需要任何 mod 脚本，不再列举国策 id；并行)
-   - 挂在国策进度对象(CNationalFocusProgress)的每日更新入口。引擎自己维护着一份“当前可开始国策”列表
-     (前置已完成、available 条件成立)，补丁每天遍历这份列表：
-       * 并行：没有 mutually_exclusive 且通过引擎“国策能否选择”校验(含 available 触发器，与国策槽用同一个校验)的国策，
-         第一次出现时开始计时(校验不通过的不计时、不高亮，已在计时的失效后清除计时)，满 (国策原版天数 - 1，最少 1 天) 后调用引擎
-         自带的“完成国策”函数(与脚本效果 complete_national_focus 同一个函数；完成时不弹窗，改发右下角侧边消息，见第 12 项)，计时中的国策同时加上国策树高亮；
-       * 引擎原生的“当前国策”(只能有一个，界面显示剩余天数)：玩家当前没有在做国策时，补丁从列表里挑第一个
-         没有 mutually_exclusive 且通过引擎“国策能否选择”校验(含 available 触发器；与玩家点国策同一个校验)的国策，
-         调用引擎自带的“设置当前国策”函数，由引擎自己倒计时、完成并显示剩余天数；这个国策不进自建计时；
-       * 带 mutually_exclusive 的互斥线不自动，留给玩家；玩家手选的当前国策也不干预。
-   - 计时状态放在补丁自带的数据区里(读档/换国家会按新的进度对象重置计时)。
-   - 任何国家都适用(玩家玩哪棵国策树就自动哪棵)。
+6. 自动国策：改由原版 AI 选国策(见第 12 项“AI 选国策”开关，mod 决议控制，默认关闭)
+   - 补丁不再自己计时/并行完成/挑选国策；开关打开时只让玩家的政治大臣运行，并只放行它发出的
+     设置国策/持续国策/绕过国策命令(不放行“取消当前国策”，不会覆盖你手选的国策)，选法与原版 AI 国家完全一致。
+   - 原来挂在国策进度每日更新上的钩子保留，只做第 7~9 项(MIO/科技/专项项目)。
 7. 自动解锁 MIO 特性(只对玩家本国；不再列举特性 id)
    - 与自动国策同一个每日钩子：遍历玩家国家的 MIO(与脚本里 every_military_industrial_organization 一样，
      只处理当前可见的 MIO)，对每个 MIO 模板里的每个特性：没解锁就“+1 规模并解锁”，与效果 complete_mio_trait
@@ -81,13 +73,7 @@
    - “专项项目完成”弹窗由一个只负责显示窗口的函数创建(不做任何游戏逻辑)，补丁把它的第一条指令改成 ret，
      项目完成时不再弹窗(对所有人生效；单人游戏里只有玩家会看到这个弹窗)。
 
-12. 并行完成的国策用侧边消息提示(国策槽里的国策保持引擎原来的弹窗提示)
-   - 引擎的“完成国策”函数有一个“提示模式”参数：0=弹出“国策完成”窗口；1=发一条“某国策已被某某完成”的侧边通知
-     (externally_completed_focus_notification，与脚本效果 complete_national_focus 完成国策时的提示相同)，
-     通知里的“某某”取参数里自带的文字。补丁并行完成国策时用模式 1，文字是“自动国策”；
-     引擎自己完成的当前国策(国策槽)不动，仍是原来的弹窗。
-
-13. AI 控制玩家陆军和空军(实验功能，默认关闭；用 mod 决议“AI 控制”或游戏运行中用 --ai on / --ai off 开关)
+12. AI 控制玩家陆军和空军(实验功能，默认关闭；用 mod 决议“AI 控制”或游戏运行中用 --ai on / --ai off 开关)
    - 引擎里每个国家(包括玩家)都有一套 AI 对象 CCountryAI(政治/外交/内政/军事大臣等模块)，玩家那套没有被驱动：
      CCountryAI::Update 开头要先过“这个国家是不是 AI 国家”的判断，玩家过不了。
    - 补丁一(AI陆军:放行玩家)：只在 CCountryAI::Update 调用该判断时(靠返回地址限定)，开关打开后对玩家本国返回“是”。
@@ -110,6 +96,9 @@
    - 决议开关：mod 决议“AI 控制 → 开启/关闭 AI 控制”(common/decisions/autocore_ai_control_*.txt)给玩家设
      国家旗标 autocore_ai_control，值 7700=关、7701=开；补丁二每次玩家 AI 更新时扫描玩家旗标容器
      ([国家+0x230]，+8 数组/+0x14 数量，每项 0x30 字节、+0x28 为值)，见到这两个值就改开关。旗标随存档保存。
+   - AI 选国策(独立开关，补丁数据区第 2 个字节)：决议“开启/关闭 AI 选国策”设国家旗标 autocore_focus_ai，
+     值 7710=关、7711=开。只开这一项时玩家 CCountryAI 只跑模块 0(政治大臣)，命令过滤只放行国策命令；
+     与陆空 AI 同时开时跑前 4 个模块，两类命令都放行。--ai on/off 只改陆空开关，不影响它。
    - 用法：pythonw 本脚本 --ai on|off|status(游戏运行时执行，日志在 %TEMP% 下的 hoi4_nologistics.log)。
 
 兼容性(防止游戏更新后失效)
@@ -449,19 +438,20 @@ CAVES = {
     ),
     "AIUPD": (
         "000000000000000000000000000000000000000000000000505241504151488b05dbffffff488b004885c00f84"
-        "15010000488b15d0ffffff483990100100000f85010100008b90800200003b90200500000f85ef00000085d20f"
-        "84e70000003b901c0300000f83db0000004c8b80100300004d85c00f84cb0000004d8b04d04d85c00f84be0000"
-        "004c3941080f85b40000004c8b0d77ffffff4989492049ff4128498b80300200004885c074448b5014488b4008"
-        "4885c0743881fa00100000773085d2742cffca4c8d045249c1e004460fb74400284181f8141e0000740f4181f8"
-        "151e000075da41c60101eb0441c6010041803901752f493949087449488b41204885c074408b512c83fa057c38"
-        "4c8b004d89411041895118c7412c0400000049894908eb20493949087512488b41204d8b41104c8900418b5118"
-        "89512c49c7410800000000415941585a58"
+        "4c010000488b15d0ffffff483990100100000f85380100008b90800200003b90200500000f852601000085d20f"
+        "841e0100003b901c0300000f83120100004c8b80100300004d85c00f84020100004d8b04d04d85c00f84f50000"
+        "004c3941080f85eb0000004c8b0d77ffffff4989492049ff4128498b80300200004885c074668b5014488b4008"
+        "4885c0745a81fa00100000775285d2744effca4c8d045249c1e004460fb74400284181f8141e0000742f4181f8"
+        "151e000074204181f81e1e000074104181f81f1e000075c841c6410101ebc141c6410100ebba41c60101ebb441"
+        "c60100ebae418039027444ba0400000041803901740cba010000004180790101752d493949087422488b412048"
+        "85c0743e448b412c4183f8057c34458941184c8b004d8941104989490889512ceb20493949087512488b41204d"
+        "8b41104c8900418b511889512c49c7410800000000415941585a58"
     ),
     "AIGATE": (
         "000000000000000000000000000000000000000000000000000000000000000050524150488b05e5ffffff4839"
-        "4424187569488b05dfffffff803800745d488b05bbffffff488b004885c0744e488b15b4ffffff483990100100"
-        "00753e8b90800200003b9020050000753085d2742c3b901c03000073244c8b80100300004d85c074184d8b04d0"
-        "4d85c0740f4c39c1750a41585a58b801000000c341585a58"
+        "442418756a488b05dfffffff66833800745d488b05baffffff488b004885c0744e488b15b3ffffff4839901001"
+        "0000753e8b90800200003b9020050000753085d2742c3b901c03000073244c8b80100300004d85c074184d8b04"
+        "d04d85c0740f4c39c1750a41585a58b801000000c341585a58"
     ),
     "AREASYNC": (
         "000000000000000000000000000000000000000000000000535657415441554156488b05d8ffffff4885c0747e"
@@ -487,10 +477,13 @@ CAVES = {
         "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
-        "000000000000000000000000000000000000000000000000000000505241504151488b05ebfcffff4885c0747b"
-        "8038017576488b05cafcffff488b004885c074674c8b05c3fcffff4c3980100100007557448b8080020000443b"
-        "802005000075474585c07442448b0a4539c1753a4c8b094c8d05a3fcffffb8600000004d390874264983c008ff"
-        "c875f3415941585a584883ec284889c9488b01ba01000000ff104883c42831c0c3415941585a58"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000505241504151488b05d3fcffff4885c00f84c00000008038020f84b7000000668338000f84ad00"
+        "0000488b05a0fcffff488b004885c00f849a0000004c8b0595fcffff4c3980100100000f8586000000448b8080"
+        "020000443b802005000075764585c07471448b0a4539c175694c8b09488b0569fcffff4c3b0d6afcffff74324c"
+        "3b0d69fcffff74294c3b0d68fcffff742080380175214c8d0562fcffffb8600000004d3908742e4983c008ffc8"
+        "75f3eb0680780101741e415941585a584883ec284889c9488b01ba01000000ff104883c42831c0c3415941585a"
+        "58"
     ),
     "POSTA": (
         "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
@@ -510,10 +503,13 @@ CAVES = {
         "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
-        "000000000000000000000000000000000000000000000000000000505241504151488b05ebfcffff4885c0747b"
-        "8038017576488b05cafcffff488b004885c074674c8b05c3fcffff4c3980100100007557448b8080020000443b"
-        "802005000075474585c07442448b094539c1753a4c8b0a4c8d05a3fcffffb8600000004d390874264983c008ff"
-        "c875f3415941585a584883ec284889d1488b01ba01000000ff104883c42831c0c3415941585a58"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000505241504151488b05d3fcffff4885c00f84c00000008038020f84b7000000668338000f84ad00"
+        "0000488b05a0fcffff488b004885c00f849a0000004c8b0595fcffff4c3980100100000f8586000000448b8080"
+        "020000443b802005000075764585c07471448b094539c175694c8b0a488b0569fcffff4c3b0d6afcffff74324c"
+        "3b0d69fcffff74294c3b0d68fcffff742080380175214c8d0562fcffffb8600000004d3908742e4983c008ffc8"
+        "75f3eb0680780101741e415941585a584883ec284889d1488b01ba01000000ff104883c42831c0c3415941585a"
+        "58"
     ),
     "FOCUS": (
         "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
@@ -522,49 +518,35 @@ CAVES = {
         "00eb603f1d9f038f3f9f03c7619f03ff839f0337a69f0387c89f03bfea9f03f70ca0032f2fa0037f51a003b773"
         "a003ef95a00327b8a00377daa003affca003e71ea1031f41a1036f63a103a785a103dfa7a10317caa10367eca1"
         "039f0ea203d730a20350515241504151415241535356574154415541564157554883ec504989cc488b05f1feff"
-        "ff488b004885c00f8446070000488b15e6feffff483990100100000f85320700008b90800200003b9020050000"
-        "0f852007000085d20f84180700003b901c0300000f830c0700004c8b88100300004d85c90f84fc0600004189d0"
-        "4f8b2cc14d85ed0f84ec0600004d396c24080f85e1060000488b1df9feffff4c3923741c4c892348c743080000"
-        "0000488dbb20020000b90002000031c0f348ab48ff430849837c241000757c48833d64feffff007472418b8c24"
-        "8400000085c97e66498b7424784885f6745c4189ce4531ff4539f773514489f8488b3cc641ffc74885ff74ec83"
-        "bf94050000007fe348833d29feffff0074234883ec40498b4508488944242848897c24304889e1ff150cfeffff"
-        "4883c44084c074b64c89e94889faff15f0fdffff418b8c248400000085c90f8ed201000083f9407605b9400000"
-        "00498b7424784885f60f84ba010000488d7b204189cef348a54531ff4539f70f83a40100004489f8488b74c320"
-        "41ffc74885f674e7493b74241074e083be94050000007fd748833d92fdffff00744e4883ec40498b4508488944"
-        "242848897424304889e1ff1575fdffff4883c44084c0752b488dbb2002000031c981f900010000739989c848c1"
-        "e00448393407750a48c7040700000000eb83ffc1ebde488dbb2002000031c94531d281f900010000732189c848"
-        "c1e004488b14074839f274704885d275094d85d275044c8d1407ffc1ebd74d85d20f8441ffffff498932488b43"
-        "0849894208418b4c242c498b5424208b46084531c04139c87d184e8b0cc24939f10f8414ffffff413941087c05"
-        "41ffc0ebe34889742420498d4c24204489c24c8d442420ff15a4fcffffe9ecfeffff89c848c1e0044c8d140748"
-        "8b8668050000489941b9a086010049f7f948ffc84883f8017d05b801000000488b5308492b52084839c20f8cb1"
-        "feffff49c70200000000c7442420010000000f57c00f1144242848b8e887aae58aa8e59b4889442428c7442430"
-        "bde7ad9648c74424380c00000048c74424400f0000004c89e94889f24d8d45084c8d4c2420ff1507fcffff48ff"
-        "4310e953feffff48833d3efcffff000f84c30100004d8bbd600f00004d85ff0f84b301000049638f9400000048"
-        "85c90f8ea30100004d8bb7880000004d85f60f84930100004989cf31ed4c39fd0f8d85010000498b34ee48ffc5"
-        "4885f674eb488bbe600100004885ff74df807f400074d98b87dc0300003986740100007dcb488b9f8003000048"
-        "85db74bf488b4318488b4b20488d53084883f90f7604488b53084883f80d750f48b961726d6f75725f6648390a"
-        "74944883f810751348b96169725f7465636848390a0f847bffffff8b8fd803000081f9900700007c2f81e99007"
-        "000083f9180f835effffff488d058cfbffff8b0488488b15f8faffff488b123982680400000f8e3effffff4881"
-        "ec000100000f57c00f114424200f114424300f114424400f114424500f114424600f114424700f118424800000"
-        "000f118424900000000f118424a00000000f118424b00000000f118424c00000000f118424d00000000f118424"
-        "e00000000f118424f0000000488d8424a00000004889442478c784248400000001000000488d8424b000000048"
-        "898424a0000000c68424a8000000014889bc24c0000000410f1045080f118424d8000000488d4c2420488d9424"
-        "d0000000ff1581faffff4881c400010000e972feffff48833d45faffff000f840701000048833d3ffaffff000f"
-        "84f900000048833d39faffff000f84eb00000048833d33faffff000f84dd000000498b85680f00004885c00f84"
-        "cd0000004c8bb0300100004d85f60f84bd0000004c63b83c01000031ed4c39fd0f8dab000000498b34ee48ffc5"
-        "4885f674eb48833deff9ffff00740d4889f1ff15e4f9ffff84c074d4488b86100100004885c074c8488b783048"
-        "85ff74bf4c63603c4d85e47eb6488b059bf9ffff48390775aabbd80300004983fc017e18bb0800000081fb0010"
-        "000073924839041f740583c308ebed4889f9488d9640010000ff156bf9ffff84c0751a4889f1ba01000000ff15"
-        "61f9ffff4889f14889faff155df9ffff4801df49ffcc7fcae94cffffff48833d60f9ffff000f845b0100004883"
-        "3d5af9ffff000f844d01000048833d54f9ffff000f843f01000048833d4ef9ffff000f8431010000488b1d49f9"
-        "ffff4c8b73184d85f67516ff1532f9ffff4885c00f84120100004989c648894318498b85a80f00004885c00f84"
-        "fb000000488b40184885c00f84ee0000004c63781c488b70104885f60f84dd0000004d85ff0f8ed40000004889"
-        "f1ff15d2f8ffff84c00f85b40000004889f131d2ff15c7f8ffff84c00f84a10000008b46184189869000000041"
-        "c7868c000000174c000041c64661004881ec000100000f57c00f114424200f114424300f114424400f11442450"
-        "0f114424600f114424700f118424800000000f118424900000000f118424a00000000f118424b00000000f1184"
-        "24c00000000f118424d00000000f118424e00000000f118424f0000000410f1045080f114424284c89f1488d54"
-        "2420ff1515f8ffff4881c4000100004881c6c001000049ffcfe923ffffff4883c4505d415f415e415d415c5f5e"
-        "5b415b415a415941585a5958"
+        "ff488b004885c00f84e0040000488b15e6feffff483990100100000f85cc0400008b90800200003b9020050000"
+        "0f85ba04000085d20f84b20400003b901c0300000f83a60400004c8b88100300004d85c90f84960400004189d0"
+        "4f8b2cc14d85ed0f84860400004d396c24080f857b040000488b1df9feffff4c3923741c4c892348c743080000"
+        "0000488dbb20020000b90002000031c0f348ab48ff430848833da4feffff000f84c30100004d8bbd600f00004d"
+        "85ff0f84b301000049638f940000004885c90f8ea30100004d8bb7880000004d85f60f84930100004989cf31ed"
+        "4c39fd0f8d85010000498b34ee48ffc54885f674eb488bbe600100004885ff74df807f400074d98b87dc030000"
+        "3986740100007dcb488b9f800300004885db74bf488b4318488b4b20488d53084883f90f7604488b53084883f8"
+        "0d750f48b961726d6f75725f6648390a74944883f810751348b96169725f7465636848390a0f847bffffff8b8f"
+        "d803000081f9900700007c2f81e99007000083f9180f835effffff488d05f2fdffff8b0488488b155efdffff48"
+        "8b123982680400000f8e3effffff4881ec000100000f57c00f114424200f114424300f114424400f114424500f"
+        "114424600f114424700f118424800000000f118424900000000f118424a00000000f118424b00000000f118424"
+        "c00000000f118424d00000000f118424e00000000f118424f0000000488d8424a00000004889442478c7842484"
+        "00000001000000488d8424b000000048898424a0000000c68424a8000000014889bc24c0000000410f1045080f"
+        "118424d8000000488d4c2420488d9424d0000000ff15e7fcffff4881c400010000e972feffff48833dabfcffff"
+        "000f840701000048833da5fcffff000f84f900000048833d9ffcffff000f84eb00000048833d99fcffff000f84"
+        "dd000000498b85680f00004885c00f84cd0000004c8bb0300100004d85f60f84bd0000004c63b83c01000031ed"
+        "4c39fd0f8dab000000498b34ee48ffc54885f674eb48833d55fcffff00740d4889f1ff154afcffff84c074d448"
+        "8b86100100004885c074c8488b78304885ff74bf4c63603c4d85e47eb6488b0501fcffff48390775aabbd80300"
+        "004983fc017e18bb0800000081fb0010000073924839041f740583c308ebed4889f9488d9640010000ff15d1fb"
+        "ffff84c0751a4889f1ba01000000ff15c7fbffff4889f14889faff15c3fbffff4801df49ffcc7fcae94cffffff"
+        "48833dc6fbffff000f845b01000048833dc0fbffff000f844d01000048833dbafbffff000f843f01000048833d"
+        "b4fbffff000f8431010000488b1daffbffff4c8b73184d85f67516ff1598fbffff4885c00f84120100004989c6"
+        "48894318498b85a80f00004885c00f84fb000000488b40184885c00f84ee0000004c63781c488b70104885f60f"
+        "84dd0000004d85ff0f8ed40000004889f1ff1538fbffff84c00f85b40000004889f131d2ff152dfbffff84c00f"
+        "84a10000008b46184189869000000041c7868c000000174c000041c64661004881ec000100000f57c00f114424"
+        "200f114424300f114424400f114424500f114424600f114424700f118424800000000f118424900000000f1184"
+        "24a00000000f118424b00000000f118424c00000000f118424d00000000f118424e00000000f118424f0000000"
+        "410f1045080f114424284c89f1488d542420ff157bfaffff4881c4000100004881c6c001000049ffcfe923ffff"
+        "ff4883c4505d415f415e415d415c5f5e5b415b415a415941585a5958"
     ),
 }
 
@@ -586,15 +568,15 @@ HOOKS = (
     ("登陆/空降:准备时间", "AGAINST", 5, "AGAINST", ("mgr", "hvt", "cvt", "yes"), 0, None, "cave"),
     ("空降:每次师数上限", "SKIPCAP", 7, "SKIPCAP", ("mgr", "hvt", "cvt", "yes"), 0x43,
      bytes.fromhex("b0014883c428"), "cave"),
-    ("自动国策", "DAILY", 5, "FOCUS", ("mgr", "hvt", "complete", "vecins", "setfocus", "validfocus", "tmv", "contains", "addsize", "unlock", "visible", "setfn",
+    ("每日:MIO/科技/专项项目", "DAILY", 5, "FOCUS", ("mgr", "hvt", "complete", "vecins", "setfocus", "validfocus", "tmv", "contains", "addsize", "unlock", "visible", "setfn",
       "spexec", "spiscomp", "spcanstart", "spfactory", "bss"), 0, None, "cave"),
     ("运输船:玩家船队不被击沉", "CONVOY", 5, "CONVOY", ("mgr", "hvt"), 0, None, "cave"),
     ("专项项目:完成不弹窗", "SPPOPUP", 1, None, (), 0, None, "direct"),
     ("AI陆军:状态维护", "AIUPD", 5, "AIUPD", ("mgr", "hvt", "bss"), 0, None, "cave"),
     ("AI陆军:放行玩家", "AIGATE", 6, "AIGATE", ("mgr", "hvt", "aiupd_ret", "aibss"), 0, None, "cave"),
     ("AI陆军:控制区变更同步给玩家", "AREASYNC", 5, "AREASYNC", ("aibss", "mmv", "self"), 0, None, "cave"),
-    ("AI陆军:只放行军事/空军命令(B)", "POSTB", 6, "POSTB", ("mgr", "hvt", "aibss", "w00", "w01", "w02", "w03", "w04", "w05", "w06", "w07", "w08", "w09", "w10", "w11", "w12", "w13", "w14", "w15", "w16", "w17", "w18", "w19", "w20", "w21", "w22", "w23", "w24", "w25", "w26", "w27", "w28", "w29", "w30", "w31", "w32", "w33", "w34", "w35", "w36", "w37", "w38", "w39", "w40", "w41", "w42", "w43", "w44", "w45", "w46", "w47", "w48", "w49", "w50", "w51", "w52", "w53", "w54", "w55", "w56", "w57", "w58", "w59", "w60", "w61", "w62", "w63", "w64", "w65", "w66", "w67", "w68", "w69", "w70", "w71", "w72", "w73", "w74", "w75", "w76", "w77", "w78", "w79", "w80", "w81", "w82", "w83", "w84", "w85", "w86", "w87", "w88", "w89", "w90", "w91", "w92", "w93", "w94", "w95"), 0, None, "cave"),
-    ("AI陆军:只放行军事/空军命令(A)", "POSTA", 5, "POSTA", ("mgr", "hvt", "aibss", "w00", "w01", "w02", "w03", "w04", "w05", "w06", "w07", "w08", "w09", "w10", "w11", "w12", "w13", "w14", "w15", "w16", "w17", "w18", "w19", "w20", "w21", "w22", "w23", "w24", "w25", "w26", "w27", "w28", "w29", "w30", "w31", "w32", "w33", "w34", "w35", "w36", "w37", "w38", "w39", "w40", "w41", "w42", "w43", "w44", "w45", "w46", "w47", "w48", "w49", "w50", "w51", "w52", "w53", "w54", "w55", "w56", "w57", "w58", "w59", "w60", "w61", "w62", "w63", "w64", "w65", "w66", "w67", "w68", "w69", "w70", "w71", "w72", "w73", "w74", "w75", "w76", "w77", "w78", "w79", "w80", "w81", "w82", "w83", "w84", "w85", "w86", "w87", "w88", "w89", "w90", "w91", "w92", "w93", "w94", "w95"), 0, None, "cave"),
+    ("AI陆军:只放行军事/空军命令(B)", "POSTB", 6, "POSTB", ("mgr", "hvt", "aibss", "f0", "f1", "f2", "w00", "w01", "w02", "w03", "w04", "w05", "w06", "w07", "w08", "w09", "w10", "w11", "w12", "w13", "w14", "w15", "w16", "w17", "w18", "w19", "w20", "w21", "w22", "w23", "w24", "w25", "w26", "w27", "w28", "w29", "w30", "w31", "w32", "w33", "w34", "w35", "w36", "w37", "w38", "w39", "w40", "w41", "w42", "w43", "w44", "w45", "w46", "w47", "w48", "w49", "w50", "w51", "w52", "w53", "w54", "w55", "w56", "w57", "w58", "w59", "w60", "w61", "w62", "w63", "w64", "w65", "w66", "w67", "w68", "w69", "w70", "w71", "w72", "w73", "w74", "w75", "w76", "w77", "w78", "w79", "w80", "w81", "w82", "w83", "w84", "w85", "w86", "w87", "w88", "w89", "w90", "w91", "w92", "w93", "w94", "w95"), 0, None, "cave"),
+    ("AI陆军:只放行军事/空军命令(A)", "POSTA", 5, "POSTA", ("mgr", "hvt", "aibss", "f0", "f1", "f2", "w00", "w01", "w02", "w03", "w04", "w05", "w06", "w07", "w08", "w09", "w10", "w11", "w12", "w13", "w14", "w15", "w16", "w17", "w18", "w19", "w20", "w21", "w22", "w23", "w24", "w25", "w26", "w27", "w28", "w29", "w30", "w31", "w32", "w33", "w34", "w35", "w36", "w37", "w38", "w39", "w40", "w41", "w42", "w43", "w44", "w45", "w46", "w47", "w48", "w49", "w50", "w51", "w52", "w53", "w54", "w55", "w56", "w57", "w58", "w59", "w60", "w61", "w62", "w63", "w64", "w65", "w66", "w67", "w68", "w69", "w70", "w71", "w72", "w73", "w74", "w75", "w76", "w77", "w78", "w79", "w80", "w81", "w82", "w83", "w84", "w85", "w86", "w87", "w88", "w89", "w90", "w91", "w92", "w93", "w94", "w95"), 0, None, "cave"),
     ("成就:mod 校验恒通过", "ACH", 2, None, (), 0, None, "direct"),
     ("成就:非铁人也算铁人", "IRON", 3, None, (), 0, None, "direct"),
     ("成就:状态面板不要求铁人", "ACHUI", 4, None, (), 0, None, "direct"),
@@ -618,10 +600,10 @@ SIG_FUNCS = {"complete": "COMPLETE", "vecins": "VECINS", "setfocus": "SETFOCUS",
              "spexec": "SPEXEC", "spiscomp": "SPISCOMP", "spcanstart": "SPCANSTART", "spfactory": "SPFACTORY",
              "wupd": "WUPD"}
 # 缺了也不影响整个补丁的可选键(机器码里值为 0 就跳过对应功能：MIO 特性自动解锁)
-OPT_KEYS = ("setfocus", "validfocus", "tmv", "contains", "addsize", "unlock", "visible", "setfn", "spexec", "spiscomp", "spcanstart", "spfactory", "wupd")
+OPT_KEYS = ("f0", "f1", "f2", "setfocus", "validfocus", "tmv", "contains", "addsize", "unlock", "visible", "setfn", "spexec", "spiscomp", "spcanstart", "spfactory", "wupd")
 # 需要 vtable 的类
 AI_WHITELIST = ['CAiDiscardForceConcentrationTargetCommand', 'CAiStoreForceConcentrationTargetCommand', 'CAiStoreTotalWantedNrDivisionsCommand', 'CArmyGroupCommand', 'CAssignToArmyGroupCommand', 'CAssignToTheaterGroupCommand', 'CAttachAirWingToArmyCommand', 'CCancelMovementCommand', 'CCreateAreaDefenseCommand', 'CDeployAirWingCommand', 'CDetachAirWingFromArmyCommand', 'CDisbandTheaterGroupCommand', 'CMoveAirGroupAndAirTheatreToFreeCommand', 'CMoveAirWingAndAirGroupToAirTheatreCommand', 'CMoveAirWingToAirGroupCommand', 'CMoveArmiesInTheaterCommand', 'CMoveArmyGroupInTheaterCommand', 'COrderAddNewCompletePlanCommand', 'COrderAssignCommand', 'COrderBlockSectionsCommand', 'COrderChildFrontRatioCommand', 'COrderConnectCommand', 'COrderDeleteAllCommand', 'COrderDeleteCommand', 'COrderEditRootCommand', 'COrderExecuteCommand', 'COrderGroupCommand', 'COrderInsertFrontCommand', 'COrderMembersFairSplitCommand', 'COrderMergeRootsCommand', 'COrderNewFallbackCommand', 'COrderNewFrontCommand', 'COrderNewRootCommand', 'COrderReconnectCommand', 'COrderReorderChildFrontCommand', 'COrderReshapeCommand', 'COrderSetCollapseCommand', 'COrderSetInvasionSourceCommand', 'COrderSetParadropSourceCommand', 'COrderSetParadropTargetCommand', 'COrderSetPathCommand', 'COrderSetTrainingCommand', 'COrderUnassignCommand', 'CRemoveFromArmyGroupCommand', 'CReorderAirTheatersCommand', 'CReorderTheatersCommand', 'CSetArmyLeaderCommand', 'CSetOrderGroupExecutionTypeCommand', 'CSetTheaterGroupPriorityCommand', 'CSetTheatreCommand', 'CSetWingReinforcementPriorityCommand', 'CStratAirCancelTransferCommand', 'CStratAirChangeAggressivnessCommand', 'CStratAirConsolidateCommand', 'CStratAirDayNightCommand', 'CStratAirEnableMissionCommand', 'CStratAirMoveEquipmentCommand', 'CStratAirMoveEquipmentToReservesCommand', 'CStratAirSetMissionCommand', 'CStratAirSplitCommand', 'CStratAirTransferCommand', 'CStrategicRedeploymentCommand', 'COrderReplaceRootCommands', 'CMassMoveCommand', 'CSetOrderGroupCohesionTypeCommand', 'CEditAreaDefenseStateCommand', 'CSetAreaDefenseSettingCommand', 'CSetArmyLeaderPreferredTacticCommand', 'CSetCountryReinforcementPriorityCommand', 'CSetPreferredTacticCommand', 'CAddNavalInvasionTargetCommand', 'CRemoveNavalInvasionTargetCommand', 'CAiOnFailedInvasionCommand', 'COrderRemoveRootCommands', 'COrderReplaceFallbackCommands', 'CDeleteOrderGroupCommand', 'CAutoMergeOrdersCommand', 'CSetOrdersLinkCommand', 'CSetOrderGroupMotorizationCommand', 'CSetOrderGroupLeaderProximityCommand', 'CTransportUnitCommand']
-VTABLE_CLASSES = {"hvt": "CHuman", "mmv": "CAIMilitaryMinister", "cvt": "CCountry", "svt": "CShip", "tvt": "CTaskForce",
+VTABLE_CLASSES = {"hvt": "CHuman", "f0": "CSetNationalFocusCommand", "f1": "CSetContinuousFocusCommand", "f2": "CBypassNationalFocusCommand", "mmv": "CAIMilitaryMinister", "cvt": "CCountry", "svt": "CShip", "tvt": "CTaskForce",
                   "wvt": "CAirWing", "xvt": "CStrategicNavy",
                   "tmv": "CTraitTemplate@NIndustrialOrganisation"}
 WL_KEYS = {f"w{i:02d}" for i in range(96)}
@@ -823,11 +805,11 @@ def ai_switch(cmd):
     h = P.open_process(pid)
     bss = st["aibss"]
     if cmd in ("on", "full", "off"):
-        if not P.write_mem(h, bss, bytes([{"on": 1, "full": 2, "off": 0}[cmd]]) + bytes(7)):
+        if not P.write_mem(h, bss, bytes([{"on": 1, "full": 2, "off": 0}[cmd]])):
             log("写入失败")
             return 1
     on, restricted, _s, _c, ai, ticks = struct.unpack("<QQQQQQ", P.read_mem(h, bss, 48))
-    log(f"AI 控制玩家陆军: {({0: '关', 1: '开(前4个模块+命令过滤)', 2: '开(全部模块)'}).get(on & 0xFF, '?')}；玩家国家 AI 对象=0x{ai:X}；已限制模块列表={'是' if restricted else '否'}；累计更新次数={ticks}")
+    log(f"AI 控制玩家陆军: {({0: '关', 1: '开(前4个模块+命令过滤)', 2: '开(全部模块)'}).get(on & 0xFF, '?')}；AI 选国策: {'开' if (on >> 8) & 0xFF == 1 else '关'}；玩家国家 AI 对象=0x{ai:X}；已限制模块列表={'是' if restricted else '否'}；累计更新次数={ticks}")
     return 0
 
 
