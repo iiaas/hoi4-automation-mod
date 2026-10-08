@@ -19,10 +19,11 @@
 2. 海军登陆去除限制
    - 无视制海权不足：登陆路线校验里“我方是否控制该海区”对玩家恒为“是”(不再提示 Insufficient Naval Dominance)。
    - 每次登陆的师数上限：对玩家恒为 99。
-   - 登陆计划数量上限：对玩家恒为 99。
+   - 登陆计划数量上限：对玩家恒为 99；另一个独立的“登陆计划是否已满”判断(0x702540，下达/设置登陆出发港时用，
+     自己算上限、不走上面的函数)对玩家恒为“未满”，否则 AI 控制玩家时登陆命令全被判无效。
    - 登陆准备时间：对玩家把“准备时间修正”固定为 -0.99，准备时间约剩原来的 1%。
 3. 空降去除限制
-   - 空降计划数量上限：对玩家恒为 99。
+   - 空降计划数量上限：对玩家恒为 99；“空降计划是否已满”判断(0x700180)对玩家恒为“未满”。
    - 空降每次师数上限：校验时对玩家直接判定“允许”。
    - 空降准备时间：与海军共用同一补丁(修正 id 0xE)，约剩原来的 1%。
 4. 使用 mod 也可以解锁成就(对所有人生效，没有“玩家”的概念)
@@ -95,7 +96,7 @@
      政治、外交、内政三个大臣一起运行后才有，和游戏开始时先 observe 让整套 AI 跑过一遍再切回玩家是同一个原因)。
    - 补丁三(AI陆军:只放行军事/空军命令 A/B)：AI 所有命令都经过引擎的两个“发布 AI 命令”函数。开关为 on 时，
      对玩家本国只放行陆军(战线/编队/战区/师数需求/部队移动…)和空军(任务/转场/部署…)类命令(白名单
-     AI_WHITELIST，约 70 类)，其余(生产、贸易、外交、法律、科研、海军…)命令直接销毁，所以政治/外交/内政
+     AI_WHITELIST，约 80 类)，其余(生产、贸易、外交、法律、科研、海军…)命令直接销毁，所以政治/外交/内政
      大臣虽然运行了，但不会真的替你做这些事。
    - on=只放行军事/空军命令；full=所有模块都运行且不过滤(调试用，会崩溃，不要用)；off=关闭；status=查看。
    - 暂未限制在某个战区内：打开后作用于玩家全部陆军和空军。已设置的手动任务可能被 AI 改掉。
@@ -103,6 +104,9 @@
      AI 将军(CAIGeneral)里引用的旧控制区换成新的，但玩家的将军不在通知名单里，留着已释放的指针，运行一段时间后
      在 AI 将军代码 0x106AE90 处崩溃。补丁在该函数被调用(给任一 AI 将军)时，顺带用同样参数对玩家军事大臣
      (CCountryAI 模块 3，+0x18 将军列表)下的每个将军也调用一次原函数，与原版 AI 国家的处理一致。
+   - 登陆：白名单原先缺“添加/移除登陆目标”(CAddNavalInvasionTargetCommand/CRemoveNavalInvasionTargetCommand)等命令，
+     玩家的登陆计划建出来却没有目标，永远不执行；已补上这些及其它战线/编组类命令(白名单 96 槽)。
+     另见第 2 项“登陆计划是否已满”判断对玩家恒为“未满”，否则设置登陆出发港的命令会被判无效。
    - 用法：pythonw 本脚本 --ai on|off|status(游戏运行时执行，日志在 %TEMP% 下的 hoi4_nologistics.log)。
 
 兼容性(防止游戏更新后失效)
@@ -352,6 +356,8 @@ SIGS = {
     "INV": "48 83 EC 28 48 8B C2 48 8D 51 10 48 8B 88 E8 00 00 00 E8 ?? ?? ?? ?? 83 F8 01",
     "GET_DIVCAP": "48 83 EC 28 48 81 C1 B8 05 00 00 48 8D 54 24 30 41 B8 20 00 00 00 E8 ?? ?? ?? ??",
     "GET_PLANCAP": "48 83 EC 28 48 81 C1 B8 05 00 00 48 8D 54 24 30 41 B8 83 01 00 00 E8 ?? ?? ?? ??",
+    "PLANFULL": "48 89 5C 24 10 48 89 74 24 18 57 48 83 EC 20 4C 8B 99 68 01 00 00 33 DB 48 63 81 74 01 00 00 48 8B F1 49 8D 3C C3 4C 3B DF 74 6F 0F 1F 44 00 00 49 8B 03 4C 8B 80 80 00 00 00 48 63 80 8C 00 00 00 4D 8D 14 C0 4D 3B C2 74 47 66 0F 1F 44 00 00 49 8B 08 48 8B 81 98 00 00 00 48 63 89 A4 00 00 00 4C 8D 0C C8 49 3B C1 74 1E 66 0F 1F 44 00 00 48 8B 08 8D 53 01 83 79 30 03 0F 45 D3 48 83 C0",
+    "AIRPLANFULL": "48 89 5C 24 10 48 89 74 24 18 57 48 83 EC 20 4C 8B 99 68 01 00 00 33 DB 48 63 81 74 01 00 00 48 8B F1 49 8D 3C C3 4C 3B DF 74 6F 0F 1F 44 00 00 49 8B 03 4C 8B 80 80 00 00 00 48 63 80 8C 00 00 00 4D 8D 14 C0 4D 3B C2 74 47 66 0F 1F 44 00 00 49 8B 08 48 8B 81 98 00 00 00 48 63 89 A4 00 00 00 4C 8D 0C C8 49 3B C1 74 1E 66 0F 1F 44 00 00 48 8B 08 8D 53 01 83 79 30 04 0F 45 D3 48 83 C0",
     "GET_AIRPLAN": "48 83 EC 28 48 81 C1 B8 05 00 00 48 8D 54 24 30 41 B8 87 01 00 00 E8 ?? ?? ?? ??",
     "AGAINST": "48 89 5C 24 10 48 89 6C 24 18 48 89 74 24 20 57 48 83 EC 20 48 8B F1 49 8B F9",
     "SKIPCAP": "48 8D 8D B8 05 00 00 41 B8 86 01 00 00 48 8D 54 24 60 E8 ?? ?? ?? ?? 48 8B 08",
@@ -420,6 +426,13 @@ CAVES = {
         "0075438b90800200003b9020050000753585d274313b901c03000073294c8b88100300004d85c9741d4189d04f"
         "8b0cc14939c97511415941585a5848c702487dfeff4889d0c3415941585a58"
     ),
+    # 同 CONST，但对玩家返回 0(“计划数已满”判断恒为否)
+    "ZERO": (
+        "0000000000000000000000000000000000000000000000000000000000000000505241504151488b05e3ffffff"
+        "483901755d488b05c7ffffff488b004885c0744e488b15c0ffffff48399010010000753e8b90800200003b9020"
+        "050000753085d2742c3b901c03000073244c8b88100300004d85c974184189d04f8b0cc14939c9750c41594158"
+        "5a5831c0909090c3415941585a58"
+    ),
     "SKIPCAP": (
         "0000000000000000000000000000000000000000000000000000000000000000505241504151488b05e3ffffff"
         "48394500755d488b05c6ffffff488b004885c0744e488b15bfffffff48399010010000753e8b90800200003b90"
@@ -466,11 +479,13 @@ CAVES = {
         "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
-        "00000000000000000000000000000000000000000000000000000000000000000000505241504151488b056bfd"
-        "ffff4885c0747b8038017576488b054afdffff488b004885c074674c8b0543fdffff4c3980100100007557448b"
-        "8080020000443b802005000075474585c07442448b0a4539c1753a4c8b094c8d0523fdffffb8500000004d3908"
-        "74264983c008ffc875f3415941585a584883ec284889c9488b01ba01000000ff104883c42831c0c3415941585a"
-        "58"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000505241504151488b05ebfcffff4885c0747b"
+        "8038017576488b05cafcffff488b004885c074674c8b05c3fcffff4c3980100100007557448b8080020000443b"
+        "802005000075474585c07442448b0a4539c1753a4c8b094c8d05a3fcffffb8600000004d390874264983c008ff"
+        "c875f3415941585a584883ec284889c9488b01ba01000000ff104883c42831c0c3415941585a58"
     ),
     "POSTA": (
         "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
@@ -487,11 +502,13 @@ CAVES = {
         "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
-        "00000000000000000000000000000000000000000000000000000000000000000000505241504151488b056bfd"
-        "ffff4885c0747b8038017576488b054afdffff488b004885c074674c8b0543fdffff4c3980100100007557448b"
-        "8080020000443b802005000075474585c07442448b094539c1753a4c8b0a4c8d0523fdffffb8500000004d3908"
-        "74264983c008ffc875f3415941585a584883ec284889d1488b01ba01000000ff104883c42831c0c3415941585a"
-        "58"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        "000000000000000000000000000000000000000000000000000000505241504151488b05ebfcffff4885c0747b"
+        "8038017576488b05cafcffff488b004885c074674c8b05c3fcffff4c3980100100007557448b8080020000443b"
+        "802005000075474585c07442448b094539c1753a4c8b0a4c8d05a3fcffffb8600000004d390874264983c008ff"
+        "c875f3415941585a584883ec284889d1488b01ba01000000ff104883c42831c0c3415941585a58"
     ),
     "FOCUS": (
         "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
@@ -559,6 +576,8 @@ HOOKS = (
     ("海军:每次登陆师数上限", "GET_DIVCAP", 11, "CONST", ("mgr", "hvt", "cvt", "yes"), 0, None, "cave"),
     ("海军:登陆计划数量上限", "GET_PLANCAP", 11, "CONST", ("mgr", "hvt", "cvt", "yes"), 0, None, "cave"),
     ("空降:计划数量上限", "GET_AIRPLAN", 11, "CONST", ("mgr", "hvt", "cvt", "yes"), 0, None, "cave"),
+    ("海军:登陆计划已满判断", "PLANFULL", 5, "ZERO", ("mgr", "hvt", "cvt", "yes"), 0, None, "cave"),
+    ("空降:计划已满判断", "AIRPLANFULL", 5, "ZERO", ("mgr", "hvt", "cvt", "yes"), 0, None, "cave"),
     ("登陆/空降:准备时间", "AGAINST", 5, "AGAINST", ("mgr", "hvt", "cvt", "yes"), 0, None, "cave"),
     ("空降:每次师数上限", "SKIPCAP", 7, "SKIPCAP", ("mgr", "hvt", "cvt", "yes"), 0x43,
      bytes.fromhex("b0014883c428"), "cave"),
@@ -569,8 +588,8 @@ HOOKS = (
     ("AI陆军:状态维护", "AIUPD", 5, "AIUPD", ("mgr", "hvt", "bss"), 0, None, "cave"),
     ("AI陆军:放行玩家", "AIGATE", 6, "AIGATE", ("mgr", "hvt", "aiupd_ret", "aibss"), 0, None, "cave"),
     ("AI陆军:控制区变更同步给玩家", "AREASYNC", 5, "AREASYNC", ("aibss", "mmv", "self"), 0, None, "cave"),
-    ("AI陆军:只放行军事/空军命令(B)", "POSTB", 6, "POSTB", ("mgr", "hvt", "aibss", "w00", "w01", "w02", "w03", "w04", "w05", "w06", "w07", "w08", "w09", "w10", "w11", "w12", "w13", "w14", "w15", "w16", "w17", "w18", "w19", "w20", "w21", "w22", "w23", "w24", "w25", "w26", "w27", "w28", "w29", "w30", "w31", "w32", "w33", "w34", "w35", "w36", "w37", "w38", "w39", "w40", "w41", "w42", "w43", "w44", "w45", "w46", "w47", "w48", "w49", "w50", "w51", "w52", "w53", "w54", "w55", "w56", "w57", "w58", "w59", "w60", "w61", "w62", "w63", "w64", "w65", "w66", "w67", "w68", "w69", "w70", "w71", "w72", "w73", "w74", "w75", "w76", "w77", "w78", "w79"), 0, None, "cave"),
-    ("AI陆军:只放行军事/空军命令(A)", "POSTA", 5, "POSTA", ("mgr", "hvt", "aibss", "w00", "w01", "w02", "w03", "w04", "w05", "w06", "w07", "w08", "w09", "w10", "w11", "w12", "w13", "w14", "w15", "w16", "w17", "w18", "w19", "w20", "w21", "w22", "w23", "w24", "w25", "w26", "w27", "w28", "w29", "w30", "w31", "w32", "w33", "w34", "w35", "w36", "w37", "w38", "w39", "w40", "w41", "w42", "w43", "w44", "w45", "w46", "w47", "w48", "w49", "w50", "w51", "w52", "w53", "w54", "w55", "w56", "w57", "w58", "w59", "w60", "w61", "w62", "w63", "w64", "w65", "w66", "w67", "w68", "w69", "w70", "w71", "w72", "w73", "w74", "w75", "w76", "w77", "w78", "w79"), 0, None, "cave"),
+    ("AI陆军:只放行军事/空军命令(B)", "POSTB", 6, "POSTB", ("mgr", "hvt", "aibss", "w00", "w01", "w02", "w03", "w04", "w05", "w06", "w07", "w08", "w09", "w10", "w11", "w12", "w13", "w14", "w15", "w16", "w17", "w18", "w19", "w20", "w21", "w22", "w23", "w24", "w25", "w26", "w27", "w28", "w29", "w30", "w31", "w32", "w33", "w34", "w35", "w36", "w37", "w38", "w39", "w40", "w41", "w42", "w43", "w44", "w45", "w46", "w47", "w48", "w49", "w50", "w51", "w52", "w53", "w54", "w55", "w56", "w57", "w58", "w59", "w60", "w61", "w62", "w63", "w64", "w65", "w66", "w67", "w68", "w69", "w70", "w71", "w72", "w73", "w74", "w75", "w76", "w77", "w78", "w79", "w80", "w81", "w82", "w83", "w84", "w85", "w86", "w87", "w88", "w89", "w90", "w91", "w92", "w93", "w94", "w95"), 0, None, "cave"),
+    ("AI陆军:只放行军事/空军命令(A)", "POSTA", 5, "POSTA", ("mgr", "hvt", "aibss", "w00", "w01", "w02", "w03", "w04", "w05", "w06", "w07", "w08", "w09", "w10", "w11", "w12", "w13", "w14", "w15", "w16", "w17", "w18", "w19", "w20", "w21", "w22", "w23", "w24", "w25", "w26", "w27", "w28", "w29", "w30", "w31", "w32", "w33", "w34", "w35", "w36", "w37", "w38", "w39", "w40", "w41", "w42", "w43", "w44", "w45", "w46", "w47", "w48", "w49", "w50", "w51", "w52", "w53", "w54", "w55", "w56", "w57", "w58", "w59", "w60", "w61", "w62", "w63", "w64", "w65", "w66", "w67", "w68", "w69", "w70", "w71", "w72", "w73", "w74", "w75", "w76", "w77", "w78", "w79", "w80", "w81", "w82", "w83", "w84", "w85", "w86", "w87", "w88", "w89", "w90", "w91", "w92", "w93", "w94", "w95"), 0, None, "cave"),
     ("成就:mod 校验恒通过", "ACH", 2, None, (), 0, None, "direct"),
     ("成就:非铁人也算铁人", "IRON", 3, None, (), 0, None, "direct"),
     ("成就:状态面板不要求铁人", "ACHUI", 4, None, (), 0, None, "direct"),
@@ -596,11 +615,11 @@ SIG_FUNCS = {"complete": "COMPLETE", "vecins": "VECINS", "setfocus": "SETFOCUS",
 # 缺了也不影响整个补丁的可选键(机器码里值为 0 就跳过对应功能：MIO 特性自动解锁)
 OPT_KEYS = ("setfocus", "validfocus", "tmv", "contains", "addsize", "unlock", "visible", "setfn", "spexec", "spiscomp", "spcanstart", "spfactory", "wupd")
 # 需要 vtable 的类
-AI_WHITELIST = ['CAiDiscardForceConcentrationTargetCommand', 'CAiStoreForceConcentrationTargetCommand', 'CAiStoreTotalWantedNrDivisionsCommand', 'CArmyGroupCommand', 'CAssignToArmyGroupCommand', 'CAssignToTheaterGroupCommand', 'CAttachAirWingToArmyCommand', 'CCancelMovementCommand', 'CCreateAreaDefenseCommand', 'CDeployAirWingCommand', 'CDetachAirWingFromArmyCommand', 'CDisbandTheaterGroupCommand', 'CMoveAirGroupAndAirTheatreToFreeCommand', 'CMoveAirWingAndAirGroupToAirTheatreCommand', 'CMoveAirWingToAirGroupCommand', 'CMoveArmiesInTheaterCommand', 'CMoveArmyGroupInTheaterCommand', 'COrderAddNewCompletePlanCommand', 'COrderAssignCommand', 'COrderBlockSectionsCommand', 'COrderChildFrontRatioCommand', 'COrderConnectCommand', 'COrderDeleteAllCommand', 'COrderDeleteCommand', 'COrderEditRootCommand', 'COrderExecuteCommand', 'COrderGroupCommand', 'COrderInsertFrontCommand', 'COrderMembersFairSplitCommand', 'COrderMergeRootsCommand', 'COrderNewFallbackCommand', 'COrderNewFrontCommand', 'COrderNewRootCommand', 'COrderReconnectCommand', 'COrderReorderChildFrontCommand', 'COrderReshapeCommand', 'COrderSetCollapseCommand', 'COrderSetInvasionSourceCommand', 'COrderSetParadropSourceCommand', 'COrderSetParadropTargetCommand', 'COrderSetPathCommand', 'COrderSetTrainingCommand', 'COrderUnassignCommand', 'CRemoveFromArmyGroupCommand', 'CReorderAirTheatersCommand', 'CReorderTheatersCommand', 'CSetArmyLeaderCommand', 'CSetOrderGroupExecutionTypeCommand', 'CSetTheaterGroupPriorityCommand', 'CSetTheatreCommand', 'CSetWingReinforcementPriorityCommand', 'CStratAirCancelTransferCommand', 'CStratAirChangeAggressivnessCommand', 'CStratAirConsolidateCommand', 'CStratAirDayNightCommand', 'CStratAirEnableMissionCommand', 'CStratAirMoveEquipmentCommand', 'CStratAirMoveEquipmentToReservesCommand', 'CStratAirSetMissionCommand', 'CStratAirSplitCommand', 'CStratAirTransferCommand', 'CStrategicRedeploymentCommand', 'COrderReplaceRootCommands', 'CMassMoveCommand', 'CSetOrderGroupCohesionTypeCommand', 'CEditAreaDefenseStateCommand', 'CSetAreaDefenseSettingCommand', 'CSetArmyLeaderPreferredTacticCommand', 'CSetCountryReinforcementPriorityCommand', 'CSetPreferredTacticCommand']
+AI_WHITELIST = ['CAiDiscardForceConcentrationTargetCommand', 'CAiStoreForceConcentrationTargetCommand', 'CAiStoreTotalWantedNrDivisionsCommand', 'CArmyGroupCommand', 'CAssignToArmyGroupCommand', 'CAssignToTheaterGroupCommand', 'CAttachAirWingToArmyCommand', 'CCancelMovementCommand', 'CCreateAreaDefenseCommand', 'CDeployAirWingCommand', 'CDetachAirWingFromArmyCommand', 'CDisbandTheaterGroupCommand', 'CMoveAirGroupAndAirTheatreToFreeCommand', 'CMoveAirWingAndAirGroupToAirTheatreCommand', 'CMoveAirWingToAirGroupCommand', 'CMoveArmiesInTheaterCommand', 'CMoveArmyGroupInTheaterCommand', 'COrderAddNewCompletePlanCommand', 'COrderAssignCommand', 'COrderBlockSectionsCommand', 'COrderChildFrontRatioCommand', 'COrderConnectCommand', 'COrderDeleteAllCommand', 'COrderDeleteCommand', 'COrderEditRootCommand', 'COrderExecuteCommand', 'COrderGroupCommand', 'COrderInsertFrontCommand', 'COrderMembersFairSplitCommand', 'COrderMergeRootsCommand', 'COrderNewFallbackCommand', 'COrderNewFrontCommand', 'COrderNewRootCommand', 'COrderReconnectCommand', 'COrderReorderChildFrontCommand', 'COrderReshapeCommand', 'COrderSetCollapseCommand', 'COrderSetInvasionSourceCommand', 'COrderSetParadropSourceCommand', 'COrderSetParadropTargetCommand', 'COrderSetPathCommand', 'COrderSetTrainingCommand', 'COrderUnassignCommand', 'CRemoveFromArmyGroupCommand', 'CReorderAirTheatersCommand', 'CReorderTheatersCommand', 'CSetArmyLeaderCommand', 'CSetOrderGroupExecutionTypeCommand', 'CSetTheaterGroupPriorityCommand', 'CSetTheatreCommand', 'CSetWingReinforcementPriorityCommand', 'CStratAirCancelTransferCommand', 'CStratAirChangeAggressivnessCommand', 'CStratAirConsolidateCommand', 'CStratAirDayNightCommand', 'CStratAirEnableMissionCommand', 'CStratAirMoveEquipmentCommand', 'CStratAirMoveEquipmentToReservesCommand', 'CStratAirSetMissionCommand', 'CStratAirSplitCommand', 'CStratAirTransferCommand', 'CStrategicRedeploymentCommand', 'COrderReplaceRootCommands', 'CMassMoveCommand', 'CSetOrderGroupCohesionTypeCommand', 'CEditAreaDefenseStateCommand', 'CSetAreaDefenseSettingCommand', 'CSetArmyLeaderPreferredTacticCommand', 'CSetCountryReinforcementPriorityCommand', 'CSetPreferredTacticCommand', 'CAddNavalInvasionTargetCommand', 'CRemoveNavalInvasionTargetCommand', 'CAiOnFailedInvasionCommand', 'COrderRemoveRootCommands', 'COrderReplaceFallbackCommands', 'CDeleteOrderGroupCommand', 'CAutoMergeOrdersCommand', 'CSetOrdersLinkCommand', 'CSetOrderGroupMotorizationCommand', 'CSetOrderGroupLeaderProximityCommand', 'CTransportUnitCommand']
 VTABLE_CLASSES = {"hvt": "CHuman", "mmv": "CAIMilitaryMinister", "cvt": "CCountry", "svt": "CShip", "tvt": "CTaskForce",
                   "wvt": "CAirWing", "xvt": "CStrategicNavy",
                   "tmv": "CTraitTemplate@NIndustrialOrganisation"}
-WL_KEYS = {f"w{i:02d}" for i in range(80)}
+WL_KEYS = {f"w{i:02d}" for i in range(96)}
 VTABLE_CLASSES.update({f"w{i:02d}": c for i, c in enumerate(AI_WHITELIST)})
 
 
