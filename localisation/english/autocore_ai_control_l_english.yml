@@ -1,0 +1,7 @@
+﻿l_english:
+ autocore_ai_control_category:0 "AI Control"
+ autocore_ai_control_category_desc:0 "Toggle AI command of your army and air force (requires the tools/hoi4_nologistics.py patch)."
+ autocore_ai_control_turn_off:0 "Disable AI Control"
+ autocore_ai_control_turn_off_desc:0 "Stop letting the AI command your army and air force."
+ autocore_ai_control_turn_on:0 "Enable AI Control"
+ autocore_ai_control_turn_on_desc:0 "Let the AI command your army and air force. Your manual orders may be changed."
