@@ -17,7 +17,6 @@ on_actions = {
 				limit = { is_ai = no }
 				auto_design = yes
 				auto_build = yes
-				auto_import_resources = yes
 				auto_production_naval = yes
 			}
 		}
