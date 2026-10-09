@@ -68,7 +68,8 @@
 ------
 - 补丁位置都用特征码在 hoi4.exe 里查找，类用 RTTI 类名查找，不写死地址。
 - 某个特征码找不到或不唯一时，只跳过对应补丁并写日志，不会乱改。
-- 游戏更新若改了结构体字段偏移(写在机器码里)，相关补丁通常会失效但不会崩溃，需要重新分析。
+- 结构体字段偏移大多写在机器码里；已知会随版本变化的(装备原型字段)在安装时从引擎代码里读出实际值再填入。
+- 已核对的游戏版本：1.19.3.0.c01a、1.19.3.0.3fba(所有特征码在两个版本都唯一命中)。
 
 用法
 ----
@@ -247,7 +248,9 @@ class Image:
         return self.data[o:o + n] if o is not None else b""
 
     def find_sig(self, sig):
-        """特征码(十六进制字节，'??' 通配)在代码段里的全部命中 RVA。"""
+        """特征码(十六进制字节，'??' 通配)在代码段里的全部命中 RVA。用 " | " 分隔多个候选(不同游戏版本)时返回各候选命中的并集。"""
+        if " | " in sig:
+            return sorted({h for alt in sig.split(" | ") for h in self.find_sig(alt)})
         toks = sig.split()
         pat = re.compile(b"".join(b"." if t == "??" else re.escape(bytes([int(t, 16)])) for t in toks), re.S)
         # 用最长的连续固定字节做种子，快速定位候选再用完整正则确认
@@ -332,7 +335,7 @@ SIGS = {
     "SPISCOMP": "48 8B 49 28 E9 ?? ?? ?? ?? CC CC CC CC CC CC CC 48 8B 49 28",
     "SPCANSTART": "48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 20 57 48 83 EC 50 48 8B FA 48 8B D9",
     "SPPOPUP": "48 89 5C 24 10 48 89 6C 24 18 56 57 41 56 48 83 EC 30 4C 8B F2 48 8B F1 80 3D ?? ?? ?? ?? 00",
-    "AIUPD": "48 89 5C 24 08 57 48 83 EC 40 48 8B F9 E8 ?? ?? ?? ?? 48 8B D8 48 85 C0 0F 84 ?? ?? ?? ?? 80 7F 60 00 0F 84 ?? ?? ?? ?? 83 B8 84 04 00 00 00 0F 8E ?? ?? ?? ?? 48 8B C8 E8",
+    "AIUPD": "48 89 5C 24 08 57 48 83 EC ?? 48 8B F9 E8 ?? ?? ?? ?? 48 8B D8 48 85 C0 0F 84 ?? ?? ?? ?? 80 7F 60 00 | 48 89 5C 24 08 57 48 83 EC ?? 48 8B F9 E8 ?? ?? ?? ?? 48 8B D8 48 85 C0 74 ?? 80 7F 60 00",
     "AREASYNC": "48 89 5C 24 18 48 89 6C 24 20 56 57 41 56 48 83 EC 20 4C 89 7C 24 48 49 8B E8 4C 63 79 54 48 8B DA",
     "HRESOLVE": "48 83 EC 28 8B 01 3D 68 12 00 00 76 ?? 48 8B 05 ?? ?? ?? ?? 48 85 C0 74 ?? 48 8B D1 48 8B C8 E8 ?? ?? ?? ?? 48 85 C0 74 ?? 48 8B 00 48 83 C4 28 C3",
     "POSTA": "48 89 5C 24 10 57 48 83 EC 40 48 8B F9 48 8B DA 48 8B 0D ?? ?? ?? ?? 48 8B 01 FF ?? ?? ?? ?? ?? 8B 17 44 8B 00",
@@ -342,8 +345,9 @@ SIGS = {
     "RS_RAILB": "8B C8 E8 ?? ?? ?? ?? 48 8B F8 48 8B D7 49 8B CC E8 ?? ?? ?? ?? 48 8B 9C 24 88 00 00 00",
     "RS_RAILC": "DD 75 D0 45 0F B6 CD 45 8B C4 49 8B D6 48 8B CE E8 ?? ?? ?? ?? 48 8B 5C 24 68 48 8B 6C",
     "CONVRAID": "48 89 5C 24 10 4C 89 44 24 18 55 56 57 41 54 41 55 41 56 41 57 48 83 EC 40 49 8B F1 4C 8B EA 48",
-    "TRANSNAV": "48 89 5C 24 20 4C 89 44 24 18 48 89 54 24 10 55 56 57 41 54 41 55 41 56 41 57 48 81 EC 80 00 00",
+    "TRANSNAV": "48 89 5C 24 20 4C 89 44 24 18 48 89 54 24 10 55 56 57 41 54 41 55 41 56 41 57 48 81 EC 80 00 00 00 0F 29 74",
     "TRANSAIR": "48 89 5C 24 08 48 89 74 24 10 48 89 7C 24 18 55 41 56 41 57 48 8D AC 24 70 FF FF FF 48 81 EC 90",
+    "ARCHOFF": "48 8D 4B 40 E8 ?? ?? ?? ?? 48 8B 88 F0 03 00 00 49 3B CF 74 0D 4C 39 B9 ?? ?? ?? ??",
     "POSTB": "40 53 48 83 EC 40 80 3D ?? ?? ?? ?? 00 48 8B D9 0F 84 ?? ?? ?? ?? 80 3D ?? ?? ?? ?? 00 75 ?? 48 8B CA E8 ?? ?? ?? ??",
     "SPFACTORY": "40 53 48 83 EC 20 B9 E8 02 00 00",
 }
@@ -565,8 +569,10 @@ HOOKS = (
 DIRECT_PATCHES = {"SPPOPUP": bytes.fromhex("c3"), "ACH": bytes.fromhex("31c0"), "IRON": bytes.fromhex("b10190"), "ACHUI": bytes.fromhex("6a01415d")}
 # 机器码需要额外的零初始化数据区(bss)，紧跟在补丁代码后面；大小(字节)
 CAVE_BSS = {"FOCUS": 4640, "AIUPD": 64}
+# 机器码里写死、但不同游戏版本可能不同的结构体偏移：(R 里的键, 机器码里的占位值)
+CAVE_FIELD_PATCH = {"POSTB": [("archoff", 0x4D8)]}
 # 不能直接用特征码定位、而是从别的函数里的 call 目标推出来的入口：键 = (宿主特征码键, call 指令相对宿主入口的偏移)
-DERIVED = {"AIGATE": ("AIUPD", 0x38)}
+DERIVED = {"AIGATE": ("AIUPD", None)}   # None：在宿主开头找第一处 mov rcx,rax; call(不同版本位置不同)
 # 需要用特征码解析出入口地址、供机器码调用的引擎函数：键 -> 特征码键
 SIG_FUNCS = {"complete": "COMPLETE", "vecins": "VECINS", "setfocus": "SETFOCUS", "validfocus": "VALIDFOCUS", "contains": "CONTAINS", "addsize": "ADDSIZE",
              "unlock": "UNLOCK", "visible": "VISIBLE", "setfn": "SETTECH",
@@ -610,6 +616,12 @@ def resolve(img):
             R[key] = hits[0]
         else:
             problems.append(f"引擎函数 {key}: 特征码{'未命中' if not hits else '命中 %d 处(不唯一)' % len(hits)}")
+    # 装备类型(CEquipmentType)里“原型”指针的字段偏移(1.19.3.0.c01a 为 0x4D8，3fba 为 0x4E0)：从引擎里一处读它的指令取出
+    hits = img.find_sig(SIGS["ARCHOFF"])
+    if len(hits) == 1:
+        R["archoff"] = struct.unpack("<I", img.bytes_at(hits[0] + 24, 4))[0]
+    else:
+        problems.append("装备原型字段偏移: 特征码" + ("未命中" if not hits else "不唯一"))
     # 调用点的返回地址(特征码命中处 +16 是 call，返回地址 = +21)
     for key in ("RS_ADV", "RS_RAILAI", "RS_RAILA", "RS_RAILB", "RS_RAILC"):
         hits = img.find_sig(SIGS[key])
@@ -625,6 +637,14 @@ def resolve(img):
             if len(hh) != 1:
                 problems.append(f"{name}: 宿主特征码 {host} {'未命中' if not hh else '不唯一'}")
                 continue
+            if off is None:
+                head = img.bytes_at(hh[0], 0x80)
+                k = head.find(bytes.fromhex("488BC8E8"))
+                if k < 0:
+                    problems.append(f"{name}: 宿主 {host} 开头找不到 mov rcx,rax; call")
+                    continue
+                off = k + 3
+                R["derived_off:" + sigkey] = off
             o = hh[0] + off
             b = img.bytes_at(o, 5)
             if b[0] != 0xE8:
@@ -709,6 +729,10 @@ def install_all(h, base, img):
             out.append((name, "依赖的 AI陆军:状态维护 未安装，跳过"))
             continue
         code = bytearray(bytes.fromhex(CAVES[cavekey]))
+        if cavekey in CAVE_FIELD_PATCH:                # 机器码里随游戏版本变化的结构体偏移，安装时换成实际值
+            for rkey, placeholder in CAVE_FIELD_PATCH[cavekey]:
+                if rkey in R:
+                    code = bytearray(bytes(code).replace(struct.pack("<I", placeholder), struct.pack("<I", R[rkey])))
         cave = arena + cur_off
         vals = []
         for k in keys:
@@ -721,7 +745,7 @@ def install_all(h, base, img):
                 if cavekey == "AIUPD":
                     shared["aibss"] = vals[-1]
             elif k == "aiupd_ret":
-                vals.append(base + R["entry:AI陆军:状态维护"] + 0x3D)
+                vals.append(base + R["entry:AI陆军:状态维护"] + R["derived_off:AIGATE"] + 5)
             elif k == "self":
                 vals.append(e)
             elif k == "agc_ret":
