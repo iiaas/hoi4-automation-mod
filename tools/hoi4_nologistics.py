@@ -87,6 +87,10 @@
      AI_WHITELIST，约 80 类)，其余(生产、贸易、外交、法律、科研、海军…)命令直接销毁，所以政治/外交/内政
      大臣虽然运行了，但不会真的替你做这些事。
    - 暂未限制在某个战区内：打开后作用于玩家全部陆军和空军。已设置的手动任务可能被 AI 改掉。
+   - 补丁一另外处理一处：CArmyGroupCommand(新建/调整集团军)执行时，集团军属于本机玩家且该国“不是 AI 国家”就让界面
+     选中这个集团军(会关掉生产等顶部面板、移动视角)。AI 控制军队打开时 AI 会替玩家建集团军，导致面板被反复关掉；
+     所以补丁一在这次调用(返回地址取自该命令执行函数里调用判断的那条 call，安装时自动找)也对玩家返回“是”，只在
+     AI 控制军队打开时生效。副作用：开着 AI 控制军队时，你自己新建集团军后不会自动选中它。
    - 补丁四(AI陆军:控制区变更同步给玩家)：引擎重建“控制区”(CControllerArea)时，会调 0x108EA90 把每个 AI 国家的
      AI 将军(CAIGeneral)里引用的旧控制区换成新的，但玩家的将军不在通知名单里，留着已释放的指针，运行一段时间后
      在 AI 将军代码 0x106AE90 处崩溃。补丁在该函数被调用(给任一 AI 将军)时，顺带用同样参数对玩家军事大臣
@@ -466,10 +470,11 @@ CAVES = {
         "512ceb20493949087512488b41204d8b41104c8900418b511889512c49c7410800000000415941585a58"
     ),
     "AIGATE": (
-        "000000000000000000000000000000000000000000000000000000000000000050524150488b05e5ffffff4839"
-        "4424187569488b05dfffffff833800745d488b05bbffffff488b004885c0744e488b15b4ffffff483990100100"
-        "00753e8b90800200003b9020050000753085d2742c3b901c03000073244c8b80100300004d85c074184d8b04d0"
-        "4d85c0740f4c39c1750a41585a58b801000000c341585a58"
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000005052415048"
+        "8b05ddffffff48394424187421488b05dfffffff4885c0747e48394424187577488b05c4ffffff803801756beb"
+        "0c488b05b6ffffff833800745d488b0592ffffff488b004885c0744e488b158bffffff48399010010000753e8b"
+        "90800200003b9020050000753085d2742c3b901c03000073244c8b80100300004d85c074184d8b04d04d85c074"
+        "0f4c39c1750a41585a58b801000000c341585a58"
     ),
     "AREASYNC": (
         "000000000000000000000000000000000000000000000000535657415441554156488b05d8ffffff4885c0747e"
@@ -573,7 +578,7 @@ HOOKS = (
     ("运输船:玩家船队不被击沉", "CONVOY", 5, "CONVOY", ("mgr", "hvt"), 0, None, "cave"),
     ("专项项目:完成不弹窗", "SPPOPUP", 1, None, (), 0, None, "direct"),
     ("AI陆军:状态维护", "AIUPD", 5, "AIUPD", ("mgr", "hvt", "bss"), 0, None, "cave"),
-    ("AI陆军:放行玩家", "AIGATE", 6, "AIGATE", ("mgr", "hvt", "aiupd_ret", "aibss"), 0, None, "cave"),
+    ("AI陆军:放行玩家", "AIGATE", 6, "AIGATE", ("mgr", "hvt", "aiupd_ret", "aibss", "agc_ret"), 0, None, "cave"),
     ("AI陆军:控制区变更同步给玩家", "AREASYNC", 5, "AREASYNC", ("aibss", "mmv", "self"), 0, None, "cave"),
     ("AI陆军:只放行军事/空军/国策/贸易/生产命令", "POSTB", 6, "POSTB", ("mgr", "hvt", "aibss", "f0", "f1", "f2", "t0", "p0", "p1", "hres", "mlv", "w00", "w01", "w02", "w03", "w04", "w05", "w06", "w07", "w08", "w09", "w10", "w11", "w12", "w13", "w14", "w15", "w16", "w17", "w18", "w19", "w20", "w21", "w22", "w23", "w24", "w25", "w26", "w27", "w28", "w29", "w30", "w31", "w32", "w33", "w34", "w35", "w36", "w37", "w38", "w39", "w40", "w41", "w42", "w43", "w44", "w45", "w46", "w47", "w48", "w49", "w50", "w51", "w52", "w53", "w54", "w55", "w56", "w57", "w58", "w59", "w60", "w61", "w62", "w63", "w64", "w65", "w66", "w67", "w68", "w69", "w70", "w71", "w72", "w73", "w74", "w75", "w76", "w77", "w78", "w79", "w80", "w81", "w82", "w83", "w84", "w85", "w86", "w87", "w88", "w89", "w90", "w91", "w92", "w93", "w94", "w95"), 0, None, "cave"),
     ("成就:mod 校验恒通过", "ACH", 2, None, (), 0, None, "direct"),
@@ -602,7 +607,7 @@ SIG_FUNCS = {"complete": "COMPLETE", "vecins": "VECINS", "setfocus": "SETFOCUS",
 OPT_KEYS = ("f0", "f1", "f2", "t0", "p0", "p1", "hres", "mlv", "setfocus", "validfocus", "tmv", "contains", "addsize", "unlock", "visible", "setfn", "spexec", "spiscomp", "spcanstart", "spfactory", "wupd")
 # 需要 vtable 的类
 AI_WHITELIST = ['CAiDiscardForceConcentrationTargetCommand', 'CAiStoreForceConcentrationTargetCommand', 'CAiStoreTotalWantedNrDivisionsCommand', 'CArmyGroupCommand', 'CAssignToArmyGroupCommand', 'CAssignToTheaterGroupCommand', 'CAttachAirWingToArmyCommand', 'CCancelMovementCommand', 'CCreateAreaDefenseCommand', 'CDeployAirWingCommand', 'CDetachAirWingFromArmyCommand', 'CDisbandTheaterGroupCommand', 'CMoveAirGroupAndAirTheatreToFreeCommand', 'CMoveAirWingAndAirGroupToAirTheatreCommand', 'CMoveAirWingToAirGroupCommand', 'CMoveArmiesInTheaterCommand', 'CMoveArmyGroupInTheaterCommand', 'COrderAddNewCompletePlanCommand', 'COrderAssignCommand', 'COrderBlockSectionsCommand', 'COrderChildFrontRatioCommand', 'COrderConnectCommand', 'COrderDeleteAllCommand', 'COrderDeleteCommand', 'COrderEditRootCommand', 'COrderExecuteCommand', 'COrderGroupCommand', 'COrderInsertFrontCommand', 'COrderMembersFairSplitCommand', 'COrderMergeRootsCommand', 'COrderNewFallbackCommand', 'COrderNewFrontCommand', 'COrderNewRootCommand', 'COrderReconnectCommand', 'COrderReorderChildFrontCommand', 'COrderReshapeCommand', 'COrderSetCollapseCommand', 'COrderSetInvasionSourceCommand', 'COrderSetParadropSourceCommand', 'COrderSetParadropTargetCommand', 'COrderSetPathCommand', 'COrderSetTrainingCommand', 'COrderUnassignCommand', 'CRemoveFromArmyGroupCommand', 'CReorderAirTheatersCommand', 'CReorderTheatersCommand', 'CSetArmyLeaderCommand', 'CSetOrderGroupExecutionTypeCommand', 'CSetTheaterGroupPriorityCommand', 'CSetTheatreCommand', 'CSetWingReinforcementPriorityCommand', 'CStratAirCancelTransferCommand', 'CStratAirChangeAggressivnessCommand', 'CStratAirConsolidateCommand', 'CStratAirDayNightCommand', 'CStratAirEnableMissionCommand', 'CStratAirMoveEquipmentCommand', 'CStratAirMoveEquipmentToReservesCommand', 'CStratAirSetMissionCommand', 'CStratAirSplitCommand', 'CStratAirTransferCommand', 'CStrategicRedeploymentCommand', 'COrderReplaceRootCommands', 'CMassMoveCommand', 'CSetOrderGroupCohesionTypeCommand', 'CEditAreaDefenseStateCommand', 'CSetAreaDefenseSettingCommand', 'CSetArmyLeaderPreferredTacticCommand', 'CSetCountryReinforcementPriorityCommand', 'CSetPreferredTacticCommand', 'CAddNavalInvasionTargetCommand', 'CRemoveNavalInvasionTargetCommand', 'CAiOnFailedInvasionCommand', 'COrderRemoveRootCommands', 'COrderReplaceFallbackCommands', 'CDeleteOrderGroupCommand', 'CAutoMergeOrdersCommand', 'CSetOrdersLinkCommand', 'CSetOrderGroupMotorizationCommand', 'CSetOrderGroupLeaderProximityCommand', 'CTransportUnitCommand']
-VTABLE_CLASSES = {"hvt": "CHuman", "f0": "CSetNationalFocusCommand", "f1": "CSetContinuousFocusCommand", "f2": "CBypassNationalFocusCommand", "t0": "CCreateTradeCommand", "p0": "CSetProductionLineCommand", "p1": "CAddMassFactoryAssignmentCommand", "mlv": "CMilitaryProductionLine", "mmv": "CAIMilitaryMinister", "cvt": "CCountry", "svt": "CShip", "tvt": "CTaskForce",
+VTABLE_CLASSES = {"hvt": "CHuman", "agcv": "CArmyGroupCommand", "f0": "CSetNationalFocusCommand", "f1": "CSetContinuousFocusCommand", "f2": "CBypassNationalFocusCommand", "t0": "CCreateTradeCommand", "p0": "CSetProductionLineCommand", "p1": "CAddMassFactoryAssignmentCommand", "mlv": "CMilitaryProductionLine", "mmv": "CAIMilitaryMinister", "cvt": "CCountry", "svt": "CShip", "tvt": "CTaskForce",
                   "wvt": "CAirWing", "xvt": "CStrategicNavy",
                   "tmv": "CTraitTemplate@NIndustrialOrganisation"}
 WL_KEYS = {f"w{i:02d}" for i in range(96)}
@@ -659,8 +664,19 @@ def resolve(img):
     return R, problems
 
 
+def agc_ret(img, R, gate):
+    """CArmyGroupCommand::Execute(vtable 第 10 项)里调用“是否 AI 国家”判断的那条 call 的返回地址(RVA)；找不到返回 0。"""
+    ib = img.image_base()
+    ex = struct.unpack("<Q", img.bytes_at(R["agcv"] + 8 * 10, 8))[0] - ib
+    code = img.bytes_at(ex, 0x900)
+    for i in range(len(code) - 5):
+        if code[i] == 0xE8 and ex + i + 5 + struct.unpack_from("<i", code, i + 1)[0] == gate:
+            return ex + i + 5
+    return 0
+
+
 def need_keys(keys, R):
-    return all(k in R or k in ("yes", "bss", "aiupd_ret", "aibss", "self") + OPT_KEYS or k in WL_KEYS for k in keys)
+    return all(k in R or k in ("yes", "bss", "aiupd_ret", "aibss", "self", "agc_ret") + OPT_KEYS or k in WL_KEYS for k in keys)
 
 
 shared = {}   # 装完后留给 --ai status 用的地址(AI 开关字节所在的数据区)
@@ -732,6 +748,8 @@ def install_all(h, base, img):
                 vals.append(base + R["entry:AI陆军:状态维护"] + 0x3D)
             elif k == "self":
                 vals.append(e)
+            elif k == "agc_ret":
+                vals.append(base + agc_ret(img, R, entry) if "agcv" in R else 0)
             elif k == "aibss":
                 vals.append(shared.get("aibss", 0))
             elif (k in OPT_KEYS or k in WL_KEYS) and k not in R:
