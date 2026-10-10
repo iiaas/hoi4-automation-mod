@@ -347,6 +347,7 @@ SIGS = {
     "CONVRAID": "48 89 5C 24 10 4C 89 44 24 18 55 56 57 41 54 41 55 41 56 41 57 48 83 EC 40 49 8B F1 4C 8B EA 48",
     "TRANSNAV": "48 89 5C 24 20 4C 89 44 24 18 48 89 54 24 10 55 56 57 41 54 41 55 41 56 41 57 48 81 EC 80 00 00 00 0F 29 74",
     "TRANSAIR": "48 89 5C 24 08 48 89 74 24 10 48 89 7C 24 18 55 41 56 41 57 48 8D AC 24 70 FF FF FF 48 81 EC 90",
+    "TECHARR": "48 83 EC 38 4C 63 42 38 41 8D 40 FF 3B 81 ?? ?? ?? ?? 7D ?? 85 C0 78 ?? 48 8B 81 ?? ?? ?? ??",
     "ARCHOFF": "48 8D 4B 40 E8 ?? ?? ?? ?? 48 8B 88 F0 03 00 00 49 3B CF 74 0D 4C 39 B9 ?? ?? ?? ??",
     "POSTB": "40 53 48 83 EC 40 80 3D ?? ?? ?? ?? 00 48 8B D9 0F 84 ?? ?? ?? ?? 80 3D ?? ?? ?? ?? 00 75 ?? 48 8B CA E8 ?? ?? ?? ??",
     "SPFACTORY": "40 53 48 83 EC 20 B9 E8 02 00 00",
@@ -570,7 +571,13 @@ DIRECT_PATCHES = {"SPPOPUP": bytes.fromhex("c3"), "ACH": bytes.fromhex("31c0"), 
 # 机器码需要额外的零初始化数据区(bss)，紧跟在补丁代码后面；大小(字节)
 CAVE_BSS = {"FOCUS": 4640, "AIUPD": 64}
 # 机器码里写死、但不同游戏版本可能不同的结构体偏移：(R 里的键, 机器码里的占位值)
-CAVE_FIELD_PATCH = {"POSTB": [("archoff", 0x4D8)]}
+CAVE_FIELD_PATCH = {
+    "POSTB": [("archoff", 0x4D8)],
+    # 每日钩子读科技数组的两条指令(movsxd rcx,[r15+数量]；mov r14,[r15+数组])，按实际偏移重写；
+    # 找不到偏移时安装会被拒绝(见 CAVE_FIELD_REQUIRED)，避免读错地址崩溃
+    "FOCUS": [("techcnt", bytes.fromhex("49638F"), 0x94), ("techarr", bytes.fromhex("4D8BB7"), 0x88)],
+}
+CAVE_FIELD_REQUIRED = {"FOCUS": ("techcnt", "techarr"), "POSTB": ("archoff",)}
 # 不能直接用特征码定位、而是从别的函数里的 call 目标推出来的入口：键 = (宿主特征码键, call 指令相对宿主入口的偏移)
 DERIVED = {"AIGATE": ("AIUPD", None)}   # None：在宿主开头找第一处 mov rcx,rax; call(不同版本位置不同)
 # 需要用特征码解析出入口地址、供机器码调用的引擎函数：键 -> 特征码键
@@ -622,6 +629,13 @@ def resolve(img):
         R["archoff"] = struct.unpack("<I", img.bytes_at(hits[0] + 24, 4))[0]
     else:
         problems.append("装备原型字段偏移: 特征码" + ("未命中" if not hits else "不唯一"))
+    # 科技管理器里科技数组的字段偏移(c01a: 数组 +0x88/数量 +0x94；3fba: +0x90/+0x9C)
+    hits = img.find_sig(SIGS["TECHARR"])
+    if len(hits) == 1:
+        R["techcnt"] = struct.unpack("<I", img.bytes_at(hits[0] + 14, 4))[0]
+        R["techarr"] = struct.unpack("<I", img.bytes_at(hits[0] + 27, 4))[0]
+    else:
+        problems.append("科技数组字段偏移: 特征码" + ("未命中" if not hits else "不唯一"))
     # 调用点的返回地址(特征码命中处 +16 是 call，返回地址 = +21)
     for key in ("RS_ADV", "RS_RAILAI", "RS_RAILA", "RS_RAILB", "RS_RAILC"):
         hits = img.find_sig(SIGS[key])
@@ -729,10 +743,16 @@ def install_all(h, base, img):
             out.append((name, "依赖的 AI陆军:状态维护 未安装，跳过"))
             continue
         code = bytearray(bytes.fromhex(CAVES[cavekey]))
-        if cavekey in CAVE_FIELD_PATCH:                # 机器码里随游戏版本变化的结构体偏移，安装时换成实际值
-            for rkey, placeholder in CAVE_FIELD_PATCH[cavekey]:
-                if rkey in R:
-                    code = bytearray(bytes(code).replace(struct.pack("<I", placeholder), struct.pack("<I", R[rkey])))
+        if any(k not in R for k in CAVE_FIELD_REQUIRED.get(cavekey, ())):
+            out.append((name, "找不到随版本变化的字段偏移，跳过"))
+            continue
+        for item in CAVE_FIELD_PATCH.get(cavekey, ()):  # 机器码里随游戏版本变化的结构体偏移，安装时换成实际值
+            if len(item) == 2:
+                rkey, placeholder = item
+                code = bytearray(bytes(code).replace(struct.pack("<I", placeholder), struct.pack("<I", R[rkey])))
+            else:
+                rkey, prefix, placeholder = item
+                code = bytearray(bytes(code).replace(prefix + struct.pack("<I", placeholder), prefix + struct.pack("<I", R[rkey])))
         cave = arena + cur_off
         vals = []
         for k in keys:
