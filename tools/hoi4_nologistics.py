@@ -348,6 +348,9 @@ SIGS = {
     "TRANSNAV": "48 89 5C 24 20 4C 89 44 24 18 48 89 54 24 10 55 56 57 41 54 41 55 41 56 41 57 48 81 EC 80 00 00 00 0F 29 74",
     "TRANSAIR": "48 89 5C 24 08 48 89 74 24 10 48 89 7C 24 18 55 41 56 41 57 48 8D AC 24 70 FF FF FF 48 81 EC 90",
     "TECHARR": "48 83 EC 38 4C 63 42 38 41 8D 40 FF 3B 81 ?? ?? ?? ?? 7D ?? 85 C0 78 ?? 48 8B 81 ?? ?? ?? ??",
+    # 运输船所属国字段：从类的构造函数里读(开头的 lea 必须指向该类 vtable，见 resolve)
+    "CTOR_TRANSFER": "48 8D 05 ?? ?? ?? ?? 48 89 01 48 83 C1 ?? E8 ?? ?? ?? ?? 90 48 8B 05 ?? ?? ?? ?? 49 89 46 ?? 49 8D 4E ?? E8 ?? ?? ?? ?? 90 33 ED 49 89 6E ?? 8B 03 41 89 46 ??",
+    "CTOR_CONVOY": "48 8D 05 ?? ?? ?? ?? 48 89 01 8B 02 89 41 ?? 48 8D 05 ?? ?? ?? ?? 48 89 41 ?? 45 33 FF 4C 89 79 ?? 44 89 79 ?? 4C 89 79 ??",
     "ARCHOFF": "48 8D 4B 40 E8 ?? ?? ?? ?? 48 8B 88 F0 03 00 00 49 3B CF 74 0D 4C 39 B9 ?? ?? ?? ??",
     "POSTB": "40 53 48 83 EC 40 80 3D ?? ?? ?? ?? 00 48 8B D9 0F 84 ?? ?? ?? ?? 80 3D ?? ?? ?? ?? 00 75 ?? 48 8B CA E8 ?? ?? ?? ??",
     "SPFACTORY": "40 53 48 83 EC 20 B9 E8 02 00 00",
@@ -576,8 +579,13 @@ CAVE_FIELD_PATCH = {
     # 每日钩子读科技数组的两条指令(movsxd rcx,[r15+数量]；mov r14,[r15+数组])，按实际偏移重写；
     # 找不到偏移时安装会被拒绝(见 CAVE_FIELD_REQUIRED)，避免读错地址崩溃
     "FOCUS": [("techcnt", bytes.fromhex("49638F"), 0x94), ("techarr", bytes.fromhex("4D8BB7"), 0x88)],
+    # 运输船补丁里比较所属国的指令(偏移是 1 字节)
+    "CONVRAID": [("convoy_owner", bytes.fromhex("4C3942"), 0x38, 1)],
+    "TRANSNAV": [("transfer_owner", bytes.fromhex("453B41"), 0x58, 1)],
+    "TRANSAIR": [("transfer_owner", bytes.fromhex("453B41"), 0x58, 1)],
 }
-CAVE_FIELD_REQUIRED = {"FOCUS": ("techcnt", "techarr"), "POSTB": ("archoff",)}
+CAVE_FIELD_REQUIRED = {"FOCUS": ("techcnt", "techarr"), "POSTB": ("archoff",), "CONVRAID": ("convoy_owner",),
+                       "TRANSNAV": ("transfer_owner",), "TRANSAIR": ("transfer_owner",)}
 # 不能直接用特征码定位、而是从别的函数里的 call 目标推出来的入口：键 = (宿主特征码键, call 指令相对宿主入口的偏移)
 DERIVED = {"AIGATE": ("AIUPD", None)}   # None：在宿主开头找第一处 mov rcx,rax; call(不同版本位置不同)
 # 需要用特征码解析出入口地址、供机器码调用的引擎函数：键 -> 特征码键
@@ -636,6 +644,17 @@ def resolve(img):
         R["techarr"] = struct.unpack("<I", img.bytes_at(hits[0] + 27, 4))[0]
     else:
         problems.append("科技数组字段偏移: 特征码" + ("未命中" if not hits else "不唯一"))
+    # 运输船所属国字段偏移：构造函数里写入的位置(海上运输部队 CNavalUnitTransfer 写所属国编号；
+    # 补给/贸易运输船 CConvoyClient 依次初始化的第 3 个字段是所属国家指针)
+    for key, sk, cls in (("transfer_owner", "CTOR_TRANSFER", "CNavalUnitTransfer"),
+                         ("convoy_owner", "CTOR_CONVOY", "CConvoyClient")):
+        vt = img.vtable_of(cls)
+        found = [hit for hit in img.find_sig(SIGS[sk])
+                 if vt and hit + 7 + struct.unpack("<i", img.bytes_at(hit + 3, 4))[0] == vt]
+        if len(found) == 1:
+            R[key] = img.bytes_at(found[0] + len(SIGS[sk].split()) - 1, 1)[0]
+        else:
+            problems.append(f"{cls} 所属国字段偏移: 构造函数特征码" + ("未命中" if not found else "不唯一"))
     # 调用点的返回地址(特征码命中处 +16 是 call，返回地址 = +21)
     for key in ("RS_ADV", "RS_RAILAI", "RS_RAILA", "RS_RAILB", "RS_RAILC"):
         hits = img.find_sig(SIGS[key])
@@ -751,8 +770,17 @@ def install_all(h, base, img):
                 rkey, placeholder = item
                 code = bytearray(bytes(code).replace(struct.pack("<I", placeholder), struct.pack("<I", R[rkey])))
             else:
-                rkey, prefix, placeholder = item
-                code = bytearray(bytes(code).replace(prefix + struct.pack("<I", placeholder), prefix + struct.pack("<I", R[rkey])))
+                rkey, prefix, placeholder, *size = item
+                if size and size[0] == 1:
+                    if not 0 <= R[rkey] < 0x80:
+                        out.append((name, "字段偏移超出 1 字节，跳过"))
+                        code = None
+                        break
+                    code = bytearray(bytes(code).replace(prefix + bytes([placeholder]), prefix + bytes([R[rkey]])))
+                else:
+                    code = bytearray(bytes(code).replace(prefix + struct.pack("<I", placeholder), prefix + struct.pack("<I", R[rkey])))
+        if code is None:
+            continue
         cave = arena + cur_off
         vals = []
         for k in keys:
